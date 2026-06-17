@@ -14,7 +14,10 @@ const LearnScreen = ({ navigation, route }) => {
 
   // Defensive: should never happen because Home passes a valid key.
   const tabs = data?.tabs || [];
-  const [activeTab, setActiveTab] = useState(tabs[0]?.key);
+  // A Home card may request a specific category to open first.
+  const initialTab = route?.params?.initialTab;
+  const defaultTab = tabs.some((t) => t.key === initialTab) ? initialTab : tabs[0]?.key;
+  const [activeTab, setActiveTab] = useState(defaultTab);
 
   if (!data) {
     return (

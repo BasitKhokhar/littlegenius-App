@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../Context';
 
@@ -10,6 +10,7 @@ const Header = ({
   avatar = '🦁',
   stars = null,
   rightAction = null,
+  useLogo = false,
 }) => {
   const insets = useSafeAreaInsets();
   const auth = useAuth();
@@ -30,6 +31,14 @@ const Header = ({
             >
               <Text style={styles.backIcon}>←</Text>
             </TouchableOpacity>
+          ) : useLogo ? (
+            <View style={styles.logoBadge}>
+              <Image
+                source={require('../../../assets/logo.png')}
+                style={styles.logoImage}
+                resizeMode="cover"
+              />
+            </View>
           ) : (
             <View style={styles.logoCircle}>
               <Text style={styles.logoEmoji}>{displayAvatar}</Text>
@@ -109,6 +118,27 @@ const styles = StyleSheet.create({
   },
   logoEmoji: {
     fontSize: 22,
+  },
+  logoBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: '#312E81',
+    borderWidth: 2,
+    borderColor: '#818CF8',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  logoImage: {
+    width: '100%',
+    height: '100%',
   },
   titleBlock: {
     flex: 1,

@@ -5,13 +5,13 @@ export default () => ({
     slug: 'little-genius',
     version: '1.0.0',
     orientation: 'portrait',
-    icon: './assets/icon.png',
+    icon: './assets/logo.png',
     owner: 'talhabasit7016',
     userInterfaceStyle: 'light',
     splash: {
-      image: './assets/splash-icon.png',
+      image: './assets/logo.png',
       resizeMode: 'contain',
-      backgroundColor: '#FDFBF7'
+      backgroundColor: '#1E1B4B'
     },
     ios: {
       supportsTablet: true,
@@ -19,8 +19,8 @@ export default () => ({
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: './assets/adaptive-icon.png',
-        backgroundColor: '#FDFBF7'
+        foregroundImage: './assets/logo.png',
+        backgroundColor: '#1E1B4B'
       },
       package: 'com.littlegenius.app'
     },

@@ -89,6 +89,18 @@ const MODULES = [
   },
 ];
 
+// Direct shortcuts into the "My World" categories so kids can jump
+// straight to a topic from Home. Each opens LearnScreen on that tab.
+const WORLD_CATEGORIES = [
+  { key: 'animals', name: 'Animals', icon: '🦁', count: 26, color: '#F59E0B' },
+  { key: 'birds', name: 'Birds', icon: '🦜', count: 20, color: '#16A34A' },
+  { key: 'fruits', name: 'Fruits', icon: '🍎', count: 20, color: '#EF4444' },
+  { key: 'veggies', name: 'Vegetables', icon: '🥕', count: 20, color: '#F97316' },
+  { key: 'vehicles', name: 'Vehicles', icon: '🚗', count: 21, color: '#3B82F6' },
+  { key: 'body', name: 'My Body', icon: '🧠', count: 20, color: '#EC4899' },
+  { key: 'colors', name: 'Colors', icon: '🎨', count: 20, color: '#8B5CF6' },
+];
+
 const QUICK_ACTIONS = [
   {
     name: 'Stories',
@@ -169,6 +181,7 @@ const HomeScreen = ({ navigation }) => {
         title="Little Genius"
         avatar={userProfile.avatar}
         stars={stars}
+        useLogo
       />
 
       <ScrollView
@@ -206,6 +219,29 @@ const HomeScreen = ({ navigation }) => {
               delay={index * 80}
               onPress={() => navigation.navigate(module.screen, module.params)}
             />
+          ))}
+        </View>
+
+        {/* Explore My World — quick category shortcuts */}
+        <Text style={styles.sectionTitle}>🌍 Explore My World</Text>
+        <View style={styles.catGrid}>
+          {WORLD_CATEGORIES.map((cat) => (
+            <TouchableOpacity
+              key={cat.key}
+              style={styles.catCard}
+              onPress={() =>
+                navigation.navigate('Learn', { moduleKey: 'world', initialTab: cat.key })
+              }
+              activeOpacity={0.85}
+            >
+              <View style={[styles.catIconCircle, { backgroundColor: cat.color + '22' }]}>
+                <Text style={styles.catIcon}>{cat.icon}</Text>
+              </View>
+              <Text style={styles.catName} numberOfLines={1}>{cat.name}</Text>
+              <View style={[styles.catCountPill, { backgroundColor: cat.color }]}>
+                <Text style={styles.catCountText}>{cat.count}</Text>
+              </View>
+            </TouchableOpacity>
           ))}
         </View>
 
@@ -420,6 +456,58 @@ const styles = StyleSheet.create({
   },
   moduleArrowText: {
     fontSize: 14,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+
+  // Explore My World category cards (3-column grid)
+  catGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 24,
+  },
+  catCard: {
+    width: (width - 52) / 3,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#1E1B4B',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    borderBottomWidth: 3,
+    borderBottomColor: 'rgba(30,27,75,0.08)',
+  },
+  catIconCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  catIcon: {
+    fontSize: 28,
+  },
+  catName: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#1E1B4B',
+    letterSpacing: -0.2,
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  catCountPill: {
+    borderRadius: 10,
+    paddingVertical: 2,
+    paddingHorizontal: 10,
+  },
+  catCountText: {
+    fontSize: 11,
     fontWeight: '900',
     color: '#FFFFFF',
   },

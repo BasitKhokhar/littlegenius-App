@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, Image, StyleSheet, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Typography, Spacing } from '../../Theme';
-import { Colors } from '../../Data/colorsTheme';
 import { ROUTES } from '../../Constants';
 
 const LogoSplash = ({ navigation }) => {
@@ -37,9 +36,13 @@ const LogoSplash = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.bgMain} />
+      <StatusBar barStyle="light-content" backgroundColor="#1E1B4B" />
       <View style={styles.logoWrapper}>
-        <Text style={styles.logo}>🎓</Text>
+        <Image
+          source={require('../../../assets/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
         <Text style={styles.appName}>Little Genius</Text>
         <Text style={styles.tagline}>Premium Offline Education Edition</Text>
       </View>
@@ -50,7 +53,7 @@ const LogoSplash = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.bgMain,
+    backgroundColor: '#1E1B4B',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -59,19 +62,26 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   logo: {
-    fontSize: 80,
+    width: 160,
+    height: 160,
+    borderRadius: 36,
     marginBottom: Spacing.md,
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
   },
   appName: {
     fontSize: 32,
     fontWeight: '900',
-    color: Colors.primary,
+    color: '#FFFFFF',
     letterSpacing: -0.5,
   },
   tagline: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.textLight,
+    color: '#A5B4FC',
     marginTop: Spacing.xs,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
