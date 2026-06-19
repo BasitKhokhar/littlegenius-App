@@ -67,7 +67,7 @@ const GamesScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F4F0FF' },
+  container: { flex: 1, backgroundColor: '#F6F5FC' },
   content: {
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -81,18 +81,16 @@ const styles = StyleSheet.create({
   },
   gameCard: {
     flexDirection: 'row',
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 18,
     marginBottom: 14,
     alignItems: 'center',
     overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.18)',
+    elevation: 6,
+    shadowColor: '#1E1B4B',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.16,
+    shadowRadius: 16,
   },
   gameDecor: {
     position: 'absolute',

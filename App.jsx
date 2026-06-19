@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -20,23 +19,18 @@ import {
 } from '@expo-google-fonts/noto-naskh-arabic';
 
 // Context Providers
-import { AuthProvider } from './src/Context';
+import { AuthProvider, DialogProvider, ThemeProvider } from './src/Context';
 import { RootNavigator } from './src/Navigation';
 
 // Global App Container (StatusBar + SafeArea + background)
 import AppContainer from './src/AppContainer';
 
-// Theme — colors for the loading splash + global font installer
-import { colors } from './src/Theme/colors';
-import { applyGlobalFont } from './src/Theme/applyGlobalFont';
+// Branded splash — shown while the font assets load so the first frame
+// already matches the boot splash (no jarring two-screen feel).
+import { BrandSplash } from './src/Components/Common';
 
-// Minimal splash shown only while the font assets load (no navigation).
-const LoadingSplash = () => (
-  <View style={styles.splash}>
-    <Text style={styles.splashLogo}>🎓</Text>
-    <Text style={styles.splashName}>Little Genius</Text>
-  </View>
-);
+// Global font installer
+import { applyGlobalFont } from './src/Theme/applyGlobalFont';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -59,39 +53,24 @@ export default function App() {
   if (!fontsLoaded) {
     return (
       <SafeAreaProvider>
-        <LoadingSplash />
+        <BrandSplash />
       </SafeAreaProvider>
     );
   }
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <AppContainer>
-          <NavigationContainer>
-            <RootNavigator />
-          </NavigationContainer>
-        </AppContainer>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <DialogProvider>
+            <AppContainer>
+              <NavigationContainer>
+                <RootNavigator />
+              </NavigationContainer>
+            </AppContainer>
+          </DialogProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  splash: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.bodyBackground,
-  },
-  splashLogo: {
-    fontSize: 80,
-    marginBottom: 16,
-  },
-  splashName: {
-    fontSize: 30,
-    fontWeight: '900',
-    color: colors.primary,
-    letterSpacing: -0.5,
-  },
-});

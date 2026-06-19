@@ -83,7 +83,7 @@ const AlphabetScreen = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
           <QuizEntryBar
-            color="#F85A9B"
+            color="#F43F5E"
             onPress={() => navigation.navigate('QuizList', { module: 'alphabet' })}
           />
         }
@@ -104,7 +104,7 @@ const AlphabetScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F0FF',
+    backgroundColor: '#F6F5FC',
   },
 
   // Grid view
@@ -132,13 +132,11 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     alignItems: 'center',
     overflow: 'hidden',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    borderBottomWidth: 5,
-    borderBottomColor: 'rgba(0,0,0,0.2)',
+    elevation: 8,
+    shadowColor: '#1E1B4B',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
   },
   letterHeroDecor: {
     position: 'absolute',

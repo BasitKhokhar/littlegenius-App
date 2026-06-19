@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
-import * as Speech from 'expo-speech';
+import SpeechEngine from '../../Utils/speechEngine';
 import { Colors } from '../../Data/colorsTheme';
+import { Radius, coloredShadow } from '../../Theme';
 
 const SpeakButton = ({ 
   text, 
@@ -17,34 +18,25 @@ const SpeakButton = ({
   useEffect(() => {
     return () => {
       // Stop speech on unmount
-      Speech.stop();
+      SpeechEngine.stop();
     };
   }, []);
 
   const handleSpeak = async () => {
-    try {
-      await Speech.stop();
-      setIsSpeaking(true);
-      
-      if (onSpeakStart) onSpeakStart();
+    setIsSpeaking(true);
+    if (onSpeakStart) onSpeakStart();
 
-      await Speech.speak(text, {
-        language,
-        pitch: 1.35,  // Kid-friendly pitch
-        rate: 0.85,   // Clear, slow rate
-        onDone: () => {
-          setIsSpeaking(false);
-          if (onSpeakEnd) onSpeakEnd();
-        },
-        onError: (error) => {
-          setIsSpeaking(false);
-          console.warn('Speech error:', error);
-        },
-      });
-    } catch (error) {
-      setIsSpeaking(false);
-      console.warn('Failed to speak:', error);
-    }
+    // Clear, professional MALE voice handled centrally by SpeechEngine
+    // (male voice selection + adult pitch + slow rate).
+    await SpeechEngine.speak(text, language, {
+      onDone: () => {
+        setIsSpeaking(false);
+        if (onSpeakEnd) onSpeakEnd();
+      },
+      onError: () => {
+        setIsSpeaking(false);
+      },
+    });
   };
 
   const sizeConfig = {
@@ -61,13 +53,12 @@ const SpeakButton = ({
       disabled={isSpeaking}
       style={[
         styles.button,
+        coloredShadow(color, 'sm'),
         {
-          backgroundColor: isSpeaking ? color : color,
+          backgroundColor: color,
           paddingVertical: config.padding,
           paddingHorizontal: config.padding * 1.5,
-          opacity: isSpeaking ? 0.8 : 1,
-          borderBottomWidth: isSpeaking ? 2 : 4,
-          borderBottomColor: 'rgba(0,0,0,0.1)',
+          opacity: isSpeaking ? 0.85 : 1,
         },
       ]}
       activeOpacity={0.8}
@@ -93,15 +84,10 @@ const SpeakButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 16,
+    borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.primary,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
   },
   buttonText: {
     color: '#FFF',

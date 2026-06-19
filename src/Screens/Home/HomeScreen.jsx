@@ -8,89 +8,34 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Header } from '../../Components/UI';
+import { SectionHeader, Badge } from '../../Components/Common';
 import { useAuth } from '../../Context';
+import { useThemeColors } from '../../Context/ThemeContext';
+import {
+  Spacing,
+  Radius,
+  textStyles,
+  Typography,
+  Elevation,
+  coloredShadow,
+  Motion,
+  moduleColors,
+} from '../../Theme';
 
 const { width } = Dimensions.get('window');
 
 const MODULES = [
-  {
-    id: 1,
-    name: 'English ABC',
-    icon: '🔤',
-    description: '26 Letters • 130 Words',
-    gradStart: '#FF6B9D',
-    gradEnd: '#FF8A65',
-    screen: 'Alphabet',
-    badge: 'LEARN',
-  },
-  {
-    id: 2,
-    name: 'Urdu Haroof',
-    icon: 'اب',
-    description: '34 Sound Cards',
-    gradStart: '#7C3AED',
-    gradEnd: '#A855F7',
-    screen: 'Urdu',
-    badge: 'اردو',
-  },
-  {
-    id: 3,
-    name: 'Numbers 1–100',
-    icon: '🔢',
-    description: 'Count & Shapes',
-    gradStart: '#059669',
-    gradEnd: '#34D399',
-    screen: 'Numbers',
-    badge: '123',
-  },
-  {
-    id: 4,
-    name: 'Islamic Studies',
-    icon: '🕌',
-    description: 'Duas • 99 Names • Salah',
-    gradStart: '#0EA5E9',
-    gradEnd: '#6366F1',
-    screen: 'Islamic',
-    badge: 'DEEN',
-  },
-  {
-    id: 5,
-    name: 'My Pakistan',
-    icon: '🇵🇰',
-    description: 'Symbols • Provinces • Heroes',
-    gradStart: '#059669',
-    gradEnd: '#10B981',
-    screen: 'Pakistan',
-    badge: 'GK',
-  },
-  {
-    id: 6,
-    name: 'My World',
-    icon: '🌍',
-    description: 'Animals • Birds • Fruits • Veggies',
-    gradStart: '#0EA5E9',
-    gradEnd: '#38BDF8',
-    screen: 'Learn',
-    params: { moduleKey: 'world' },
-    badge: 'GK',
-  },
-  {
-    id: 7,
-    name: 'Good Habits',
-    icon: '🌟',
-    description: 'Manners • Cleanliness • Safety',
-    gradStart: '#F59E0B',
-    gradEnd: '#FBBF24',
-    screen: 'Learn',
-    params: { moduleKey: 'habits' },
-    badge: 'LIFE',
-  },
+  { id: 1, name: 'English ABC', icon: '🔤', description: '26 Letters • 130 Words', mod: 'alphabet', screen: 'Alphabet', badge: 'LEARN' },
+  { id: 2, name: 'Urdu Haroof', icon: 'اب', description: '34 Sound Cards', mod: 'urdu', screen: 'Urdu', badge: 'اردو' },
+  { id: 3, name: 'Numbers 1–100', icon: '🔢', description: 'Count & Shapes', mod: 'numbers', screen: 'Numbers', badge: '123' },
+  { id: 4, name: 'Islamic Studies', icon: '🕌', description: 'Duas • 99 Names • Salah', mod: 'islamic', screen: 'Islamic', badge: 'DEEN' },
+  { id: 5, name: 'My Pakistan', icon: '🇵🇰', description: 'Symbols • Provinces • Heroes', mod: 'pakistan', screen: 'Pakistan', badge: 'GK' },
+  { id: 6, name: 'My World', icon: '🌍', description: 'Animals • Birds • Fruits', mod: 'world', screen: 'Learn', params: { moduleKey: 'world' }, badge: 'GK' },
+  { id: 7, name: 'Good Habits', icon: '🌟', description: 'Manners • Cleanliness • Safety', mod: 'habits', screen: 'Learn', params: { moduleKey: 'habits' }, badge: 'LIFE' },
 ];
 
-// Direct shortcuts into the "My World" categories so kids can jump
-// straight to a topic from Home. Each opens LearnScreen on that tab.
 const WORLD_CATEGORIES = [
   { key: 'animals', name: 'Animals', icon: '🦁', count: 26, color: '#F59E0B' },
   { key: 'birds', name: 'Birds', icon: '🦜', count: 20, color: '#16A34A' },
@@ -102,65 +47,48 @@ const WORLD_CATEGORIES = [
 ];
 
 const QUICK_ACTIONS = [
-  {
-    name: 'Stories',
-    icon: '📚',
-    gradStart: '#F59E0B',
-    gradEnd: '#EF4444',
-    screen: 'Stories',
-  },
-  {
-    name: 'IQ Games',
-    icon: '🧠',
-    gradStart: '#3B82F6',
-    gradEnd: '#8B5CF6',
-    screen: 'Games',
-  },
+  { name: 'Stories', icon: '📚', mod: 'stories', screen: 'Stories' },
+  { name: 'IQ Games', icon: '🧠', mod: 'games', screen: 'Games' },
 ];
 
 const ModuleCard = ({ module, onPress, delay }) => {
   const scale = useRef(new Animated.Value(0.92)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const press = useRef(new Animated.Value(1)).current;
+  const m = moduleColors[module.mod];
 
   useEffect(() => {
     Animated.sequence([
       Animated.delay(delay),
       Animated.parallel([
-        Animated.spring(scale, { toValue: 1, useNativeDriver: true, tension: 100, friction: 8 }),
-        Animated.timing(opacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.spring(scale, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }),
+        Animated.timing(opacity, { toValue: 1, ...Motion.timing.base, useNativeDriver: true }),
       ]),
     ]).start();
   }, []);
 
-  const handlePressIn = () => Animated.spring(scale, { toValue: 0.96, useNativeDriver: true }).start();
-  const handlePressOut = () => Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start();
-
   return (
-    <Animated.View style={[styles.moduleCardWrapper, { opacity, transform: [{ scale }] }]}>
+    <Animated.View style={[styles.moduleCardWrapper, { opacity, transform: [{ scale }, { scale: press }] }]}>
       <TouchableOpacity
-        style={[styles.moduleCard, { backgroundColor: module.gradStart }]}
+        activeOpacity={0.92}
         onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        activeOpacity={1}
+        onPressIn={() => Animated.spring(press, { toValue: Motion.pressScale, useNativeDriver: true, ...Motion.spring.soft }).start()}
+        onPressOut={() => Animated.spring(press, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }).start()}
+        style={coloredShadow(m.solid, 'md')}
       >
-        {/* Gradient layer effect */}
-        <View style={[styles.gradientOverlay, { backgroundColor: module.gradEnd + '60' }]} />
-        
-        <View style={styles.moduleBadge}>
-          <Text style={styles.moduleBadgeText}>{module.badge}</Text>
-        </View>
-        
-        <Text style={styles.moduleIcon}>{module.icon}</Text>
-        
-        <View style={styles.moduleInfo}>
-          <Text style={styles.moduleName}>{module.name}</Text>
-          <Text style={styles.moduleDescription}>{module.description}</Text>
-        </View>
-        
-        <View style={styles.moduleArrow}>
-          <Text style={styles.moduleArrowText}>→</Text>
-        </View>
+        <LinearGradient colors={[m.from, m.to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.moduleCard}>
+          <View style={styles.moduleTopRow}>
+            <Badge label={module.badge} tone="glass" />
+          </View>
+          <Text style={styles.moduleIcon}>{module.icon}</Text>
+          <View style={styles.moduleInfo}>
+            <Text style={styles.moduleName}>{module.name}</Text>
+            <Text style={styles.moduleDescription}>{module.description}</Text>
+          </View>
+          <View style={styles.moduleArrow}>
+            <Text style={styles.moduleArrowText}>→</Text>
+          </View>
+        </LinearGradient>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -168,76 +96,70 @@ const ModuleCard = ({ module, onPress, delay }) => {
 
 const HomeScreen = ({ navigation }) => {
   const { user, stars } = useAuth();
+  const colors = useThemeColors();
   const userProfile = user || { name: 'Superstar', avatar: '🦁' };
 
-  const heroScale = useRef(new Animated.Value(0.95)).current;
+  const heroScale = useRef(new Animated.Value(0.96)).current;
   useEffect(() => {
-    Animated.spring(heroScale, { toValue: 1, useNativeDriver: true, tension: 80 }).start();
+    Animated.spring(heroScale, { toValue: 1, useNativeDriver: true, ...Motion.spring.gentle }).start();
   }, []);
 
-  return (
-    <View style={styles.container}>
-      <Header
-        title="Little Genius"
-        avatar={userProfile.avatar}
-        stars={stars}
-        useLogo
-      />
+  const s = makeStyles(colors);
 
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+  return (
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      <Header title="Little Genius" avatar={userProfile.avatar} stars={stars} useLogo />
+
+      <ScrollView style={styles.flex} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Hero Welcome Card */}
-        <Animated.View style={[styles.heroCard, { transform: [{ scale: heroScale }] }]}>
-          <View style={styles.heroLeft}>
-            <Text style={styles.heroGreeting}>Assalam-o-Alaikum!</Text>
-            <Text style={styles.heroName}>{userProfile.name} 🎓</Text>
-            <View style={styles.heroBadge}>
-              <Text style={styles.heroBadgeText}>PG • Nursery • Class 1</Text>
+        <Animated.View style={{ transform: [{ scale: heroScale }] }}>
+          <LinearGradient
+            colors={colors.gradients.hero}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.heroCard, coloredShadow(colors.brandSurface, 'lg')]}
+          >
+            <View style={styles.heroLeft}>
+              <Text style={s.heroGreeting}>ASSALAM-O-ALAIKUM!</Text>
+              <Text style={styles.heroName}>{userProfile.name} 🎓</Text>
+              <Badge label="PG • Nursery • Class 1" tone="glass" style={styles.heroBadge} />
             </View>
-          </View>
-          <View style={styles.heroRight}>
-            <View style={styles.heroAvatarCircle}>
-              <Text style={styles.heroAvatar}>{userProfile.avatar}</Text>
+            <View style={styles.heroRight}>
+              <View style={styles.heroAvatarCircle}>
+                <Text style={styles.heroAvatar}>{userProfile.avatar}</Text>
+              </View>
+              <Badge label={String(stars || 0)} icon="⭐" tone="glass" />
             </View>
-            <View style={styles.starsRow}>
-              <Text style={styles.starEmoji}>⭐</Text>
-              <Text style={styles.starsText}>{stars || 0}</Text>
-            </View>
-          </View>
+          </LinearGradient>
         </Animated.View>
 
-        {/* Learning Modules Section */}
-        <Text style={styles.sectionTitle}>📖 Learning Modules</Text>
+        {/* Learning Modules */}
+        <SectionHeader emoji="📖" title="Learning Modules" />
         <View style={styles.modulesGrid}>
           {MODULES.map((module, index) => (
             <ModuleCard
               key={module.id}
               module={module}
-              delay={index * 80}
+              delay={index * Motion.stagger}
               onPress={() => navigation.navigate(module.screen, module.params)}
             />
           ))}
         </View>
 
-        {/* Explore My World — quick category shortcuts */}
-        <Text style={styles.sectionTitle}>🌍 Explore My World</Text>
+        {/* Explore My World */}
+        <SectionHeader emoji="🌍" title="Explore My World" />
         <View style={styles.catGrid}>
           {WORLD_CATEGORIES.map((cat) => (
             <TouchableOpacity
               key={cat.key}
-              style={styles.catCard}
-              onPress={() =>
-                navigation.navigate('Learn', { moduleKey: 'world', initialTab: cat.key })
-              }
+              style={[s.catCard, Elevation.sm]}
+              onPress={() => navigation.navigate('Learn', { moduleKey: 'world', initialTab: cat.key })}
               activeOpacity={0.85}
             >
               <View style={[styles.catIconCircle, { backgroundColor: cat.color + '22' }]}>
                 <Text style={styles.catIcon}>{cat.icon}</Text>
               </View>
-              <Text style={styles.catName} numberOfLines={1}>{cat.name}</Text>
+              <Text style={s.catName} numberOfLines={1}>{cat.name}</Text>
               <View style={[styles.catCountPill, { backgroundColor: cat.color }]}>
                 <Text style={styles.catCountText}>{cat.count}</Text>
               </View>
@@ -245,312 +167,121 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </View>
 
-        {/* Quick Actions */}
-        <Text style={styles.sectionTitle}>⚡ Quick Play</Text>
+        {/* Quick Play */}
+        <SectionHeader emoji="⚡" title="Quick Play" />
         <View style={styles.quickActions}>
-          {QUICK_ACTIONS.map((action) => (
-            <TouchableOpacity
-              key={action.name}
-              style={[styles.quickCard, { backgroundColor: action.gradStart }]}
-              onPress={() => navigation.navigate(action.screen)}
-              activeOpacity={0.88}
-            >
-              <View style={[styles.quickOverlay, { backgroundColor: action.gradEnd + '55' }]} />
-              <Text style={styles.quickIcon}>{action.icon}</Text>
-              <Text style={styles.quickLabel}>{action.name}</Text>
-            </TouchableOpacity>
-          ))}
+          {QUICK_ACTIONS.map((action) => {
+            const m = moduleColors[action.mod];
+            return (
+              <TouchableOpacity
+                key={action.name}
+                style={[styles.quickWrap, coloredShadow(m.solid, 'md')]}
+                onPress={() => navigation.navigate(action.screen)}
+                activeOpacity={0.9}
+              >
+                <LinearGradient colors={[m.from, m.to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.quickCard}>
+                  <Text style={styles.quickIcon}>{action.icon}</Text>
+                  <Text style={styles.quickLabel}>{action.name}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F4F0FF',
-  },
-  content: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 100,
-  },
+// Theme-dependent styles
+const makeStyles = (colors) =>
+  StyleSheet.create({
+    heroGreeting: { ...textStyles.overline, color: colors.onBrandMuted, marginBottom: Spacing.xs },
+    catCard: {
+      width: (width - 32 - Spacing.sm * 2) / 3,
+      backgroundColor: colors.surface,
+      borderRadius: Radius.lg,
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.sm,
+      alignItems: 'center',
+    },
+    catName: { ...textStyles.caption, fontFamily: Typography.font.bold, color: colors.textPrimary, marginBottom: Spacing.sm, textAlign: 'center' },
+  });
 
-  // Hero card
+// Static styles
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  flex: { flex: 1 },
+  scrollContent: { paddingHorizontal: 16, paddingTop: Spacing.md, paddingBottom: 100 },
+
+  // Hero
   heroCard: {
-    backgroundColor: '#1E1B4B',
-    borderRadius: 28,
-    paddingVertical: 22,
-    paddingHorizontal: 20,
-    marginBottom: 24,
+    borderRadius: Radius.xl,
+    paddingVertical: Spacing.xxl,
+    paddingHorizontal: Spacing.xl,
+    marginBottom: Spacing.xxl,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    elevation: 6,
-    shadowColor: '#1E1B4B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
     overflow: 'hidden',
   },
-  heroLeft: {
-    flex: 1,
-  },
-  heroGreeting: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#A5B4FC',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
-  heroName: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    marginBottom: 10,
-    letterSpacing: -0.5,
-  },
-  heroBadge: {
-    backgroundColor: '#4338CA',
-    borderRadius: 10,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    alignSelf: 'flex-start',
-  },
-  heroBadgeText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#C7D2FE',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  heroRight: {
-    alignItems: 'center',
-    marginLeft: 16,
-  },
+  heroLeft: { flex: 1 },
+  heroName: { ...textStyles.h1, color: '#FFFFFF', marginBottom: Spacing.md },
+  heroBadge: { alignSelf: 'flex-start' },
+  heroRight: { alignItems: 'center', marginLeft: Spacing.lg, gap: Spacing.sm },
   heroAvatarCircle: {
     width: 72,
     height: 72,
-    borderRadius: 36,
-    backgroundColor: '#4338CA',
-    borderWidth: 3,
-    borderColor: '#818CF8',
+    borderRadius: Radius.full,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.4)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
   },
-  heroAvatar: {
-    fontSize: 36,
-  },
-  starsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#312E81',
-    borderRadius: 12,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-  },
-  starEmoji: {
-    fontSize: 12,
-    marginRight: 4,
-  },
-  starsText: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: '#FCD34D',
-  },
+  heroAvatar: { fontSize: 36 },
 
-  // Section titles
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: '900',
-    color: '#1E1B4B',
-    marginBottom: 12,
-    letterSpacing: -0.3,
-  },
-
-  // Module cards grid
-  modulesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
-  },
-  moduleCardWrapper: {
-    width: (width - 44) / 2,
-  },
+  // Module grid
+  modulesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: Spacing.xxl },
+  moduleCardWrapper: { width: (width - 32 - 12) / 2 },
   moduleCard: {
-    borderRadius: 24,
-    paddingVertical: 18,
-    paddingHorizontal: 14,
-    minHeight: 170,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    minHeight: 168,
     justifyContent: 'space-between',
     overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.2)',
   },
-  gradientOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    transform: [{ translateX: 30 }, { translateY: 30 }],
-  },
-  moduleBadge: {
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    borderRadius: 8,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    alignSelf: 'flex-start',
-    marginBottom: 8,
-  },
-  moduleBadgeText: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-  },
-  moduleIcon: {
-    fontSize: 36,
-    marginBottom: 8,
-  },
-  moduleInfo: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  moduleName: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    marginBottom: 3,
-    letterSpacing: -0.3,
-  },
-  moduleDescription: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.8)',
-  },
+  moduleTopRow: { flexDirection: 'row' },
+  moduleIcon: { fontSize: 38, marginTop: Spacing.sm },
+  moduleInfo: { marginTop: Spacing.sm },
+  moduleName: { ...textStyles.title, color: '#FFFFFF', marginBottom: 2 },
+  moduleDescription: { ...textStyles.caption, color: 'rgba(255,255,255,0.85)' },
   moduleArrow: {
     position: 'absolute',
-    bottom: 16,
-    right: 14,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    bottom: Spacing.lg,
+    right: Spacing.lg,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  moduleArrowText: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: '#FFFFFF',
-  },
+  moduleArrowText: { fontSize: 15, color: '#FFFFFF', fontFamily: 'Baloo2_800ExtraBold' },
 
-  // Explore My World category cards (3-column grid)
-  catGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 24,
-  },
-  catCard: {
-    width: (width - 52) / 3,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#1E1B4B',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    borderBottomWidth: 3,
-    borderBottomColor: 'rgba(30,27,75,0.08)',
-  },
-  catIconCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  catIcon: {
-    fontSize: 28,
-  },
-  catName: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: '#1E1B4B',
-    letterSpacing: -0.2,
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  catCountPill: {
-    borderRadius: 10,
-    paddingVertical: 2,
-    paddingHorizontal: 10,
-  },
-  catCountText: {
-    fontSize: 11,
-    fontWeight: '900',
-    color: '#FFFFFF',
-  },
+  // Category grid
+  catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.xxl },
+  catIconCircle: { width: 52, height: 52, borderRadius: Radius.full, alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.sm },
+  catIcon: { fontSize: 28 },
+  catCountPill: { borderRadius: Radius.full, paddingVertical: 2, paddingHorizontal: Spacing.md },
+  catCountText: { fontSize: 11, color: '#FFFFFF', fontFamily: 'Baloo2_800ExtraBold' },
 
-  // Quick actions
-  quickActions: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  quickCard: {
-    flex: 1,
-    borderRadius: 20,
-    paddingVertical: 20,
-    alignItems: 'center',
-    overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.15)',
-  },
-  quickOverlay: {
-    position: 'absolute',
-    top: -20,
-    right: -20,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  quickIcon: {
-    fontSize: 28,
-    marginBottom: 8,
-  },
-  quickLabel: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
+  // Quick play
+  quickActions: { flexDirection: 'row', gap: 12, marginBottom: Spacing.lg },
+  quickWrap: { flex: 1, borderRadius: Radius.lg },
+  quickCard: { borderRadius: Radius.lg, paddingVertical: Spacing.xl, alignItems: 'center', overflow: 'hidden' },
+  quickIcon: { fontSize: 28, marginBottom: Spacing.sm },
+  quickLabel: { ...textStyles.overline, color: '#FFFFFF', fontSize: 12 },
 });
 
 export default HomeScreen;

@@ -3,25 +3,22 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ROUTES } from '../Constants';
 
 // Screens
-import LogoSplash from '../Screens/SplashScreens/LogoSplash';
 import Onboarding from '../Screens/Onboarding/Onboarding';
-import Login from '../Screens/Auth/Login';
-import Signup from '../Screens/Auth/Signup';
+import ProfileSetup from '../Screens/Auth/ProfileSetup';
 
 const Stack = createNativeStackNavigator();
 
 const AuthNavigator = ({ route }) => {
-  const skipSplash = route.params?.skipSplash;
+  // Returning (onboarded but unprofiled) users skip straight to Profile Setup.
+  const onboardingDone = route.params?.onboardingDone;
 
   return (
-    <Stack.Navigator 
-      initialRouteName={skipSplash ? ROUTES.AUTH.LOGIN : ROUTES.AUTH.SPLASH}
+    <Stack.Navigator
+      initialRouteName={onboardingDone ? ROUTES.AUTH.PROFILE : ROUTES.AUTH.ONBOARDING}
       screenOptions={{ headerShown: false }}
     >
-      <Stack.Screen name={ROUTES.AUTH.SPLASH}     component={LogoSplash} />
       <Stack.Screen name={ROUTES.AUTH.ONBOARDING} component={Onboarding} />
-      <Stack.Screen name={ROUTES.AUTH.LOGIN}       component={Login} />
-      <Stack.Screen name={ROUTES.AUTH.SIGNUP}      component={Signup} />
+      <Stack.Screen name={ROUTES.AUTH.PROFILE}    component={ProfileSetup} />
     </Stack.Navigator>
   );
 };

@@ -1,67 +1,87 @@
-﻿import React from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
+import React from 'react';
+import { Modal, View, Text, StyleSheet } from 'react-native';
+import { useThemeColors } from '../../Context/ThemeContext';
+import { Spacing, Radius, textStyles, Elevation } from '../../Theme';
+import Button from '../Common/Button';
+
+// Per-variant accent + default emoji so callers just pass a variant.
+const VARIANT_META = {
+  info: { key: 'primary', emoji: '🎓' },
+  success: { key: 'success', emoji: '🎉' },
+  error: { key: 'error', emoji: '😅' },
+  confirm: { key: 'primary', emoji: '🤔' },
+};
 
 const CustomDialog = ({
   visible = false,
   title = '',
   description = '',
-  emoji = '🎓',
+  emoji,
+  variant = 'info',
   primaryButtonLabel = 'Awesome!',
   secondaryButtonLabel = null,
   onPrimaryPress = () => {},
   onSecondaryPress = () => {},
   onDismiss = () => {},
 }) => {
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onDismiss}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.emoji}>{emoji}</Text>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.description}>{description}</Text>
+  const colors = useThemeColors();
+  const meta = VARIANT_META[variant] || VARIANT_META.info;
+  const accent = colors[meta.key] || colors.primary;
+  const shownEmoji = emoji || meta.emoji;
+  const isConfirm = !!secondaryButtonLabel;
 
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.primaryButton}
+  const hexToRgba = (hex, a) => {
+    const h = hex.replace('#', '');
+    const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
+      <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
+        <View
+          style={[styles.modalView, Elevation.xl, { backgroundColor: colors.surface }]}
+        >
+          <View
+            style={[
+              styles.emojiRing,
+              { backgroundColor: hexToRgba(accent, 0.12), borderColor: hexToRgba(accent, 0.4) },
+            ]}
+          >
+            <Text style={styles.emoji}>{shownEmoji}</Text>
+          </View>
+          <Text style={[textStyles.h2, styles.title, { color: colors.textPrimary }]}>{title}</Text>
+          {!!description && (
+            <Text style={[textStyles.body, styles.description, { color: colors.textSecondary }]}>
+              {description}
+            </Text>
+          )}
+
+          <View style={[styles.buttonContainer, isConfirm && styles.buttonRow]}>
+            {secondaryButtonLabel && (
+              <Button
+                title={secondaryButtonLabel}
+                variant="tonal"
+                size="md"
+                fullWidth={!isConfirm}
+                style={isConfirm && styles.flexBtn}
                 onPress={() => {
-                  onPrimaryPress();
+                  onSecondaryPress();
                   onDismiss();
                 }}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.primaryButtonText}>
-                  {primaryButtonLabel}
-                </Text>
-              </TouchableOpacity>
-
-              {secondaryButtonLabel && (
-                <TouchableOpacity
-                  style={styles.secondaryButton}
-                  onPress={() => {
-                    onSecondaryPress();
-                    onDismiss();
-                  }}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.secondaryButtonText}>
-                    {secondaryButtonLabel}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
+              />
+            )}
+            <Button
+              title={primaryButtonLabel}
+              variant={variant === 'error' ? 'danger' : 'primary'}
+              size="md"
+              fullWidth={!isConfirm}
+              style={[isConfirm && styles.flexBtn, variant === 'success' && { backgroundColor: colors.success }]}
+              onPress={() => {
+                onPrimaryPress();
+                onDismiss();
+              }}
+            />
           </View>
         </View>
       </View>
@@ -72,90 +92,33 @@ const CustomDialog = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-  },
-  centeredView: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.xxl,
   },
   modalView: {
     width: '100%',
-    maxWidth: 320,
-    backgroundColor: Colors.bgCard,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: Colors.borderLight,
-    paddingVertical: 24,
-    paddingHorizontal: 20,
+    maxWidth: 340,
+    borderRadius: Radius.xl,
+    paddingVertical: Spacing.xxl,
+    paddingHorizontal: Spacing.xl,
     alignItems: 'center',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
   },
-  emoji: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: Colors.textDark,
-    textAlign: 'center',
-    marginBottom: 12,
-    letterSpacing: -0.3,
-  },
-  description: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.textLight,
-    textAlign: 'center',
-    marginBottom: 20,
-    lineHeight: 20,
-  },
-  buttonContainer: {
-    width: '100%',
-    gap: 10,
-  },
-  primaryButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 14,
-    borderRadius: 16,
+  emojiRing: {
+    width: 76,
+    height: 76,
+    borderRadius: Radius.full,
+    borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    borderBottomWidth: 4,
-    borderBottomColor: Colors.primaryDark,
+    marginBottom: Spacing.lg,
   },
-  primaryButtonText: {
-    color: '#FFF',
-    fontWeight: '900',
-    fontSize: 13,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  secondaryButton: {
-    backgroundColor: '#F0E6D8',
-    paddingVertical: 12,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: Colors.borderLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondaryButtonText: {
-    color: Colors.textDark,
-    fontWeight: '700',
-    fontSize: 12,
-    textTransform: 'uppercase',
-  },
+  emoji: { fontSize: 38 },
+  title: { textAlign: 'center', marginBottom: Spacing.sm },
+  description: { textAlign: 'center', marginBottom: Spacing.xl },
+  buttonContainer: { width: '100%', gap: Spacing.sm },
+  buttonRow: { flexDirection: 'row' },
+  flexBtn: { flex: 1 },
 });
 
 export default CustomDialog;

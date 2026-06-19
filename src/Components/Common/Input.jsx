@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Colors, Typography, Spacing, Radius } from '../../Theme';
+import { useThemeColors } from '../../Context/ThemeContext';
+import { Typography, Spacing, Radius, textStyles } from '../../Theme';
 
-
+// ──────────────────────────────────────────────────────────────
+// Input — elegant, token-driven text field with a soft focus ring,
+// optional leading icon, password toggle, helper + error text.
+// ──────────────────────────────────────────────────────────────
 const Input = ({
   label,
   placeholder,
@@ -11,27 +15,42 @@ const Input = ({
   secureTextEntry = false,
   keyboardType = 'default',
   error,
+  helper,
+  icon,
   style,
   inputStyle,
   ...rest
 }) => {
+  const colors = useThemeColors();
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const borderColor = error
+    ? colors.error
+    : isFocused
+    ? colors.primary
+    : colors.border;
+
   return (
     <View style={[styles.wrapper, style]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {!!label && (
+        <Text style={[textStyles.caption, styles.label, { color: colors.textSecondary }]}>{label}</Text>
+      )}
       <View
         style={[
           styles.inputContainer,
-          isFocused && styles.focused,
-          error && styles.errorBorder,
+          {
+            backgroundColor: colors.surface,
+            borderColor,
+          },
+          isFocused && { borderWidth: 2 },
         ]}
       >
+        {!!icon && <Text style={styles.icon}>{icon}</Text>}
         <TextInput
-          style={[styles.input, inputStyle]}
+          style={[styles.input, { color: colors.textPrimary }, inputStyle]}
           placeholder={placeholder}
-          placeholderTextColor={Colors.textMuted}
+          placeholderTextColor={colors.textMuted}
           value={value}
           onChangeText={onChangeText}
           secureTextEntry={secureTextEntry && !showPassword}
@@ -41,58 +60,50 @@ const Input = ({
           {...rest}
         />
         {secureTextEntry && (
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Text style={styles.toggle}>{showPassword ? 'Hide' : 'Show'}</Text>
+          <TouchableOpacity onPress={() => setShowPassword((s) => !s)} hitSlop={8}>
+            <Text style={[styles.toggle, { color: colors.primary }]}>
+              {showPassword ? 'Hide' : 'Show'}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
-      {error && <Text style={styles.error}>{error}</Text>}
+      {!!error ? (
+        <Text style={[styles.helper, { color: colors.error }]}>{error}</Text>
+      ) : helper ? (
+        <Text style={[styles.helper, { color: colors.textMuted }]}>{helper}</Text>
+      ) : null}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    marginBottom: Spacing.md,
-  },
-  label: {
-    fontSize: Typography.size.sm,
-    fontFamily: Typography.font.medium,
-    color: Colors.text,
-    marginBottom: Spacing.xs,
-  },
+  wrapper: { marginBottom: Spacing.lg },
+  label: { marginBottom: Spacing.sm, marginLeft: Spacing.xs },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: Colors.border,
     borderRadius: Radius.md,
-    backgroundColor: Colors.inputBg,
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    minHeight: 52,
+    gap: Spacing.sm,
   },
-  focused: {
-    borderColor: Colors.primary,
-  },
-  errorBorder: {
-    borderColor: Colors.error,
-  },
+  icon: { fontSize: 17 },
   input: {
     flex: 1,
     paddingVertical: Spacing.md,
     fontSize: Typography.size.md,
-    fontFamily: Typography.font.regular,
-    color: Colors.text,
+    fontFamily: Typography.font.medium,
   },
   toggle: {
-    color: Colors.primary,
-    fontFamily: Typography.font.medium,
+    fontFamily: Typography.font.bold,
     fontSize: Typography.size.sm,
   },
-  error: {
+  helper: {
     marginTop: Spacing.xs,
+    marginLeft: Spacing.xs,
     fontSize: Typography.size.xs,
-    fontFamily: Typography.font.regular,
-    color: Colors.error,
+    fontFamily: Typography.font.medium,
   },
 });
 

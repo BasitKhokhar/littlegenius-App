@@ -1,20 +1,22 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Colors } from '../../Theme';
+import { useThemeColors } from '../../Context/ThemeContext';
 
+const Loader = ({ size = 'large', color, overlay = false }) => {
+  const colors = useThemeColors();
+  const tint = color || colors.primary;
 
-const Loader = ({ size = 'large', color = Colors.primary, overlay = false }) => {
   if (overlay) {
     return (
-      <View style={styles.overlay}>
-        <ActivityIndicator size={size} color={color} />
+      <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
+        <ActivityIndicator size={size} color={tint} />
       </View>
     );
   }
 
   return (
-    <View style={styles.center}>
-      <ActivityIndicator size={size} color={color} />
+    <View style={[styles.center, { backgroundColor: colors.bg }]}>
+      <ActivityIndicator size={size} color={tint} />
     </View>
   );
 };
@@ -24,11 +26,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.background,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.45)',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 999,

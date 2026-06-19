@@ -125,7 +125,7 @@ const NumbersScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F0FF',
+    backgroundColor: '#F6F5FC',
   },
   gridContent: {
     paddingHorizontal: 12,

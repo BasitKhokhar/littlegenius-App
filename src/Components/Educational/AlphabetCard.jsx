@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, Animated, Dimensions } from 'react-native';
 import { Colors } from '../../Data/colorsTheme';
+import { Radius, Spacing, textStyles, coloredShadow, Motion } from '../../Theme';
 
 const { width } = Dimensions.get('window');
 const CARD_SIZE = (width - 12 * 3 - 32) / 2;
@@ -15,14 +16,14 @@ const AlphabetCard = ({
   const scale = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () =>
-    Animated.spring(scale, { toValue: 0.94, useNativeDriver: true }).start();
+    Animated.spring(scale, { toValue: Motion.pressScale, useNativeDriver: true, ...Motion.spring.soft }).start();
   const handlePressOut = () =>
-    Animated.spring(scale, { toValue: 1, useNativeDriver: true, tension: 100 }).start();
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }).start();
 
   return (
     <Animated.View style={[styles.wrapper, { transform: [{ scale }] }]}>
       <TouchableOpacity
-        style={[styles.card, { backgroundColor: color }]}
+        style={[styles.card, coloredShadow(color, 'md'), { backgroundColor: color }]}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -56,19 +57,12 @@ const styles = StyleSheet.create({
     maxWidth: CARD_SIZE,
   },
   card: {
-    borderRadius: 22,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.md,
     minHeight: 160,
     justifyContent: 'space-between',
     overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.2)',
   },
   decorCircle: {
     position: 'absolute',

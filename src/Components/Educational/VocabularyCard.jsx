@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, Animated } from 'react-native';
 import SpeakButton from '../Common/SpeakButton';
 import { Colors } from '../../Data/colorsTheme';
+import { useThemeColors } from '../../Context/ThemeContext';
+import { Radius, Spacing, textStyles, Elevation, Motion } from '../../Theme';
 
 const VocabularyCard = ({
   emoji = '🍎',
@@ -11,17 +13,18 @@ const VocabularyCard = ({
   onPress = () => {},
   onSpeak = () => {},
 }) => {
+  const colors = useThemeColors();
   const scale = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () =>
-    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true }).start();
+    Animated.spring(scale, { toValue: Motion.pressScale, useNativeDriver: true, ...Motion.spring.soft }).start();
   const handlePressOut = () =>
-    Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start();
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }).start();
 
   return (
     <Animated.View style={[styles.wrapper, { transform: [{ scale }] }]}>
       <TouchableOpacity
-        style={styles.card}
+        style={[styles.card, Elevation.sm, { backgroundColor: colors.surface, borderColor: colors.border }]}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -40,7 +43,7 @@ const VocabularyCard = ({
           <View style={[styles.categoryBadge, { backgroundColor: categoryColor + '18', borderColor: categoryColor + '40' }]}>
             <Text style={[styles.category, { color: categoryColor }]}>{category}</Text>
           </View>
-          <Text style={styles.word}>{word}</Text>
+          <Text style={[styles.word, { color: colors.textPrimary }]}>{word}</Text>
         </View>
 
         {/* Speak button */}
@@ -62,20 +65,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    borderWidth: 1.5,
-    borderColor: '#EDE9FE',
+    borderRadius: Radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: 12,
     paddingHorizontal: 12,
     paddingLeft: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#6366F1',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
     overflow: 'hidden',
   },
   accentBar: {
@@ -84,13 +80,13 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 4,
-    borderTopLeftRadius: 18,
-    borderBottomLeftRadius: 18,
+    borderTopLeftRadius: Radius.md,
+    borderBottomLeftRadius: Radius.md,
   },
   emojiBubble: {
     width: 52,
     height: 52,
-    borderRadius: 16,
+    borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,

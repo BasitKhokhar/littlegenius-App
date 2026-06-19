@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { Radius, Spacing, textStyles, coloredShadow } from '../../Theme';
 
-const QuizEntryBar = ({ onPress, color = '#F85A9B', compact = false }) => {
+const QuizEntryBar = ({ onPress, color = '#FB7185', compact = false }) => {
   if (compact) {
     return (
       <TouchableOpacity
-        style={[styles.compactBtn, { backgroundColor: color }]}
+        style={[styles.compactBtn, coloredShadow(color, 'sm'), { backgroundColor: color }]}
         onPress={onPress}
         activeOpacity={0.85}
       >
@@ -16,7 +17,7 @@ const QuizEntryBar = ({ onPress, color = '#F85A9B', compact = false }) => {
 
   return (
     <TouchableOpacity
-      style={[styles.fullBtn, { backgroundColor: color }]}
+      style={[styles.fullBtn, coloredShadow(color, 'md'), { backgroundColor: color }]}
       onPress={onPress}
       activeOpacity={0.88}
     >
@@ -32,34 +33,22 @@ const QuizEntryBar = ({ onPress, color = '#F85A9B', compact = false }) => {
 
 const styles = StyleSheet.create({
   compactBtn: {
-    borderRadius: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
+    borderRadius: Radius.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
   },
   compactText: {
     color: '#FFF',
-    fontWeight: '900',
+    fontFamily: 'Baloo2_800ExtraBold',
     fontSize: 12,
   },
   fullBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 20,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    marginTop: 8,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.18)',
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    marginTop: Spacing.sm,
   },
   fullEmoji: { fontSize: 28, marginRight: 12 },
   fullTextWrap: { flex: 1 },

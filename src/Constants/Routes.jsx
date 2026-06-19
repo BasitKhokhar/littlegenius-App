@@ -1,13 +1,10 @@
 // Route / screen name constants — single source of truth for navigation
 
 export const ROUTES = {
-  // Auth Stack
+  // Auth / Onboarding Stack (no login — static offline profile)
   AUTH: {
-    SPLASH:    'LogoSplash',
     ONBOARDING:'Onboarding',
-    WELCOME:   'WelcomeSplash',
-    LOGIN:     'Login',
-    SIGNUP:    'Signup',
+    PROFILE:   'ProfileSetup',
   },
 
   // Main / App Stack

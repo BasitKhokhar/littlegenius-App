@@ -2,6 +2,8 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View } from 'react-native';
+import { useThemeColors } from '../Context/ThemeContext';
+import { Radius } from '../Theme';
 
 import HomeScreen from '../Screens/Home/HomeScreen';
 import AlphabetScreen from '../Screens/Alphabet/AlphabetScreen';
@@ -64,43 +66,45 @@ const GamesStackNavigator = () => (
 // ── Tab Icon component ────────────────────────────────────────
 const TabIcon = ({ emoji, focused }) => (
   <View style={{
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: focused ? 'rgba(252,211,77,0.15)' : 'transparent',
+    width: 38,
+    height: 38,
+    borderRadius: Radius.sm,
+    backgroundColor: focused ? 'rgba(252,211,77,0.18)' : 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   }}>
-    <Text style={{ fontSize: 20 }}>{emoji}</Text>
+    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.7 }}>{emoji}</Text>
   </View>
 );
 
 // ── Root App Navigator (Bottom Tabs) ──────────────────────────
-const AppNavigator = () => (
+const AppNavigator = () => {
+  const colors = useThemeColors();
+  return (
   <Tab.Navigator
     screenOptions={{
       headerShown: false,
       tabBarShowLabel: true,
       tabBarStyle: {
-        backgroundColor: '#1E1B4B',
+        backgroundColor: colors.brandSurface,
         borderTopWidth: 0,
         height: 72,
         paddingBottom: 10,
         paddingTop: 6,
         elevation: 20,
-        shadowColor: '#1E1B4B',
+        shadowColor: colors.brandSurface,
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.5,
         shadowRadius: 12,
       },
       tabBarLabelStyle: {
+        fontFamily: 'Baloo2_800ExtraBold',
         fontSize: 10,
-        fontWeight: '800',
         marginTop: 2,
         letterSpacing: 0.3,
       },
-      tabBarActiveTintColor: '#FCD34D',
-      tabBarInactiveTintColor: '#6366F1',
+      tabBarActiveTintColor: colors.accent,
+      tabBarInactiveTintColor: colors.onBrandMuted,
     }}
   >
     <Tab.Screen
@@ -136,6 +140,7 @@ const AppNavigator = () => (
       }}
     />
   </Tab.Navigator>
-);
+  );
+};
 
 export default AppNavigator;

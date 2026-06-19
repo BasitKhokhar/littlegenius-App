@@ -1,26 +1,25 @@
 // components/AppContainer.js
 import React from "react";
-import { View, StyleSheet, StatusBar, Platform } from "react-native";
+import { View, StyleSheet, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors } from "./Theme/colors";
+import { useThemeColors } from "./Context/ThemeContext";
 
 /**
  * Universal App Container
- * - Theme-driven background
- * - StatusBar color handled globally
- * - SafeArea for left/right only
+ * - Theme-driven background (reads the ACTIVE palette)
+ * - StatusBar style follows the theme
+ * - SafeArea for left/right/bottom; top owned by each screen's header
  */
 const AppContainer = ({ children }) => {
-    const isDark =
-        colors.bodybackground === "#0d0d0d" ||
-        colors.bodybackground === "#01010a";
+    const colors = useThemeColors();
+    const isDark = colors.mode === "dark";
 
     return (
-        <View style={[styles.root, { backgroundColor: colors.cardsbackground }]}>
+        <View style={[styles.root, { backgroundColor: colors.bg }]}>
             <StatusBar
-                translucent={true}
-                backgroundColor={"transparent"}
-                barStyle={"light-content"}
+                translucent
+                backgroundColor="transparent"
+                barStyle={isDark ? "light-content" : "dark-content"}
             />
 
             <SafeAreaView edges={["left", "right", "bottom"]} style={styles.safeArea}>

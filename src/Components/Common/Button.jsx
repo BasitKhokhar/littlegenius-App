@@ -1,77 +1,129 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Colors, Typography, Spacing, Radius } from '../../Theme';
+import React, { useRef } from 'react';
+import { Animated, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useThemeColors } from '../../Context/ThemeContext';
+import { Radius, Spacing, Typography, Motion, coloredShadow, Layout } from '../../Theme';
 
+// ──────────────────────────────────────────────────────────────
+// Button — the premium CTA. Token-driven, dark-ready, with a spring
+// press-scale and an optional gradient fill.
+//
+//   variant: 'primary' | 'gradient' | 'secondary' | 'tonal' | 'ghost' | 'danger'
+//   size:    'sm' | 'md' | 'lg'
+//   icon:    leading emoji/glyph (string)
+//
+//   <Button title="Start Learning" variant="gradient" size="lg" onPress={…} />
+// ──────────────────────────────────────────────────────────────
+const SIZES = {
+  sm: { minHeight: 40, padV: Spacing.sm, padH: Spacing.lg, font: Typography.size.sm },
+  md: { minHeight: 48, padV: Spacing.md, padH: Spacing.xl, font: Typography.size.md },
+  lg: { minHeight: 56, padV: Spacing.lg, padH: Spacing.xxl, font: Typography.size.lg },
+};
 
 const Button = ({
   title,
   onPress,
   variant = 'primary',
+  size = 'md',
   loading = false,
   disabled = false,
+  icon,
+  fullWidth = true,
   style,
   textStyle,
+  gradientColors,
+  ...rest
 }) => {
+  const colors = useThemeColors();
+  const scale = useRef(new Animated.Value(1)).current;
   const isDisabled = disabled || loading;
+  const dims = SIZES[size] || SIZES.md;
+
+  const pressIn = () =>
+    Animated.spring(scale, { toValue: Motion.pressScale, useNativeDriver: true, ...Motion.spring.soft }).start();
+  const pressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }).start();
+
+  // Resolve per-variant colours.
+  const v = {
+    primary: { bg: colors.primary, fg: colors.onPrimary, border: 'transparent' },
+    secondary: { bg: 'transparent', fg: colors.primary, border: colors.primary },
+    tonal: { bg: colors.primaryLight, fg: colors.primary, border: 'transparent' },
+    ghost: { bg: 'transparent', fg: colors.textSecondary, border: 'transparent' },
+    danger: { bg: colors.error, fg: '#FFFFFF', border: 'transparent' },
+    gradient: { bg: 'transparent', fg: '#FFFFFF', border: 'transparent' },
+  }[variant] || { bg: colors.primary, fg: colors.onPrimary, border: 'transparent' };
+
+  const containerStyle = [
+    styles.base,
+    {
+      minHeight: dims.minHeight,
+      paddingVertical: dims.padV,
+      paddingHorizontal: dims.padH,
+      borderRadius: Radius.md,
+      backgroundColor: v.bg,
+      borderWidth: variant === 'secondary' ? 1.5 : 0,
+      borderColor: v.border,
+    },
+    fullWidth && styles.fullWidth,
+    (variant === 'primary' || variant === 'danger') && coloredShadow(v.bg, 'sm'),
+    isDisabled && styles.disabled,
+    style,
+  ];
+
+  const label = (
+    <React.Fragment>
+      {!!icon && <Text style={[styles.icon, { color: v.fg, fontSize: dims.font }]}>{icon} </Text>}
+      <Text style={[styles.text, { color: v.fg, fontSize: dims.font }, textStyle]}>{title}</Text>
+    </React.Fragment>
+  );
+
+  const content = loading ? <ActivityIndicator color={v.fg} size="small" /> : label;
 
   return (
-    <TouchableOpacity
-      style={[
-        styles.base,
-        styles[variant],
-        isDisabled && styles.disabled,
-        style,
-      ]}
-      onPress={onPress}
-      disabled={isDisabled}
-      activeOpacity={0.8}
-    >
-      {loading ? (
-        <ActivityIndicator color={Colors.white} size="small" />
-      ) : (
-        <Text style={[styles.text, styles[`${variant}Text`], textStyle]}>
-          {title}
-        </Text>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={[fullWidth && styles.fullWidth, { transform: [{ scale }] }]}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={pressIn}
+        onPressOut={pressOut}
+        disabled={isDisabled}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: isDisabled, busy: loading }}
+        hitSlop={Layout.hitSlop}
+        style={variant === 'gradient' ? (fullWidth && styles.fullWidth) : containerStyle}
+        {...rest}
+      >
+        {variant === 'gradient' ? (
+          <LinearGradient
+            colors={gradientColors || colors.gradients.cta}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[containerStyle, coloredShadow(colors.primary, 'md')]}
+          >
+            {content}
+          </LinearGradient>
+        ) : (
+          content
+        )}
+      </Pressable>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   base: {
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.xl,
-    borderRadius: Radius.md,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 50,
   },
-  primary: {
-    backgroundColor: Colors.primary,
-  },
-  secondary: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-  },
-  danger: {
-    backgroundColor: Colors.error,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
+  fullWidth: { width: '100%' },
+  disabled: { opacity: 0.5 },
   text: {
-    fontSize: Typography.size.md,
-    fontFamily: Typography.font.semiBold,
+    fontFamily: Typography.font.bold,
+    letterSpacing: 0.2,
   },
-  primaryText: {
-    color: Colors.white,
-  },
-  secondaryText: {
-    color: Colors.primary,
-  },
-  dangerText: {
-    color: Colors.white,
+  icon: {
+    fontFamily: Typography.font.bold,
   },
 });
 

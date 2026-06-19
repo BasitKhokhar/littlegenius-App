@@ -22,7 +22,16 @@ export default () => ({
         foregroundImage: './assets/logo.png',
         backgroundColor: '#1E1B4B'
       },
-      package: 'com.littlegenius.app'
+      package: 'com.basitkhokhar.littlegenius.app',
+      // Offline kids app — request only what's used (VIBRATE via expo-haptics,
+      // INTERNET for opening legal links). Block sensitive permissions that
+      // libraries may inject; they are a Families-policy rejection risk.
+      permissions: ['android.permission.INTERNET', 'android.permission.VIBRATE'],
+      blockedPermissions: [
+        'android.permission.SYSTEM_ALERT_WINDOW',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.WRITE_EXTERNAL_STORAGE'
+      ]
     },
     web: {
       favicon: './assets/favicon.png'
