@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
 import { Fonts } from '../../Theme/fonts';
+import { useThemeColors } from '../../Context/ThemeContext';
+import { Spacing, Radius, textStyles, Elevation, coloredShadow } from '../../Theme';
 import learnModules from '../../Data/learnModulesData';
 import { Header } from '../../Components/UI';
 import SpeakButton from '../../Components/Common/SpeakButton';
@@ -9,68 +10,80 @@ import SpeakButton from '../../Components/Common/SpeakButton';
 // Generic, data-driven general-knowledge screen. The module to show is
 // chosen by route.params.moduleKey (see learnModulesData.js).
 const LearnScreen = ({ navigation, route }) => {
+  const colors = useThemeColors();
   const moduleKey = route?.params?.moduleKey;
   const data = learnModules[moduleKey];
 
-  // Defensive: should never happen because Home passes a valid key.
   const tabs = data?.tabs || [];
-  // A Home card may request a specific category to open first.
   const initialTab = route?.params?.initialTab;
   const defaultTab = tabs.some((t) => t.key === initialTab) ? initialTab : tabs[0]?.key;
   const [activeTab, setActiveTab] = useState(defaultTab);
 
+  const s = makeStyles(colors);
+
   if (!data) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
         <Header title="Learn" showBack onBackPress={() => navigation.goBack()} />
         <View style={styles.errorWrap}>
-          <Text style={styles.errorText}>This topic is coming soon! 🚀</Text>
+          <Text style={[textStyles.body, { color: colors.textMuted, textAlign: 'center' }]}>
+            This topic is coming soon! 🚀
+          </Text>
         </View>
       </View>
     );
   }
 
+  const accent = data.color || colors.primary;
   const current = tabs.find((t) => t.key === activeTab) || tabs[0];
 
   return (
-    <View style={styles.container}>
-      <Header
-        title={data.title}
-        showBack={true}
-        onBackPress={() => navigation.goBack()}
-      />
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      <Header title={data.title} showBack onBackPress={() => navigation.goBack()} />
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabScroll}
-        contentContainerStyle={styles.tabContainer}
-      >
-        {tabs.map((tab) => (
-          <TouchableOpacity
-            key={tab.key}
-            style={[styles.tab, { backgroundColor: activeTab === tab.key ? data.color : Colors.borderLight }]}
-            onPress={() => setActiveTab(tab.key)}
-          >
-            <Text style={[styles.tabText, { color: activeTab === tab.key ? '#FFF' : Colors.textDark }]}>
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={styles.tabBarWrap}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabContainer}
+        >
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <TouchableOpacity
+                key={tab.key}
+                activeOpacity={0.85}
+                onPress={() => setActiveTab(tab.key)}
+                style={[
+                  styles.tab,
+                  { backgroundColor: isActive ? accent : colors.surface, borderColor: isActive ? accent : colors.border },
+                  isActive && coloredShadow(accent, 'sm'),
+                ]}
+              >
+                <Text
+                  numberOfLines={1}
+                  style={[styles.tabText, { color: isActive ? '#FFFFFF' : colors.textSecondary }]}
+                >
+                  {tab.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {current?.items.map((item) => (
-          <View key={item.en} style={[styles.card, { borderLeftWidth: 4, borderLeftColor: item.color }]}>
+          <View key={item.en} style={[s.card, { borderLeftWidth: 4, borderLeftColor: item.color }]}>
             <View style={styles.row}>
               <Text style={styles.emoji}>{item.emoji}</Text>
               <View style={styles.flex}>
-                <Text style={styles.value}>{item.en}</Text>
-                <Text style={styles.urduValue}>{item.ur}</Text>
+                <Text style={[styles.value, { color: colors.textPrimary }]}>{item.en}</Text>
+                <Text style={[styles.urduValue, { color: colors.textPrimary }]}>{item.ur}</Text>
               </View>
             </View>
-            <Text style={styles.fact}>{item.fact}</Text>
-            <Text style={styles.urduFact}>{item.urFact}</Text>
+            <Text style={[styles.fact, { color: colors.textSecondary }]}>{item.fact}</Text>
+            <Text style={[styles.urduFact, { color: colors.textSecondary }]}>{item.urFact}</Text>
             <SpeakButton text={item.speak || `${item.en}. ${item.fact}`} language="en-US" label="🔊 Hear" color={item.color} />
           </View>
         ))}
@@ -79,35 +92,48 @@ const LearnScreen = ({ navigation, route }) => {
   );
 };
 
+const makeStyles = (colors) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: Radius.md,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      padding: Spacing.lg,
+      marginBottom: Spacing.md,
+      ...Elevation.sm,
+    },
+  });
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bgMain },
-  tabScroll: { flexGrow: 0 },
-  tabContainer: { flexDirection: 'row', paddingHorizontal: 16, gap: 8, paddingVertical: 12 },
-  tab: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  tabText: { fontWeight: '700', fontSize: 11, textTransform: 'uppercase' },
-  content: { paddingHorizontal: 16, paddingBottom: 40 },
-  card: {
-    backgroundColor: Colors.bgCard,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: Colors.borderLight,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
+  container: { flex: 1 },
+  tabBarWrap: { flexGrow: 0 },
+  tabContainer: { flexDirection: 'row', paddingHorizontal: Spacing.lg, gap: Spacing.sm, paddingVertical: Spacing.md },
+  tab: {
+    minHeight: 40,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8 },
+  tabText: {
+    fontFamily: Fonts.bold,
+    fontSize: 13,
+    letterSpacing: 0.3,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+  },
+  content: { paddingHorizontal: Spacing.lg, paddingBottom: 40 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, marginBottom: Spacing.sm },
   flex: { flex: 1 },
   emoji: { fontSize: 34 },
-  value: { fontSize: 17, fontWeight: '900', color: Colors.textDark },
-  urduValue: { fontSize: 16, fontWeight: '700', color: Colors.textDark, textAlign: 'right', lineHeight: 30, fontFamily: Fonts.urdu },
-  fact: { fontSize: 13, fontWeight: '600', color: Colors.textLight, marginBottom: 4, lineHeight: 18 },
-  urduFact: { fontSize: 14, fontWeight: '700', color: Colors.textLight, textAlign: 'right', lineHeight: 28, marginBottom: 6, fontFamily: Fonts.urdu },
+  value: { fontSize: 17, fontFamily: Fonts.extraBold },
+  urduValue: { fontSize: 16, fontFamily: Fonts.urdu, textAlign: 'right', lineHeight: 30 },
+  fact: { fontSize: 13, fontFamily: Fonts.medium, marginBottom: 4, lineHeight: 18 },
+  urduFact: { fontSize: 14, fontFamily: Fonts.urdu, textAlign: 'right', lineHeight: 28, marginBottom: 6 },
   errorWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  errorText: { fontSize: 14, fontWeight: '700', color: Colors.textLight, textAlign: 'center' },
 });
 
 export default LearnScreen;

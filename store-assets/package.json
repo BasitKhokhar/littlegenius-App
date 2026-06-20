@@ -1,0 +1,12 @@
+{
+  "name": "littlegenius-store-assets",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generates Play Store marketing graphics (screenshots + feature graphic) for Little Genius.",
+  "scripts": {
+    "generate": "node generate.js"
+  },
+  "devDependencies": {
+    "puppeteer": "^23.0.0"
+  }
+}
