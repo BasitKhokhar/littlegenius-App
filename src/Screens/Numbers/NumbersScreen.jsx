@@ -9,7 +9,7 @@ import {
   Dimensions,
   Modal,
 } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
+import { useThemeColors } from '../../Context/ThemeContext';
 import { numbersData } from '../../Data/numbersData';
 import { Header } from '../../Components/UI';
 import SpeakButton from '../../Components/Common/SpeakButton';
@@ -19,6 +19,8 @@ import SpeechEngine from '../../Utils/speechEngine';
 const { width } = Dimensions.get('window');
 
 const NumbersScreen = ({ navigation, route }) => {
+  const colors = useThemeColors();
+  const styles = makeStyles(colors);
   const [selectedNum, setSelectedNum] = useState(null);
 
   const handleNumPress = (numItem) => {
@@ -122,14 +124,15 @@ const NumbersScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F5FC',
+    backgroundColor: colors.bg,
   },
   gridContent: {
     paddingHorizontal: 12,
     paddingVertical: 16,
+    paddingBottom: 130,
     gap: 10,
   },
   gridRow: {
@@ -137,7 +140,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 20,
     borderWidth: 2,
     paddingVertical: 18,
@@ -161,7 +164,7 @@ const styles = StyleSheet.create({
   urduName: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.textLight,
+    color: colors.textMuted,
   },
   modalOverlay: {
     flex: 1,
@@ -171,7 +174,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 32,
     padding: 24,
     width: '100%',
@@ -191,7 +194,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#F5F5F7',
+    backgroundColor: colors.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
@@ -199,7 +202,7 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#7A8B9E',
+    color: colors.textMuted,
   },
   bubble: {
     width: 110,
@@ -218,19 +221,19 @@ const styles = StyleSheet.create({
   englishLabel: {
     fontSize: 24,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   urduLabel: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.textLight,
+    color: colors.textMuted,
     marginBottom: 16,
   },
   countingTitle: {
     fontSize: 12,
     fontWeight: '800',
-    color: Colors.primary,
+    color: colors.primary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 12,

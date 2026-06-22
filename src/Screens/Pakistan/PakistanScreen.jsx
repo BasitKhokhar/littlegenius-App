@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
+import { useThemeColors } from '../../Context/ThemeContext';
 import { Fonts } from '../../Theme/fonts';
 import { nationalSymbols, provinces, heroes, famousPlaces } from '../../Data';
 import { Header } from '../../Components/UI';
@@ -15,6 +15,8 @@ const TABS = [
 ];
 
 const PakistanScreen = ({ navigation }) => {
+  const colors = useThemeColors();
+  const styles = makeStyles(colors);
   const [activeTab, setActiveTab] = useState('symbols');
 
   return (
@@ -31,17 +33,26 @@ const PakistanScreen = ({ navigation }) => {
         style={styles.tabScroll}
         contentContainerStyle={styles.tabContainer}
       >
-        {TABS.map((tab) => (
-          <TouchableOpacity
-            key={tab.key}
-            style={[styles.tab, { backgroundColor: activeTab === tab.key ? Colors.primary : Colors.borderLight }]}
-            onPress={() => setActiveTab(tab.key)}
-          >
-            <Text style={[styles.tabText, { color: activeTab === tab.key ? '#FFF' : Colors.textDark }]}>
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.key;
+          return (
+            <TouchableOpacity
+              key={tab.key}
+              style={[
+                styles.tab,
+                { backgroundColor: isActive ? colors.primary : colors.surface, borderColor: isActive ? colors.primary : colors.border },
+              ]}
+              onPress={() => setActiveTab(tab.key)}
+            >
+              <Text
+                numberOfLines={1}
+                style={[styles.tabText, { color: isActive ? '#FFF' : colors.textSecondary }]}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -116,18 +127,32 @@ const PakistanScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bgMain },
+const makeStyles = (colors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
   tabScroll: { flexGrow: 0 },
   tabContainer: { flexDirection: 'row', paddingHorizontal: 16, gap: 8, paddingVertical: 12 },
-  tab: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  tabText: { fontWeight: '700', fontSize: 11, textTransform: 'uppercase' },
-  content: { paddingHorizontal: 16, paddingBottom: 40 },
+  tab: {
+    minHeight: 40,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabText: {
+    fontWeight: '700',
+    fontSize: 11,
+    textTransform: 'uppercase',
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+  },
+  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 130 },
   card: {
-    backgroundColor: Colors.bgCard,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     padding: 16,
     marginBottom: 12,
     elevation: 1,
@@ -139,10 +164,10 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8 },
   flex: { flex: 1 },
   emoji: { fontSize: 34 },
-  label: { fontSize: 12, fontWeight: '700', color: Colors.textLight, marginBottom: 2 },
-  urduLabel: { fontSize: 13, fontWeight: '700', color: Colors.textLight, textAlign: 'right', lineHeight: 26, fontFamily: Fonts.urdu },
-  value: { fontSize: 17, fontWeight: '900', color: Colors.textDark },
-  urduValue: { fontSize: 16, fontWeight: '700', color: Colors.textDark, textAlign: 'right', lineHeight: 30, marginBottom: 6, fontFamily: Fonts.urdu },
+  label: { fontSize: 12, fontWeight: '700', color: colors.textMuted, marginBottom: 2 },
+  urduLabel: { fontSize: 13, fontWeight: '700', color: colors.textMuted, textAlign: 'right', lineHeight: 26, fontFamily: Fonts.urdu },
+  value: { fontSize: 17, fontWeight: '900', color: colors.textPrimary },
+  urduValue: { fontSize: 16, fontWeight: '700', color: colors.textPrimary, textAlign: 'right', lineHeight: 30, marginBottom: 6, fontFamily: Fonts.urdu },
 });
 
 export default PakistanScreen;

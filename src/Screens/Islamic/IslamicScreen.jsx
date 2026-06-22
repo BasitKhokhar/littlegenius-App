@@ -6,7 +6,7 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
+import { useThemeColors } from '../../Context/ThemeContext';
 import { Fonts } from '../../Theme/fonts';
 import {
   duasData,
@@ -33,6 +33,8 @@ const TABS = [
 ];
 
 const IslamicScreen = ({ navigation, route }) => {
+  const colors = useThemeColors();
+  const styles = makeStyles(colors);
   const [activeTab, setActiveTab] = useState('duas');
 
   const renderDuaCard = (dua) => (
@@ -54,7 +56,7 @@ const IslamicScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <Header
         title="Islamic Studies"
-        showBack={true}
+        showBack={navigation.canGoBack()}
         onBackPress={() => navigation.goBack()}
         stars={route?.params?.stars || 0}
       />
@@ -71,11 +73,14 @@ const IslamicScreen = ({ navigation, route }) => {
             key={tab.key}
             style={[
               styles.tab,
-              { backgroundColor: activeTab === tab.key ? Colors.primary : Colors.borderLight },
+              activeTab === tab.key ? styles.tabActive : styles.tabInactive,
             ]}
             onPress={() => setActiveTab(tab.key)}
           >
-            <Text style={[styles.tabText, { color: activeTab === tab.key ? '#FFF' : Colors.textDark }]}>
+            <Text
+              numberOfLines={1}
+              style={[styles.tabText, { color: activeTab === tab.key ? '#FFF' : colors.textSecondary }]}
+            >
               {tab.label}
             </Text>
           </TouchableOpacity>
@@ -173,7 +178,7 @@ const IslamicScreen = ({ navigation, route }) => {
             <Text style={styles.sectionHeading}>🚿 Wudu (Ablution) Steps</Text>
             {wuduSteps.map((s) => (
               <View key={`w${s.step}`} style={[styles.islamicCard, styles.stepCard]}>
-                <View style={[styles.stepNumber, { backgroundColor: Colors.primary }]}>
+                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
                   <Text style={styles.stepNumberText}>{s.step}</Text>
                 </View>
                 <View style={styles.stepBody}>
@@ -188,7 +193,7 @@ const IslamicScreen = ({ navigation, route }) => {
             <Text style={styles.sectionHeading}>🕌 Salah (Prayer) Steps</Text>
             {salahSteps.map((s) => (
               <View key={`s${s.step}`} style={[styles.islamicCard, styles.stepCard]}>
-                <View style={[styles.stepNumber, { backgroundColor: Colors.secondary }]}>
+                <View style={[styles.stepNumber, { backgroundColor: colors.secondary }]}>
                   <Text style={styles.stepNumberText}>{s.step}</Text>
                 </View>
                 <View style={styles.stepBody}>
@@ -212,36 +217,46 @@ const IslamicScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.bgMain,
+    backgroundColor: colors.bg,
   },
   tabScroll: {
     flexGrow: 0,
+    flexShrink: 0,
   },
   tabContainer: {
-    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
-    gap: 8,
     paddingVertical: 12,
   },
   tab: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingVertical: 9,
+    paddingHorizontal: 18,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1.5,
+    marginRight: 8,
+    flexShrink: 0,
+  },
+  tabActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  tabInactive: {
+    backgroundColor: colors.surface,
+    borderColor: colors.borderStrong,
   },
   tabText: {
     fontWeight: '700',
-    fontSize: 11,
-    textTransform: 'uppercase',
+    fontSize: 13,
   },
   sectionHeading: {
     fontSize: 15,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textDark,
     marginTop: 8,
     marginBottom: 12,
   },
@@ -282,13 +297,13 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 16,
-    paddingBottom: 40,
+    paddingBottom: 130,
   },
   islamicCard: {
-    backgroundColor: Colors.bgCard,
+    backgroundColor: colors.bgCard,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.borderLight,
     padding: 16,
     marginBottom: 12,
     elevation: 1,
@@ -309,13 +324,13 @@ const styles = StyleSheet.create({
   duaTitle: {
     fontSize: 14,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textDark,
     flex: 1,
   },
   arabic: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.textDark,
+    color: colors.textDark,
     lineHeight: 40,
     textAlign: 'right',
     marginVertical: 8,
@@ -324,19 +339,19 @@ const styles = StyleSheet.create({
   transliteration: {
     fontSize: 12,
     fontWeight: '600',
-    color: Colors.textLight,
+    color: colors.textLight,
     marginBottom: 8,
     fontStyle: 'italic',
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.borderLight,
+    backgroundColor: colors.borderLight,
     marginVertical: 10,
   },
   urdu: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.textDark,
+    color: colors.textDark,
     lineHeight: 30,
     marginBottom: 8,
     textAlign: 'right',
@@ -345,21 +360,21 @@ const styles = StyleSheet.create({
   english: {
     fontSize: 12,
     fontWeight: '600',
-    color: Colors.textLight,
+    color: colors.textLight,
     lineHeight: 18,
     marginBottom: 12,
   },
   kalmaNumber: {
     fontSize: 10,
     fontWeight: '900',
-    color: Colors.primary,
+    color: colors.primary,
     textTransform: 'uppercase',
     marginBottom: 6,
   },
   kalmaTitle: {
     fontSize: 13,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textDark,
     marginBottom: 8,
   },
   pillarEmoji: {
@@ -369,13 +384,13 @@ const styles = StyleSheet.create({
   pillarTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textDark,
     marginBottom: 6,
   },
   pillarUrdu: {
     fontSize: 16,
     fontWeight: '700',
-    color: Colors.textDark,
+    color: colors.textDark,
     lineHeight: 30,
     marginBottom: 6,
     fontFamily: Fonts.urdu, // Nastaliq Urdu
@@ -383,13 +398,13 @@ const styles = StyleSheet.create({
   pillarDesc: {
     fontSize: 12,
     fontWeight: '600',
-    color: Colors.textLight,
+    color: colors.textLight,
     marginBottom: 10,
   },
   pillarDetail: {
     fontSize: 12,
     fontWeight: '600',
-    color: Colors.textDark,
+    color: colors.textDark,
     lineHeight: 18,
     marginBottom: 10,
   },
@@ -410,13 +425,14 @@ const styles = StyleSheet.create({
   pillarWhenText: {
     fontSize: 12,
     fontWeight: '600',
-    color: Colors.textDark,
+    // Box bg is a fixed light green in both themes — keep text dark so it stays readable.
+    color: '#1E1B4B',
     lineHeight: 18,
   },
   pillarUrduDetail: {
     fontSize: 15,
     fontWeight: '700',
-    color: Colors.textDark,
+    color: colors.textDark,
     lineHeight: 32,
     textAlign: 'right',
     fontFamily: Fonts.urdu, // Nastaliq Urdu

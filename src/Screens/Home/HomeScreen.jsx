@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   moduleDescription: { ...textStyles.caption, color: 'rgba(255,255,255,0.85)' },
   moduleArrow: {
     position: 'absolute',
-    bottom: Spacing.lg,
+    top: Spacing.lg,
     right: Spacing.lg,
     width: 30,
     height: 30,

@@ -7,7 +7,7 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
+import { useThemeColors } from '../../Context/ThemeContext';
 import { Fonts } from '../../Theme/fonts';
 import { urduData } from '../../Data/urduData';
 import { Header } from '../../Components/UI';
@@ -15,6 +15,8 @@ import SpeakButton from '../../Components/Common/SpeakButton';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 
 const UrduScreen = ({ navigation, route }) => {
+  const colors = useThemeColors();
+  const styles = makeStyles(colors);
   const [selectedLetter, setSelectedLetter] = useState(null);
   const letter = selectedLetter !== null ? urduData[selectedLetter] : null;
 
@@ -97,21 +99,22 @@ const UrduScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.bgMain,
+    backgroundColor: colors.bg,
   },
   gridContent: {
     paddingHorizontal: 16,
     paddingVertical: 16,
+    paddingBottom: 130,
     gap: 12,
   },
   gridRow: {
     justifyContent: 'space-between',
   },
   card: {
-    backgroundColor: Colors.bgCard,
+    backgroundColor: colors.surface,
     borderRadius: 24,
     borderWidth: 3,
     paddingVertical: 20,
@@ -137,19 +140,19 @@ const styles = StyleSheet.create({
   gridNameText: {
     fontSize: 14,
     fontWeight: '800',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     marginBottom: 6,
   },
   hint: {
     fontSize: 9,
     fontWeight: '700',
-    color: Colors.primary,
+    color: colors.primary,
     textTransform: 'uppercase',
   },
   detailContent: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    paddingBottom: 40,
+    paddingBottom: 130,
   },
   letterDisplay: {
     borderRadius: 28,
@@ -158,7 +161,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
-    backgroundColor: Colors.bgCard,
+    backgroundColor: colors.surface,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -177,21 +180,21 @@ const styles = StyleSheet.create({
   letterName: {
     fontSize: 18,
     fontWeight: '900',
-    color: Colors.textLight,
+    color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   vocabularyTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     marginBottom: 16,
   },
   vocabCard: {
-    backgroundColor: Colors.bgCard,
+    backgroundColor: colors.surface,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     paddingVertical: 14,
     paddingHorizontal: 16,
     marginBottom: 12,
@@ -220,7 +223,7 @@ const styles = StyleSheet.create({
   vocabWord: {
     fontSize: 22,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     textAlign: 'left',
     lineHeight: 38,
     fontFamily: Fonts.urduBold, // Nastaliq Urdu rendering
@@ -228,7 +231,7 @@ const styles = StyleSheet.create({
   vocabMeaning: {
     fontSize: 12,
     fontWeight: '600',
-    color: Colors.textLight,
+    color: colors.textMuted,
   },
 });
 

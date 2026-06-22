@@ -50,14 +50,11 @@ export default function App() {
     if (fontsLoaded) applyGlobalFont();
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
-    return (
-      <SafeAreaProvider>
-        <BrandSplash />
-      </SafeAreaProvider>
-    );
-  }
-
+  // NOTE: we mount the FULL provider tree immediately (even before the fonts
+  // finish loading) and let RootNavigator own the one-and-only BrandSplash.
+  // Rendering a separate splash here would mount a second BrandSplash later,
+  // re-running its entrance animation — that's what made the logo look like it
+  // appeared twice. One mount → one splash.
   return (
     <SafeAreaProvider>
       <ThemeProvider>
@@ -65,7 +62,7 @@ export default function App() {
           <DialogProvider>
             <AppContainer>
               <NavigationContainer>
-                <RootNavigator />
+                <RootNavigator fontsReady={fontsLoaded} />
               </NavigationContainer>
             </AppContainer>
           </DialogProvider>

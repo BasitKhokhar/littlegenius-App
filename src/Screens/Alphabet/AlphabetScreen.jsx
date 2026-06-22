@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
+import { useThemeColors } from '../../Context/ThemeContext';
 import { alphabetData } from '../../Data/alphabetData';
 import { Header } from '../../Components/UI';
 import AlphabetCard from '../../Components/Educational/AlphabetCard';
@@ -18,6 +18,8 @@ import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 const { width } = Dimensions.get('window');
 
 const AlphabetScreen = ({ navigation, route }) => {
+  const colors = useThemeColors();
+  const styles = makeStyles(colors);
   const [selectedLetter, setSelectedLetter] = useState(null);
   const letter = selectedLetter !== null ? alphabetData[selectedLetter] : null;
 
@@ -101,17 +103,17 @@ const AlphabetScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F5FC',
+    backgroundColor: colors.bg,
   },
 
   // Grid view
   gridContent: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    paddingBottom: 30,
+    paddingBottom: 130,
     gap: 12,
   },
   columnWrapper: {
@@ -123,7 +125,7 @@ const styles = StyleSheet.create({
   detailContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 50,
+    paddingBottom: 130,
   },
   letterHeroCard: {
     borderRadius: 28,
@@ -180,7 +182,7 @@ const styles = StyleSheet.create({
   vocabSectionTitle: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#1E1B4B',
+    color: colors.textPrimary,
     marginBottom: 12,
     letterSpacing: -0.3,
   },

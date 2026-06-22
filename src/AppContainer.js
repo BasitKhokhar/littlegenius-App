@@ -12,14 +12,16 @@ import { useThemeColors } from "./Context/ThemeContext";
  */
 const AppContainer = ({ children }) => {
     const colors = useThemeColors();
-    const isDark = colors.mode === "dark";
 
     return (
         <View style={[styles.root, { backgroundColor: colors.bg }]}>
+            {/* Every screen's header is the dark indigo brand surface and sits
+                under the translucent status bar, so the status-bar content
+                (clock, battery, icons) must stay light/white in BOTH themes. */}
             <StatusBar
                 translucent
                 backgroundColor="transparent"
-                barStyle={isDark ? "light-content" : "dark-content"}
+                barStyle="light-content"
             />
 
             <SafeAreaView edges={["left", "right", "bottom"]} style={styles.safeArea}>

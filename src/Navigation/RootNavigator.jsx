@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator();
 // Minimum time the branded splash stays on screen on every launch.
 const SPLASH_MIN_MS = 2200;
 
-const RootNavigator = () => {
+const RootNavigator = ({ fontsReady = true }) => {
   const { isAuthenticated, loading } = useAuth();
   const [bootReady, setBootReady] = useState(false);
   const [onboardingDone, setOnboardingDone] = useState(false);
@@ -39,7 +39,9 @@ const RootNavigator = () => {
     };
   }, []);
 
-  if (loading || !bootReady) return <BrandSplash />;
+  // Single splash gate: stay on the branded splash until the auth state is
+  // resolved, the fonts are registered AND the minimum dwell has elapsed.
+  if (loading || !bootReady || !fontsReady) return <BrandSplash />;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

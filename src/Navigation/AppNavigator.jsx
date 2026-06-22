@@ -1,9 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, View } from 'react-native';
-import { useThemeColors } from '../Context/ThemeContext';
-import { Radius } from '../Theme';
+import { PremiumTabBar } from '../Components/UI';
 
 import HomeScreen from '../Screens/Home/HomeScreen';
 import AlphabetScreen from '../Screens/Alphabet/AlphabetScreen';
@@ -63,84 +61,29 @@ const GamesStackNavigator = () => (
   </Stack.Navigator>
 );
 
-// ── Tab Icon component ────────────────────────────────────────
-const TabIcon = ({ emoji, focused }) => (
-  <View style={{
-    width: 38,
-    height: 38,
-    borderRadius: Radius.sm,
-    backgroundColor: focused ? 'rgba(252,211,77,0.18)' : 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }}>
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.7 }}>{emoji}</Text>
-  </View>
+// ── Islamic Tab Stack ─────────────────────────────────────────
+const IslamicStackNavigator = () => (
+  <Stack.Navigator screenOptions={STACK_OPTS}>
+    <Stack.Screen name="IslamicMain" component={IslamicScreen} />
+    <Stack.Screen name="QuizList" component={QuizListScreen} />
+    <Stack.Screen name="ModuleQuiz" component={ModuleQuizScreen} />
+  </Stack.Navigator>
 );
 
 // ── Root App Navigator (Bottom Tabs) ──────────────────────────
-const AppNavigator = () => {
-  const colors = useThemeColors();
-  return (
+// The bar itself lives in PremiumTabBar; the navigator just supplies
+// routes + labels. Order puts Islamic dead-centre for prominence.
+const AppNavigator = () => (
   <Tab.Navigator
-    screenOptions={{
-      headerShown: false,
-      tabBarShowLabel: true,
-      tabBarStyle: {
-        backgroundColor: colors.brandSurface,
-        borderTopWidth: 0,
-        height: 72,
-        paddingBottom: 10,
-        paddingTop: 6,
-        elevation: 20,
-        shadowColor: colors.brandSurface,
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.5,
-        shadowRadius: 12,
-      },
-      tabBarLabelStyle: {
-        fontFamily: 'Baloo2_800ExtraBold',
-        fontSize: 10,
-        marginTop: 2,
-        letterSpacing: 0.3,
-      },
-      tabBarActiveTintColor: colors.accent,
-      tabBarInactiveTintColor: colors.onBrandMuted,
-    }}
+    screenOptions={{ headerShown: false, tabBarStyle: { position: 'absolute' } }}
+    tabBar={(props) => <PremiumTabBar {...props} />}
   >
-    <Tab.Screen
-      name="Home"
-      component={HomeStackNavigator}
-      options={{
-        tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" focused={focused} />,
-        tabBarLabel: 'Home',
-      }}
-    />
-    <Tab.Screen
-      name="Stories"
-      component={StoriesStackNavigator}
-      options={{
-        tabBarIcon: ({ focused }) => <TabIcon emoji="📚" focused={focused} />,
-        tabBarLabel: 'Stories',
-      }}
-    />
-    <Tab.Screen
-      name="Games"
-      component={GamesStackNavigator}
-      options={{
-        tabBarIcon: ({ focused }) => <TabIcon emoji="🧠" focused={focused} />,
-        tabBarLabel: 'Games',
-      }}
-    />
-    <Tab.Screen
-      name="Settings"
-      component={SettingsScreen}
-      options={{
-        tabBarIcon: ({ focused }) => <TabIcon emoji="⚙️" focused={focused} />,
-        tabBarLabel: 'Settings',
-      }}
-    />
+    <Tab.Screen name="Home" component={HomeStackNavigator} options={{ tabBarLabel: 'Home' }} />
+    <Tab.Screen name="Stories" component={StoriesStackNavigator} options={{ tabBarLabel: 'Stories' }} />
+    <Tab.Screen name="Islamic" component={IslamicStackNavigator} options={{ tabBarLabel: 'Islamic' }} />
+    <Tab.Screen name="Games" component={GamesStackNavigator} options={{ tabBarLabel: 'Games' }} />
+    <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Settings' }} />
   </Tab.Navigator>
-  );
-};
+);
 
 export default AppNavigator;
