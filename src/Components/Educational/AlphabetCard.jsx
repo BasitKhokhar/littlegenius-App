@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   emoji: {
-    fontSize: 32,
+    fontSize: 50,
     marginVertical: 4,
     alignSelf: 'center',
   },

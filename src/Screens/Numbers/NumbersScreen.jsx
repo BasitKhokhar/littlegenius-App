@@ -14,6 +14,7 @@ import { numbersData } from '../../Data/numbersData';
 import { Header } from '../../Components/UI';
 import SpeakButton from '../../Components/Common/SpeakButton';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
+import { SketchButton, SketchCanvas } from '../../Components/Educational';
 import SpeechEngine from '../../Utils/speechEngine';
 
 const { width } = Dimensions.get('window');
@@ -22,6 +23,7 @@ const NumbersScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
   const styles = makeStyles(colors);
   const [selectedNum, setSelectedNum] = useState(null);
+  const [sketchOpen, setSketchOpen] = useState(false);
 
   const handleNumPress = (numItem) => {
     setSelectedNum(numItem);
@@ -116,9 +118,29 @@ const NumbersScreen = ({ navigation, route }) => {
                   label="🔊 Hear Pronunciation"
                 />
               </View>
+
+              {/* Sketch / handwriting practice */}
+              <View style={styles.sketchSection}>
+                <SketchButton
+                  color={selectedNum.color}
+                  label={`Write number ${selectedNum.number}`}
+                  onPress={() => setSketchOpen(true)}
+                />
+              </View>
             </View>
           </View>
         </Modal>
+      )}
+
+      {/* Tracing canvas (rendered at root so it layers above the detail modal) */}
+      {selectedNum && (
+        <SketchCanvas
+          visible={sketchOpen}
+          onClose={() => setSketchOpen(false)}
+          character={String(selectedNum.number)}
+          label={`Number ${selectedNum.number}`}
+          color={selectedNum.color}
+        />
       )}
     </View>
   );
@@ -255,6 +277,10 @@ const makeStyles = (colors) => StyleSheet.create({
   },
   audioSection: {
     width: '100%',
+  },
+  sketchSection: {
+    width: '100%',
+    marginTop: 12,
   },
 });
 

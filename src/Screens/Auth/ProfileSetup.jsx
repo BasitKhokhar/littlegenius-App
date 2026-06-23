@@ -17,9 +17,14 @@ import { Input, Button, BottomSheet } from '../../Components/Common';
 import { lightColors as C, gradients } from '../../Theme/colors';
 import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
 
-const { height } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
-const AVATARS = ['🐯', '🐱', '🦄', '🦁', '🦉', '🦊', '🐨', '🐼'];
+// 10 avatars laid out as two rows of 5. Chip size is derived so exactly
+// 5 fit per row (minus horizontal padding + the 4 inter-chip gaps).
+const AVATAR_COLS = 5;
+const AVATAR_CHIP = Math.floor((width - Spacing.xl * 2 - Spacing.sm * (AVATAR_COLS - 1)) / AVATAR_COLS);
+
+const AVATARS = ['🐯', '🐱', '🦄', '🦁', '🦉', '🦊', '🐨', '🐼', '🐸', '🐵'];
 const AGE_OPTIONS = ['2 Years', '3 Years', '4 Years', '5 Years', '6 Years', '7 Years', '8 Years', '9 Years', '10 Years'];
 
 // ProfileSetup — one-time, no-login profile for the offline app.
@@ -54,7 +59,7 @@ const ProfileSetup = () => {
   const s = makeStyles(colors);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.brandSurface }]}>
+    <View style={[styles.container, { backgroundColor: gradients.hero[gradients.hero.length - 1] }]}>
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
       {/* ── Top Hero ── */}
@@ -147,8 +152,8 @@ const makeStyles = (colors) =>
   StyleSheet.create({
     sectionLabel: { ...textStyles.overline, color: colors.primary, marginBottom: Spacing.md, marginTop: Spacing.sm },
     avatarChip: {
-      width: 56,
-      height: 56,
+      width: AVATAR_CHIP,
+      height: AVATAR_CHIP,
       borderRadius: Radius.md,
       backgroundColor: colors.surface,
       borderWidth: 2,

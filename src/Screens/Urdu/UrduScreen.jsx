@@ -13,11 +13,13 @@ import { urduData } from '../../Data/urduData';
 import { Header } from '../../Components/UI';
 import SpeakButton from '../../Components/Common/SpeakButton';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
+import { SketchButton, SketchCanvas } from '../../Components/Educational';
 
 const UrduScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
   const styles = makeStyles(colors);
   const [selectedLetter, setSelectedLetter] = useState(null);
+  const [sketchOpen, setSketchOpen] = useState(false);
   const letter = selectedLetter !== null ? urduData[selectedLetter] : null;
 
   if (letter) {
@@ -35,6 +37,15 @@ const UrduScreen = ({ navigation, route }) => {
               {letter.letter}
             </Text>
             <Text style={styles.letterName}>{letter.name}</Text>
+          </View>
+
+          {/* Sketch / handwriting practice */}
+          <View style={styles.sketchSection}>
+            <SketchButton
+              color={letter.color}
+              label={`Write ${letter.name}`}
+              onPress={() => setSketchOpen(true)}
+            />
           </View>
 
           <Text style={styles.vocabularyTitle}>Vocabulary (ذخیرہ الفاظ)</Text>
@@ -57,6 +68,15 @@ const UrduScreen = ({ navigation, route }) => {
             </View>
           ))}
         </ScrollView>
+
+        <SketchCanvas
+          visible={sketchOpen}
+          onClose={() => setSketchOpen(false)}
+          character={letter.letter}
+          label={letter.name}
+          color={letter.color}
+          fontFamily={Fonts.urduBold}
+        />
       </View>
     );
   }
@@ -183,6 +203,9 @@ const makeStyles = (colors) => StyleSheet.create({
     color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  sketchSection: {
+    marginBottom: 24,
   },
   vocabularyTitle: {
     fontSize: 16,

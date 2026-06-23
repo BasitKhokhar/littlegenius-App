@@ -116,7 +116,7 @@ const PremiumTabBar = ({ state, descriptors, navigation }) => {
   return (
     <View
       pointerEvents="box-none"
-      style={[styles.wrap, { paddingBottom: insets.bottom > 0 ? insets.bottom : 12 }]}
+      style={[styles.wrap, { paddingBottom: insets.bottom > 0 ? insets.bottom / 4 : 2 }]}
     >
       <View style={[styles.bar, { backgroundColor: BAR_LIGHT.surface, shadowColor: BAR_LIGHT.shadow }]}>
         {state.routes.map((route, index) => {

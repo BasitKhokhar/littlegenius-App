@@ -211,7 +211,7 @@ const makeStyles = (colors) =>
 const styles = StyleSheet.create({
   container: { flex: 1 },
   flex: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingTop: Spacing.md, paddingBottom: 100 },
+  scrollContent: { paddingHorizontal: 16, paddingTop: Spacing.md, paddingBottom: 60 },
 
   // Hero
   heroCard: {

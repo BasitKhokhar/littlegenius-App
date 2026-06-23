@@ -13,6 +13,7 @@ import { alphabetData } from '../../Data/alphabetData';
 import { Header } from '../../Components/UI';
 import AlphabetCard from '../../Components/Educational/AlphabetCard';
 import VocabularyCard from '../../Components/Educational/VocabularyCard';
+import { SketchButton, SketchCanvas } from '../../Components/Educational';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 
 const { width } = Dimensions.get('window');
@@ -21,6 +22,7 @@ const AlphabetScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
   const styles = makeStyles(colors);
   const [selectedLetter, setSelectedLetter] = useState(null);
+  const [sketchOpen, setSketchOpen] = useState(false);
   const letter = selectedLetter !== null ? alphabetData[selectedLetter] : null;
 
   // ─── Detail view ──────────────────────────────────────────
@@ -46,6 +48,15 @@ const AlphabetScreen = ({ navigation, route }) => {
             </View>
           </View>
 
+          {/* Sketch / handwriting practice */}
+          <View style={styles.sketchSection}>
+            <SketchButton
+              color={letter.color}
+              label={`Write letter ${letter.letter}`}
+              onPress={() => setSketchOpen(true)}
+            />
+          </View>
+
           {/* Vocabulary section */}
           <View style={styles.vocabSection}>
             <Text style={styles.vocabSectionTitle}>
@@ -63,6 +74,14 @@ const AlphabetScreen = ({ navigation, route }) => {
           </View>
 
         </ScrollView>
+
+        <SketchCanvas
+          visible={sketchOpen}
+          onClose={() => setSketchOpen(false)}
+          character={letter.letter}
+          label={`Letter ${letter.letter}`}
+          color={letter.color}
+        />
       </View>
     );
   }
@@ -175,6 +194,9 @@ const makeStyles = (colors) => StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+  sketchSection: {
+    marginBottom: 24,
   },
   vocabSection: {
     marginBottom: 20,
