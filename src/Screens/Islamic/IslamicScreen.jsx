@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -13,6 +13,7 @@ import {
   kalmasData,
   pillarsData,
   namesOfAllahData,
+  namesOfMuhammadData,
   prophetsData,
   mannersData,
   wuduSteps,
@@ -26,7 +27,8 @@ const TABS = [
   { key: 'duas', label: 'Duas' },
   { key: 'kalmas', label: 'Kalmas' },
   { key: 'pillars', label: 'Pillars' },
-  { key: 'names', label: '99 Names' },
+  { key: 'names', label: '99 Names of Allah' },
+  { key: 'namesMuhammad', label: 'Names of Prophet ﷺ' },
   { key: 'prophets', label: 'Prophets' },
   { key: 'manners', label: 'Manners' },
   { key: 'salah', label: 'Wudu & Salah' },
@@ -35,7 +37,15 @@ const TABS = [
 const IslamicScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
   const styles = makeStyles(colors);
-  const [activeTab, setActiveTab] = useState('duas');
+  const initialTab = TABS.some((t) => t.key === route?.params?.tab) ? route.params.tab : 'duas';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // The hub re-navigates to this screen with a different tab param —
+  // sync when that happens (navigate() updates params without remount).
+  useEffect(() => {
+    const t = route?.params?.tab;
+    if (t && TABS.some((x) => x.key === t)) setActiveTab(t);
+  }, [route?.params?.tab]);
 
   const renderDuaCard = (dua) => (
     <View key={dua.title} style={styles.islamicCard}>
@@ -124,6 +134,23 @@ const IslamicScreen = ({ navigation, route }) => {
 
         {activeTab === 'names' &&
           namesOfAllahData.map((name) => (
+            <View key={name.number} style={[styles.islamicCard, { borderLeftWidth: 4, borderLeftColor: name.color }]}>
+              <View style={styles.duaHeader}>
+                <View style={[styles.nameBadge, { backgroundColor: name.color }]}>
+                  <Text style={styles.nameBadgeText}>{name.number}</Text>
+                </View>
+                <Text style={styles.duaTitle}>{name.transliteration}</Text>
+              </View>
+              <Text style={styles.arabic}>{name.arabic}</Text>
+              <View style={styles.divider} />
+              <Text style={styles.english}>{name.english}</Text>
+              <Text style={styles.urdu}>{name.urdu}</Text>
+              <SpeakButton text={name.transliteration} language="en-US" label="🔊 Hear" color={name.color} />
+            </View>
+          ))}
+
+        {activeTab === 'namesMuhammad' &&
+          namesOfMuhammadData.map((name) => (
             <View key={name.number} style={[styles.islamicCard, { borderLeftWidth: 4, borderLeftColor: name.color }]}>
               <View style={styles.duaHeader}>
                 <View style={[styles.nameBadge, { backgroundColor: name.color }]}>

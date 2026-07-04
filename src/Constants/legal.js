@@ -11,8 +11,9 @@
 export const LEGAL_BASE_URL = 'https://litlegeniuslegalpages.netlify.app';
 
 // Public contact shown for support + child-safety reports.
-// 👉 CHANGE THIS to a mailbox you actually monitor.
-export const SUPPORT_EMAIL = 'support@littlegenius.app';
+export const SUPPORT_EMAIL = 'basitkhokhar957@gmail.com';
+export const SUPPORT_PHONE = '03060760549';
+export const DEVELOPER_NAME = 'Basit Dev';
 
 export const LEGAL_URLS = {
   HOME:           `${LEGAL_BASE_URL}/`,

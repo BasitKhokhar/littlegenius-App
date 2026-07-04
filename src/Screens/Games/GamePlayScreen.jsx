@@ -8,8 +8,9 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
 import { patternData, memoryCardsList, oddOneOutData, colorMatchData, shapeQuizData } from '../../Data/gamesData';
+import { useThemeColors } from '../../Context/ThemeContext';
+import { useTabBarClearance } from '../../Hooks';
 import { Header } from '../../Components/UI';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
@@ -20,6 +21,9 @@ const { width } = Dimensions.get('window');
 const GamePlayScreen = ({ navigation, route }) => {
   const { gameId } = route.params;
   const { addStars } = useAuth();
+  const colors = useThemeColors();
+  const bottomPad = useTabBarClearance();
+  const styles = makeStyles(colors);
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState('playing'); // playing, won
 
@@ -400,7 +404,7 @@ const GamePlayScreen = ({ navigation, route }) => {
         onBackPress={() => navigation.goBack()}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad }]}>
         {gameState === 'playing' ? (
           <>
             {gameId === 1 && renderPatternGame()}
@@ -422,7 +426,7 @@ const GamePlayScreen = ({ navigation, route }) => {
               </TouchableOpacity>
               
               <TouchableOpacity 
-                style={[styles.victoryBtn, { backgroundColor: Colors.secondary }]} 
+                style={[styles.victoryBtn, { backgroundColor: colors.secondary }]}
                 onPress={() => navigation.goBack()}
               >
                 <Text style={styles.victoryBtnText}>Back to Games ➔</Text>
@@ -435,15 +439,14 @@ const GamePlayScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.bgMain,
+    backgroundColor: colors.bg,
   },
   scrollContent: {
     paddingHorizontal: 16,
     paddingVertical: 20,
-    paddingBottom: 40,
     flexGrow: 1,
     justifyContent: 'center',
   },
@@ -454,14 +457,14 @@ const styles = StyleSheet.create({
   questionText: {
     fontSize: 20,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: 8,
   },
   progText: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.textLight,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 24,
     letterSpacing: 0.5,
@@ -471,10 +474,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     paddingVertical: 16,
     paddingHorizontal: 20,
     marginBottom: 36,
@@ -488,16 +491,16 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#FFEFEA',
+    backgroundColor: colors.surfaceAlt,
     borderWidth: 2,
-    borderColor: Colors.primary,
+    borderColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   questionMark: {
     fontSize: 24,
     fontWeight: '900',
-    color: Colors.primary,
+    color: colors.primary,
   },
   optionsGrid: {
     flexDirection: 'row',
@@ -508,10 +511,10 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     width: '47%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
@@ -537,7 +540,7 @@ const styles = StyleSheet.create({
   memoryCard: {
     width: '22%',
     height: 70,
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
@@ -550,9 +553,9 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0,0,0,0.2)',
   },
   memoryCardFlipped: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     borderBottomWidth: 2,
   },
   memoryEmoji: {
@@ -571,10 +574,10 @@ const styles = StyleSheet.create({
   oddCard: {
     width: '40%',
     height: 110,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 2,
@@ -586,10 +589,10 @@ const styles = StyleSheet.create({
   },
   explainCard: {
     width: '100%',
-    backgroundColor: '#EAF7F2',
+    backgroundColor: colors.surfaceAlt,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: Colors.secondary,
+    borderColor: colors.secondary,
     padding: 16,
     alignItems: 'center',
     gap: 12,
@@ -597,11 +600,11 @@ const styles = StyleSheet.create({
   explainText: {
     fontSize: 14,
     fontWeight: '800',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     textAlign: 'center',
   },
   nextBtn: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: colors.secondary,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 12,
@@ -614,10 +617,10 @@ const styles = StyleSheet.create({
   },
   // Math Race
   mathBox: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 24,
     borderWidth: 3,
-    borderColor: Colors.primary,
+    borderColor: colors.primary,
     paddingVertical: 24,
     paddingHorizontal: 40,
     marginBottom: 36,
@@ -628,7 +631,7 @@ const styles = StyleSheet.create({
   mathText: {
     fontSize: 40,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textPrimary,
   },
   colorBox: {
     width: 120,
@@ -638,15 +641,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 36,
     borderWidth: 3,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     elevation: 2,
   },
   colorEmoji: { fontSize: 48 },
   shapeBox: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     paddingVertical: 28,
     paddingHorizontal: 40,
     marginBottom: 36,
@@ -657,14 +660,14 @@ const styles = StyleSheet.create({
   shapeUrdu: {
     fontSize: 18,
     fontWeight: '700',
-    color: Colors.textLight,
+    color: colors.textSecondary,
   },
   // Victory Screen
   victoryCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 32,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     padding: 28,
     alignItems: 'center',
     elevation: 3,
@@ -680,13 +683,13 @@ const styles = StyleSheet.create({
   victoryTitle: {
     fontSize: 28,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     marginBottom: 8,
   },
   victorySubtitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.textLight,
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: 28,
     lineHeight: 20,
@@ -696,7 +699,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   victoryBtn: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: 'center',

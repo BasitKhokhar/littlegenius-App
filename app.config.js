@@ -3,7 +3,7 @@ export default () => ({
   expo: {
     name: 'Little Genius',
     slug: 'little-genius',
-    version: '1.0.0',
+    version: '1.1.0',
     orientation: 'portrait',
     icon: './assets/logo.png',
     owner: 'talhabasit7016',

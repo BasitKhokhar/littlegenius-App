@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   View,
   ScrollView,
@@ -8,8 +8,22 @@ import {
 } from 'react-native';
 import { gamesList } from '../../Data/gamesData';
 import { Header } from '../../Components/UI';
+import { useThemeColors } from '../../Context/ThemeContext';
+import { useTabBarClearance } from '../../Hooks';
 
 const GamesScreen = ({ navigation }) => {
+  const colors = useThemeColors();
+  const bottomPad = useTabBarClearance();
+  const styles = makeStyles(colors);
+
+  const openGame = (game) => {
+    if (game.route) {
+      navigation.navigate(game.route);
+    } else {
+      navigation.navigate('GamePlay', { gameId: game.id });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Header
@@ -19,7 +33,7 @@ const GamesScreen = ({ navigation }) => {
       />
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.heading}>🧩 Pick a Game to Play</Text>
@@ -28,7 +42,7 @@ const GamesScreen = ({ navigation }) => {
           <TouchableOpacity
             key={game.id}
             style={[styles.gameCard, { backgroundColor: game.gradStart }]}
-            onPress={() => navigation.navigate('GamePlay', { gameId: game.id })}
+            onPress={() => openGame(game)}
             activeOpacity={0.88}
           >
             {/* Decorative overlay */}
@@ -66,17 +80,16 @@ const GamesScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F6F5FC' },
+const makeStyles = (colors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
   content: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 50,
   },
   heading: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#1E1B4B',
+    color: colors.textPrimary,
     marginBottom: 16,
   },
   gameCard: {
@@ -158,7 +171,7 @@ const styles = StyleSheet.create({
   comingSoonText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#9CA3AF',
+    color: colors.textSecondary,
   },
 });
 

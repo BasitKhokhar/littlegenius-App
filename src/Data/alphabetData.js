@@ -313,10 +313,3 @@ export const alphabetData = [
     ]
   }
 ];
-
-// Quiz questions for alphabet learning
-export const alphabetQuizData = [
-  { q: 'Which letter is for Apple? 🍎', options: ['B', 'A', 'C', 'D'], answer: 'A' },
-  { q: 'What starts with the letter K? 🪁', options: ['Grapes', 'Cat', 'Kite', 'Zebra'], answer: 'Kite' },
-  { q: 'Which animal represents letter L? 🦁', options: ['Lion', 'Dog', 'Fish', 'Elephant'], answer: 'Lion' },
-];

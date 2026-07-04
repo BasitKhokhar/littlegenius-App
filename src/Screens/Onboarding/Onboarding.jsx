@@ -102,7 +102,9 @@ const Onboarding = ({ navigation }) => {
         >
           <Text style={styles.emoji}>{item.emoji}</Text>
         </Animated.View>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.title} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.7}>
+          {item.title}
+        </Text>
         <Text style={styles.description}>{item.description}</Text>
       </View>
     </View>

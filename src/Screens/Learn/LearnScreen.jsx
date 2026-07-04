@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Fonts } from '../../Theme/fonts';
 import { useThemeColors } from '../../Context/ThemeContext';
+import { useTabBarClearance } from '../../Hooks';
 import { Spacing, Radius, textStyles, Elevation, coloredShadow } from '../../Theme';
 import learnModules from '../../Data/learnModulesData';
 import { Header } from '../../Components/UI';
@@ -11,6 +12,7 @@ import SpeakButton from '../../Components/Common/SpeakButton';
 // chosen by route.params.moduleKey (see learnModulesData.js).
 const LearnScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
+  const bottomPad = useTabBarClearance();
   const moduleKey = route?.params?.moduleKey;
   const data = learnModules[moduleKey];
 
@@ -72,7 +74,7 @@ const LearnScreen = ({ navigation, route }) => {
         </ScrollView>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
         {current?.items.map((item) => (
           <View key={item.en} style={[s.card, { borderLeftWidth: 4, borderLeftColor: item.color }]}>
             <View style={styles.row}>
@@ -125,7 +127,7 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     textAlignVertical: 'center',
   },
-  content: { paddingHorizontal: Spacing.lg, paddingBottom: 40 },
+  content: { paddingHorizontal: Spacing.lg },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, marginBottom: Spacing.sm },
   flex: { flex: 1 },
   emoji: { fontSize: 34 },

@@ -1,5 +1,5 @@
 // Export all data in one place
-export { alphabetData, alphabetQuizData } from './alphabetData';
+export { alphabetData } from './alphabetData';
 export { default as urduData } from './urduData';
 export { numbersData } from './numbersData';
 export { default as shapesData } from './shapesData';
@@ -7,9 +7,14 @@ export { default as duasData } from './duasData';
 export { default as kalmasData } from './kalmasData';
 export { default as pillarsData } from './pillarsData';
 export { default as storiesData } from './storiesData';
+export { default as islamicStoriesData } from './islamicStoriesData';
+export { default as juzAmmaData } from './juzAmmaData';
 export { patternData, memoryCardsList, oddOneOutData, gamesList, colorMatchData, shapeQuizData } from './gamesData';
 export { quizPacksByModule } from './quizPacksData';
 export { default as namesOfAllahData } from './namesOfAllahData';
+export { default as namesOfMuhammadData } from './namesOfMuhammadData';
+export { default as tasbeehData } from './tasbeehData';
+export { default as namazGuideData } from './namazGuideData';
 export { default as prophetsData } from './prophetsData';
 export { default as mannersData } from './mannersData';
 export { wuduSteps, salahSteps, default as wuduSalahData } from './wuduSalahData';

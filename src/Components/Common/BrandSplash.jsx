@@ -36,8 +36,12 @@ const BrandSplash = () => {
         <View style={[styles.logoRing, coloredShadow(lightColors.primary, 'xl')]}>
           <Image source={require('../../../assets/logo.png')} style={styles.logo} resizeMode="contain" />
         </View>
-        <Text style={styles.appName}>Little Genius</Text>
-        <Text style={styles.tagline}>Premium Offline Learning</Text>
+        <Text style={styles.appName} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.65}>
+          Little Genius
+        </Text>
+        <Text style={styles.tagline} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+          Premium Offline Learning
+        </Text>
       </Animated.View>
 
       <Animated.View style={[styles.footer, { opacity: footerFade }]}>
@@ -57,7 +61,7 @@ const styles = StyleSheet.create({
   blob2: { bottom: -50, right: -50, width: 180, height: 180, backgroundColor: C.primaryDark, opacity: 0.4 },
   blob3: { top: '38%', right: -40, width: 110, height: 110, backgroundColor: C.primary, opacity: 0.18 },
 
-  center: { alignItems: 'center' },
+  center: { alignItems: 'center', alignSelf: 'stretch', paddingHorizontal: Spacing.xl },
   logoRing: {
     width: 168,
     height: 168,
@@ -70,7 +74,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   logo: { width: 132, height: 132, borderRadius: 32 },
-  appName: { ...textStyles.display, color: C.onBrand },
+  appName: { ...textStyles.display, lineHeight: 46, color: C.onBrand, textAlign: 'center', maxWidth: '100%' },
   tagline: {
     ...textStyles.overline,
     color: C.onBrandMuted,

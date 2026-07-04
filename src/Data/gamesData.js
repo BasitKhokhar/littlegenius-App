@@ -55,6 +55,47 @@ export const gamesList = [
     gradEnd: '#8B5CF6',
     tag: 'SHAPES',
   },
+  // New games below have dedicated screens — `route` overrides GamePlay.
+  {
+    id: 7,
+    name: 'Tracing Worksheet',
+    icon: '✍️',
+    desc: 'Write letters again & again and get marks like 7/10!',
+    gradStart: '#0EA5E9',
+    gradEnd: '#6366F1',
+    tag: 'WRITING',
+    route: 'TracingWorksheet',
+  },
+  {
+    id: 8,
+    name: 'Coloring Book',
+    icon: '🎨',
+    desc: 'Tap to fill cute pictures with bright colors',
+    gradStart: '#F97316',
+    gradEnd: '#EC4899',
+    tag: 'ART',
+    route: 'ColoringBook',
+  },
+  {
+    id: 9,
+    name: 'Neon Drawing',
+    icon: '🖌️',
+    desc: 'Free drawing board with magical glowing lines',
+    gradStart: '#8B5CF6',
+    gradEnd: '#22D3EE',
+    tag: 'CREATE',
+    route: 'DrawingBoard',
+  },
+  {
+    id: 10,
+    name: 'Letter Puzzle',
+    icon: '🧩',
+    desc: 'Find the missing letter in the word (F_SH!)',
+    gradStart: '#10B981',
+    gradEnd: '#0EA5E9',
+    tag: 'WORDS',
+    route: 'LetterPuzzle',
+  },
 ];
 
 // Pattern Matching Game

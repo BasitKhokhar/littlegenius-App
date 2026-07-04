@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   ScrollView,
@@ -6,14 +6,22 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
-import { storiesData } from '../../Data';
+import { storiesData, islamicStoriesData } from '../../Data';
 import { Header } from '../../Components/UI';
+import { useThemeColors } from '../../Context/ThemeContext';
+import { useTabBarClearance } from '../../Hooks';
+import SpeakButton from '../../Components/Common/SpeakButton';
 
 const STORY_COLORS = ['#F59E0B', '#EF4444', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
-const StoriesScreen = ({ navigation }) => {
+const StoriesScreen = ({ navigation, route }) => {
+  const colors = useThemeColors();
+  const bottomPad = useTabBarClearance();
+  const styles = makeStyles(colors);
   const [selectedStory, setSelectedStory] = useState(null);
-  const story = selectedStory !== null ? storiesData[selectedStory] : null;
+  const isIslamic = route?.params?.source === 'islamic';
+  const stories = isIslamic ? islamicStoriesData : storiesData;
+  const story = selectedStory !== null ? stories[selectedStory] : null;
 
   // ─── Story Detail ──────────────────────────────────────────
   if (selectedStory !== null && story) {
@@ -26,7 +34,7 @@ const StoriesScreen = ({ navigation }) => {
           onBackPress={() => setSelectedStory(null)}
         />
         <ScrollView
-          contentContainerStyle={styles.storyContent}
+          contentContainerStyle={[styles.storyContent, { paddingBottom: bottomPad }]}
           showsVerticalScrollIndicator={false}
         >
           {/* Hero */}
@@ -57,6 +65,7 @@ const StoriesScreen = ({ navigation }) => {
               {page.urduText ? (
                 <Text style={styles.pageUrduText}>{page.urduText}</Text>
               ) : null}
+              <SpeakButton text={page.text} language="en-US" label="🔊 Read Aloud" color={accentColor} />
             </View>
           ))}
 
@@ -77,17 +86,23 @@ const StoriesScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Header
-        title="Moral Stories"
+        title={isIslamic ? 'Islamic Stories' : 'Moral Stories'}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />
       <ScrollView
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: bottomPad }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.listHeading}>📚 Choose a Story / کہانی منتخب کرو</Text>
-        <Text style={styles.listSubheading}>Simple stories for Class 1 • جماعت اول کے لیے آسان کہانیاں</Text>
-        {storiesData.map((s, idx) => {
+        <Text style={styles.listHeading}>
+          {isIslamic ? '🌙 Choose a Story / کہانی منتخب کرو' : '📚 Choose a Story / کہانی منتخب کرو'}
+        </Text>
+        <Text style={styles.listSubheading}>
+          {isIslamic
+            ? 'Stories of Prophets & Sahaba • انبیاء اور صحابہ کی کہانیاں'
+            : 'Simple stories for Class 1 • جماعت اول کے لیے آسان کہانیاں'}
+        </Text>
+        {stories.map((s, idx) => {
           const cardColor = STORY_COLORS[idx % STORY_COLORS.length];
           return (
             <TouchableOpacity
@@ -121,25 +136,24 @@ const StoriesScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F6F5FC' },
+const makeStyles = (colors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
 
   // List view
   listContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 50,
   },
   listHeading: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#1E1B4B',
+    color: colors.textPrimary,
     marginBottom: 6,
   },
   listSubheading: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#8A8DA3',
+    color: colors.textSecondary,
     marginBottom: 14,
   },
   storyCard: {
@@ -225,7 +239,6 @@ const styles = StyleSheet.create({
   storyContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 50,
   },
   storyHero: {
     borderRadius: 28,
@@ -289,10 +302,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   pageCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#ECEAF6',
+    borderColor: colors.border,
     padding: 16,
     marginBottom: 12,
     alignItems: 'center',
@@ -316,20 +329,21 @@ const styles = StyleSheet.create({
   pageText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1E1B4B',
+    color: colors.textPrimary,
     textAlign: 'center',
     lineHeight: 22,
   },
   pageUrduText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#4B5563',
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginTop: 10,
+    marginBottom: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#EDE9FE',
+    borderTopColor: colors.border,
     width: '100%',
   },
   quizButton: {

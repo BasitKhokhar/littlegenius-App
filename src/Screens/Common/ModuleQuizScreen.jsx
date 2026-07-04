@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
 import { quizPacksByModule } from '../../Data/quizPacksData';
 import { getQuizBank } from '../../Utils/quizGenerators';
 import { createQuizSession, QUIZ_QUESTION_COUNT } from '../../Utils/quizHelpers';
@@ -14,10 +13,13 @@ import { calculateStarReward } from '../../Utils/dataHelpers';
 import { Header } from '../../Components/UI';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
+import { useThemeColors } from '../../Context/ThemeContext';
 
 const ModuleQuizScreen = ({ navigation, route }) => {
   const { module, packId } = route.params;
   const { addStars } = useAuth();
+  const colors = useThemeColors();
+  const styles = makeStyles(colors);
 
   const pack = useMemo(() => {
     const config = quizPacksByModule[module];
@@ -132,7 +134,7 @@ const ModuleQuizScreen = ({ navigation, route }) => {
                 <Text style={styles.btnText}>Try Again 🔁</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.btn, { backgroundColor: Colors.secondary }]}
+                style={[styles.btn, { backgroundColor: colors.secondary }]}
                 onPress={() => navigation.goBack()}
               >
                 <Text style={styles.btnText}>Back to Quizzes ➔</Text>
@@ -145,8 +147,8 @@ const ModuleQuizScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bgMain },
+const makeStyles = (colors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
   scrollContent: {
     paddingHorizontal: 16,
     paddingVertical: 24,
@@ -157,15 +159,15 @@ const styles = StyleSheet.create({
   progText: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.textLight,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 16,
   },
   questionCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     paddingVertical: 32,
     paddingHorizontal: 20,
     width: '100%',
@@ -176,16 +178,16 @@ const styles = StyleSheet.create({
   questionText: {
     fontSize: 20,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     textAlign: 'center',
     lineHeight: 28,
   },
   optionsContainer: { width: '100%', gap: 12 },
   optionBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     paddingVertical: 16,
     paddingHorizontal: 20,
     alignItems: 'center',
@@ -197,14 +199,14 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 18,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     textAlign: 'center',
   },
   resultCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 32,
     borderWidth: 2,
-    borderColor: Colors.borderLight,
+    borderColor: colors.border,
     padding: 28,
     alignItems: 'center',
     elevation: 3,
@@ -213,24 +215,24 @@ const styles = StyleSheet.create({
   resultTitle: {
     fontSize: 26,
     fontWeight: '900',
-    color: Colors.textDark,
+    color: colors.textPrimary,
     marginBottom: 8,
   },
   scoreText: {
     fontSize: 20,
     fontWeight: '800',
-    color: Colors.primary,
+    color: colors.primary,
     marginBottom: 4,
   },
   rewardText: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.textLight,
+    color: colors.textSecondary,
     marginBottom: 32,
   },
   btnRow: { width: '100%', gap: 12 },
   btn: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: 'center',
@@ -248,7 +250,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.textLight,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
 });

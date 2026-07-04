@@ -15,11 +15,13 @@ import { useAuth, useDialog } from '../../Context';
 import { useTheme } from '../../Context/ThemeContext';
 import { LEGAL_URLS, SUPPORT_EMAIL } from '../../Constants';
 import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
+import { useTabBarClearance } from '../../Hooks';
 
 const SettingsScreen = ({ navigation }) => {
   const { user, stars, logout, deleteAccount } = useAuth();
   const { showConfirm } = useDialog();
   const { colors, isDark, toggle } = useTheme();
+  const bottomPad = useTabBarClearance();
 
   const [gate, setGate] = useState(null);
   const requestGate = (title, action) => setGate({ title, action });
@@ -85,7 +87,7 @@ const SettingsScreen = ({ navigation }) => {
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <Header title="Settings & Profile" showBack={false} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
         {/* Profile Hero */}
         <LinearGradient
           colors={colors.gradients.hero}
@@ -217,7 +219,7 @@ const makeStyles = (colors) =>
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 60 },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 20 },
   profileHero: {
     borderRadius: Radius.xl,
     paddingVertical: Spacing.xxxl,

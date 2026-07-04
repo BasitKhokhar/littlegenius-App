@@ -13,6 +13,7 @@ import { Header } from '../../Components/UI';
 import { SectionHeader, Badge } from '../../Components/Common';
 import { useAuth } from '../../Context';
 import { useThemeColors } from '../../Context/ThemeContext';
+import { useTabBarClearance } from '../../Hooks';
 import {
   Spacing,
   Radius,
@@ -97,6 +98,7 @@ const ModuleCard = ({ module, onPress, delay }) => {
 const HomeScreen = ({ navigation }) => {
   const { user, stars } = useAuth();
   const colors = useThemeColors();
+  const bottomPad = useTabBarClearance();
   const userProfile = user || { name: 'Superstar', avatar: '🦁' };
 
   const heroScale = useRef(new Animated.Value(0.96)).current;
@@ -110,7 +112,7 @@ const HomeScreen = ({ navigation }) => {
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <Header title="Little Genius" avatar={userProfile.avatar} stars={stars} useLogo />
 
-      <ScrollView style={styles.flex} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.flex} showsVerticalScrollIndicator={false} contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad }]}>
         {/* Hero Welcome Card */}
         <Animated.View style={{ transform: [{ scale: heroScale }] }}>
           <LinearGradient
@@ -211,7 +213,7 @@ const makeStyles = (colors) =>
 const styles = StyleSheet.create({
   container: { flex: 1 },
   flex: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingTop: Spacing.md, paddingBottom: 60 },
+  scrollContent: { paddingHorizontal: 16, paddingTop: Spacing.md },
 
   // Hero
   heroCard: {

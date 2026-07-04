@@ -9,10 +9,15 @@ import {
 import { quizPacksByModule } from '../../Data/quizPacksData';
 import { getQuizBank } from '../../Utils/quizGenerators';
 import { Header } from '../../Components/UI';
+import { useThemeColors } from '../../Context/ThemeContext';
+import { useTabBarClearance } from '../../Hooks';
 
 const QuizListScreen = ({ navigation, route }) => {
   const { module } = route.params;
   const config = quizPacksByModule[module];
+  const colors = useThemeColors();
+  const bottomPad = useTabBarClearance();
+  const styles = makeStyles(colors);
 
   if (!config) {
     return (
@@ -32,7 +37,7 @@ const QuizListScreen = ({ navigation, route }) => {
         showBack
         onBackPress={() => navigation.goBack()}
       />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.subtitle}>{config.subtitle}</Text>
 
         {config.packs.map((pack) => {
@@ -64,17 +69,16 @@ const QuizListScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F6F5FC' },
+const makeStyles = (colors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
   content: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 50,
   },
   subtitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#8A8DA3',
+    color: colors.textSecondary,
     marginBottom: 16,
     lineHeight: 18,
   },
@@ -153,7 +157,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#8A8DA3',
+    color: colors.textSecondary,
   },
 });
 
