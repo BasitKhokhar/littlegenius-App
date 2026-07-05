@@ -1,7 +1,7 @@
 // Metro config for Expo SDK 54
 // Adds react-native-svg-transformer so `.svg` files can be imported as
 // React components:  import Apple from '@assets/svg/apple.svg';
-const { getDefaultConfig } = require('expo/metro');
+const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
