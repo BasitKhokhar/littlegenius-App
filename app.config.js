@@ -1,4 +1,7 @@
 import 'dotenv/config';
+
+const projectId = process.env.EXPO_ID;
+
 export default () => ({
   expo: {
     name: 'Little Genius',
@@ -8,6 +11,20 @@ export default () => ({
     icon: './assets/logo.png',
     owner: 'talhabasit7016',
     userInterfaceStyle: 'light',
+    // ── OTA (Over-The-Air) updates via EAS Update ──────────────────────────
+    // JS/asset changes ship instantly without a new store build.
+    // runtimeVersion "appVersion" policy => an update only lands on a build
+    // whose `version` matches. Bump `version` above ONLY when you change
+    // native code / add native modules, then rebuild. Pure JS/UI changes keep
+    // the same version and are delivered with `eas update`.
+    runtimeVersion: { policy: 'appVersion' },
+    updates: {
+      url: `https://u.expo.dev/${projectId}`,
+      enabled: true,
+      // 0 = launch instantly from cache, fetch the new bundle in the
+      // background and apply it on next app open (best UX for kids app).
+      fallbackToCacheTimeout: 0,
+    },
     splash: {
       image: './assets/logo.png',
       resizeMode: 'contain',

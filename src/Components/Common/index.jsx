@@ -12,6 +12,7 @@ export { default as SectionHeader } from './SectionHeader';
 export { default as Badge } from './Badge';
 export { default as IconButton } from './IconButton';
 export { default as BottomSheet } from './BottomSheet';
+export { default as Illustration } from './Illustration';
 
 // States
 export { default as EmptyState } from './EmptyState';
