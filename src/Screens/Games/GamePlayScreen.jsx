@@ -14,6 +14,7 @@ import { useTabBarClearance } from '../../Hooks';
 import { Header } from '../../Components/UI';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
+import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { generateMathProblem, shuffleArray } from '../../Utils/dataHelpers';
 
 const { width } = Dimensions.get('window');
@@ -60,7 +61,7 @@ const GamePlayScreen = ({ navigation, route }) => {
     if (gameId === 1) {
       // Pattern Match
       setPatternIdx(0);
-      SpeechEngine.speak('Pattern Match! Find the emoji that fits next!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.GAME_PATTERN, 'en-US');
     } else if (gameId === 2) {
       // Memory Game
       const shuffled = shuffleArray(memoryCardsList).map((emoji, index) => ({
@@ -70,23 +71,23 @@ const GamePlayScreen = ({ navigation, route }) => {
       setCards(shuffled);
       setSelectedCards([]);
       setMatchedCards([]);
-      SpeechEngine.speak('Memory Game! Match all pairs of emojis!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.GAME_MEMORY, 'en-US');
     } else if (gameId === 3) {
       // Odd One Out
       setOddIdx(0);
       setOddExplain(null);
-      SpeechEngine.speak('Odd One Out! Tap the item that does not fit!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.GAME_ODD, 'en-US');
     } else if (gameId === 4) {
       // Math Race
       setMathIdx(0);
       setMathProblem(generateMathProblem('+'));
-      SpeechEngine.speak('Math Race! Solve the math questions quickly!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.GAME_MATH, 'en-US');
     } else if (gameId === 5) {
       setColorIdx(0);
-      SpeechEngine.speak('Color Match! Pick the right color name!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.GAME_COLOR, 'en-US');
     } else if (gameId === 6) {
       setShapeIdx(0);
-      SpeechEngine.speak('Shape Quiz! Name the shapes correctly!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.GAME_SHAPE, 'en-US');
     }
   };
 
@@ -100,14 +101,14 @@ const GamePlayScreen = ({ navigation, route }) => {
   const handlePatternAnswer = (selected) => {
     const current = patternData[patternIdx];
     if (selected === current.answer) {
-      SpeechEngine.speak('Correct! Nice job!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.CORRECT_NICE_JOB, 'en-US');
       if (patternIdx < patternData.length - 1) {
         setPatternIdx(prev => prev + 1);
       } else {
         handleGameWin(15);
       }
     } else {
-      SpeechEngine.speak('Oops! Try again!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.OOPS_TRY_AGAIN, 'en-US');
     }
   };
 
@@ -134,10 +135,10 @@ const GamePlayScreen = ({ navigation, route }) => {
           return nextMatched;
         });
         setSelectedCards([]);
-        SpeechEngine.speak('Matched!', 'en-US');
+        SpeechEngine.speak(SPEECH_PHRASES.MATCHED, 'en-US');
       } else {
         // Not a match, flip back
-        SpeechEngine.speak('No match!', 'en-US');
+        SpeechEngine.speak(SPEECH_PHRASES.NO_MATCH, 'en-US');
         setTimeout(() => {
           setSelectedCards([]);
         }, 1000);
@@ -152,7 +153,7 @@ const GamePlayScreen = ({ navigation, route }) => {
       setOddExplain(current.explain);
       SpeechEngine.speak(`Excellent! ${current.explain}`, 'en-US');
     } else {
-      SpeechEngine.speak('Try again!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
     }
   };
 
@@ -168,7 +169,7 @@ const GamePlayScreen = ({ navigation, route }) => {
   // --- Math Race Logic ---
   const handleMathAnswer = (selected) => {
     if (selected === mathProblem.answer) {
-      SpeechEngine.speak('Correct!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.CORRECT, 'en-US');
       if (mathIdx < 9) {
         setMathIdx(prev => prev + 1);
         const op = Math.random() > 0.5 ? '+' : '-';
@@ -177,7 +178,7 @@ const GamePlayScreen = ({ navigation, route }) => {
         handleGameWin(15);
       }
     } else {
-      SpeechEngine.speak('Try again!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
     }
   };
 
@@ -185,14 +186,14 @@ const GamePlayScreen = ({ navigation, route }) => {
   const handleColorAnswer = (selected) => {
     const current = colorMatchData[colorIdx];
     if (selected === current.name) {
-      SpeechEngine.speak('Correct!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.CORRECT, 'en-US');
       if (colorIdx < colorMatchData.length - 1) {
         setColorIdx((prev) => prev + 1);
       } else {
         handleGameWin(15);
       }
     } else {
-      SpeechEngine.speak('Try again!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
     }
   };
 
@@ -200,14 +201,14 @@ const GamePlayScreen = ({ navigation, route }) => {
   const handleShapeAnswer = (selected) => {
     const current = shapeQuizData[shapeIdx];
     if (selected === current.name) {
-      SpeechEngine.speak('Correct!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.CORRECT, 'en-US');
       if (shapeIdx < shapeQuizData.length - 1) {
         setShapeIdx((prev) => prev + 1);
       } else {
         handleGameWin(15);
       }
     } else {
-      SpeechEngine.speak('Try again!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
     }
   };
 

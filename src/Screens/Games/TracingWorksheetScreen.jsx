@@ -14,6 +14,7 @@ import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
+import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { DrawCanvas, MarksBadge } from '../../Components/Games';
 import traceSkeletons, { TRACE_LETTERS, TRACE_NUMBERS } from '../../Data/traceSkeletons';
 import { densifySkeleton, skeletonToPath, scoreTrace } from '../../Utils/traceScoring';
@@ -91,11 +92,11 @@ const TracingWorksheetScreen = ({ navigation }) => {
     setFeedback({ marks, cellIdx: activeIdx });
 
     if (marks >= 5) {
-      SpeechEngine.speak(marks >= 8 ? 'Amazing writing!' : 'Good job!', 'en-US');
+      SpeechEngine.speak(marks >= 8 ? SPEECH_PHRASES.TRACE_AMAZING : SPEECH_PHRASES.TRACE_GOOD, 'en-US');
       commitCell(result);
     } else {
       // Written wrong — show feedback, let them retry or keep it.
-      SpeechEngine.speak('Oops! You have written it wrong. Try again!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.TRACE_WRONG, 'en-US');
       setCells((prev) => {
         const next = [...prev];
         next[activeIdx] = { ...result, pendingRetry: true };

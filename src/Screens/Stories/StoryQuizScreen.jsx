@@ -12,6 +12,7 @@ import { Header } from '../../Components/UI';
 import { useAuth } from '../../Context';
 import { useThemeColors } from '../../Context/ThemeContext';
 import SpeechEngine from '../../Utils/speechEngine';
+import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { calculateStarReward, shuffleArray } from '../../Utils/dataHelpers';
 
 const StoryQuizScreen = ({ navigation, route }) => {
@@ -60,7 +61,7 @@ const StoryQuizScreen = ({ navigation, route }) => {
     const isCorrect = option.isCorrect;
     if (isCorrect) {
       setCorrectCount(prev => prev + 1);
-      SpeechEngine.speak('Correct! Excellent job!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.CORRECT_EXCELLENT, 'en-US');
     } else {
       const correctText = currentQuestion.options.find(o => o.isCorrect)?.text;
       SpeechEngine.speak(`Not quite! The right answer is ${correctText}`, 'en-US');

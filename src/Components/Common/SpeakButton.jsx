@@ -1,40 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { TouchableOpacity, Text, StyleSheet, View, Alert } from 'react-native';
 import SpeechEngine from '../../Utils/speechEngine';
 import { Colors } from '../../Data/colorsTheme';
 import { Radius, coloredShadow } from '../../Theme';
 
-const SpeakButton = ({ 
-  text, 
-  language = 'en-US', 
-  color = Colors.primary, 
+// Human labels + install hints for the languages that commonly lack a
+// device voice pack (Arabic/Urdu are absent on many Android phones).
+const LANG_INFO = {
+  ar: { name: 'Arabic', code: 'ar' },
+  ur: { name: 'Urdu', code: 'ur' },
+};
+// Warn at most once per language per app session so we never nag.
+const warnedLangs = new Set();
+
+const maybeWarnMissingVoice = async (language) => {
+  const prefix = `${language || ''}`.toLowerCase().split(/[-_]/)[0];
+  const info = LANG_INFO[prefix];
+  if (!info || warnedLangs.has(prefix)) return;
+  // Only warn if the device really has no voice for this language.
+  const available = await SpeechEngine.isLanguageAvailable(language);
+  if (available) return;
+  warnedLangs.add(prefix);
+  Alert.alert(
+    `${info.name} voice not installed`,
+    `Your device doesn't have a ${info.name} text-to-speech voice yet, so this audio can't play.\n\nTo enable it: open your phone's Settings → System → Languages & input → Text-to-speech output → install the ${info.name} voice data.`,
+    [{ text: 'OK' }],
+  );
+};
+
+const SpeakButton = ({
+  text,
+  language = 'en-US',
+  color = Colors.primary,
   size = 'md',
   label = '🔊 Listen',
   onSpeakStart = null,
   onSpeakEnd = null,
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
-      // Stop speech on unmount
+      // Stop speech on unmount and block any late state updates.
+      mountedRef.current = false;
       SpeechEngine.stop();
     };
   }, []);
 
+  // Central reset — safe to call from any callback; ignored after unmount.
+  const finish = () => {
+    if (!mountedRef.current) return;
+    setIsSpeaking(false);
+    if (onSpeakEnd) onSpeakEnd();
+  };
+
   const handleSpeak = async () => {
+    // Tap-to-stop: pressing while playing cancels instead of being a dead
+    // (disabled) button. This is also the user's recovery path if a device
+    // voice misbehaves.
+    if (isSpeaking) {
+      await SpeechEngine.stop();
+      finish();
+      return;
+    }
+
     setIsSpeaking(true);
     if (onSpeakStart) onSpeakStart();
 
-    // Clear, professional MALE voice handled centrally by SpeechEngine
-    // (male voice selection + adult pitch + slow rate).
+    // Voice handled centrally by SpeechEngine: it plays the pre-baked premium
+    // clip for the active persona (teacher/kid) when one exists, else falls
+    // back to device TTS. SpeechEngine guarantees exactly one of onDone/onError
+    // fires, so state can't hang.
     await SpeechEngine.speak(text, language, {
-      onDone: () => {
-        setIsSpeaking(false);
-        if (onSpeakEnd) onSpeakEnd();
-      },
+      onDone: finish,
       onError: () => {
-        setIsSpeaking(false);
+        finish();
+        // If the audio never played because the device lacks this
+        // language's voice, explain how to install it (once per language).
+        maybeWarnMissingVoice(language);
       },
     });
   };
@@ -50,7 +95,6 @@ const SpeakButton = ({
   return (
     <TouchableOpacity
       onPress={handleSpeak}
-      disabled={isSpeaking}
       style={[
         styles.button,
         coloredShadow(color, 'sm'),

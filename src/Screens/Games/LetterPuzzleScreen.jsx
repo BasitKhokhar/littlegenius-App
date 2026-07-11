@@ -13,6 +13,7 @@ import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
+import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { calculateStarReward } from '../../Utils/dataHelpers';
 import { buildPuzzleRounds } from '../../Data/letterPuzzleData';
 
@@ -86,7 +87,7 @@ const LetterPuzzleScreen = ({ navigation }) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
       setFirstTry(false);
       runShake();
-      SpeechEngine.speak('Try again!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
     }
   };
 

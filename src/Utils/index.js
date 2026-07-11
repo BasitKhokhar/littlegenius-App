@@ -7,3 +7,4 @@ export * from './quizHelpers';
 export * from './quizGenerators';
 export * from './validation';
 export * as storage from './storage';
+export * as notifications from './notifications';

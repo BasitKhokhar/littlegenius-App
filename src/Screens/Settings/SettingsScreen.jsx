@@ -7,28 +7,79 @@ import {
   ScrollView,
   Linking,
   Switch,
+  Modal,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Header, ParentalGate } from '../../Components/UI';
 import { Card, Button, Badge } from '../../Components/Common';
-import { useAuth, useDialog } from '../../Context';
+import { useAuth, useDialog, useNotifications, useVoice } from '../../Context';
 import { useTheme } from '../../Context/ThemeContext';
 import { LEGAL_URLS, SUPPORT_EMAIL } from '../../Constants';
+import SpeechEngine from '../../Utils/speechEngine';
+import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
 import { useTabBarClearance } from '../../Hooks';
+
+// Grown-up-friendly preset reminder times (no extra native date-picker dep).
+const TIME_PRESETS = [
+  { label: 'Morning', time: '8:00 AM', hour: 8, minute: 0 },
+  { label: 'Afternoon', time: '4:00 PM', hour: 16, minute: 0 },
+  { label: 'Evening', time: '7:00 PM', hour: 19, minute: 0 },
+];
+
+const formatTime = (h, m) => {
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hr12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hr12}:${String(m).padStart(2, '0')} ${period}`;
+};
 
 const SettingsScreen = ({ navigation }) => {
   const { user, stars, logout, deleteAccount } = useAuth();
   const { showConfirm } = useDialog();
   const { colors, isDark, toggle } = useTheme();
+  const { persona, setPersona } = useVoice();
+  const { enabled: remindersOn, hour, minute, setEnabled, setTime } = useNotifications();
+
+  // Preview the chosen voice by speaking a short line in it.
+  const previewVoice = (next) => {
+    setPersona(next);
+    SpeechEngine.speak(
+      next === 'kid' ? SPEECH_PHRASES.VOICE_PREVIEW_KID : SPEECH_PHRASES.VOICE_PREVIEW_TEACHER,
+      'en-US',
+    );
+  };
   const bottomPad = useTabBarClearance();
 
   const [gate, setGate] = useState(null);
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
   const requestGate = (title, action) => setGate({ title, action });
   const runGate = () => {
     const action = gate?.action;
     setGate(null);
     action?.();
+  };
+
+  // Toggle daily reminders. If the OS permission is denied, guide the grown-up
+  // to system settings and leave the switch off.
+  const toggleReminder = async (value) => {
+    const ok = await setEnabled(value);
+    if (value && !ok) {
+      showConfirm({
+        title: 'Notifications Are Off',
+        message:
+          'To get daily learning reminders, please turn on notifications for Little Genius in your device settings.',
+        emoji: '🔔',
+        variant: 'confirm',
+        confirmLabel: 'Open Settings',
+        cancelLabel: 'Not Now',
+        onConfirm: () => Linking.openSettings().catch(() => {}),
+      });
+    }
+  };
+
+  const pickTime = (h, m) => {
+    setTime(h, m);
+    setTimePickerVisible(false);
   };
 
   const openLink = (url) => Linking.openURL(url).catch(() => {});
@@ -125,6 +176,74 @@ const SettingsScreen = ({ navigation }) => {
           </View>
         </Card>
 
+        {/* Voice */}
+        <Card elevation="sm" style={styles.card}>
+          <Text style={s.cardTitle}>🎙️ Voice</Text>
+          <Text style={[s.aboutText, { marginBottom: Spacing.md }]}>
+            Choose who reads the lessons aloud. Tap to hear a preview.
+          </Text>
+          {[
+            { key: 'teacher', emoji: '👩‍🏫', label: 'Teacher', hint: 'Warm, clear grown-up voice' },
+            { key: 'kid', emoji: '🧒', label: 'Kid Voice', hint: 'Playful and fun' },
+          ].map((v) => {
+            const active = persona === v.key;
+            return (
+              <TouchableOpacity
+                key={v.key}
+                style={[s.timeChip, active && s.timeChipActive]}
+                onPress={() => previewVoice(v.key)}
+                activeOpacity={0.85}
+              >
+                <View style={s.infoIconCircle}>
+                  <Text style={styles.infoIcon}>{v.emoji}</Text>
+                </View>
+                <View style={[styles.infoTextBlock, { marginLeft: Spacing.md }]}>
+                  <Text style={[s.timeChipLabel, active && s.timeChipTextActive]}>{v.label}</Text>
+                  <Text style={s.infoLabel}>{v.hint}</Text>
+                </View>
+                {active && <Text style={[s.timeValue, { marginRight: 0 }]}>✓</Text>}
+              </TouchableOpacity>
+            );
+          })}
+        </Card>
+
+        {/* Reminders */}
+        <Card elevation="sm" style={styles.card}>
+          <Text style={s.cardTitle}>🔔 Reminders</Text>
+          <View style={[s.infoRow, !remindersOn && { borderBottomWidth: 0 }]}>
+            <View style={s.infoIconCircle}>
+              <Text style={styles.infoIcon}>⏰</Text>
+            </View>
+            <View style={styles.infoTextBlock}>
+              <Text style={s.infoValue}>Daily Learning Reminder</Text>
+              <Text style={s.infoLabel}>{remindersOn ? 'On' : 'Off'}</Text>
+            </View>
+            <Switch
+              value={remindersOn}
+              onValueChange={toggleReminder}
+              trackColor={{ false: colors.borderStrong, true: colors.primary }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+          {remindersOn && (
+            <TouchableOpacity
+              style={[s.linkRow, { borderBottomWidth: 0 }]}
+              onPress={() => requestGate('Set Reminder Time', () => setTimePickerVisible(true))}
+              activeOpacity={0.7}
+            >
+              <View style={s.infoIconCircle}>
+                <Text style={styles.infoIcon}>🕒</Text>
+              </View>
+              <View style={styles.infoTextBlock}>
+                <Text style={s.infoValue}>Reminder Time</Text>
+                <Text style={s.infoLabel}>Tap to change</Text>
+              </View>
+              <Text style={s.timeValue}>{formatTime(hour, minute)}</Text>
+              <Text style={s.chevron}>›</Text>
+            </TouchableOpacity>
+          )}
+        </Card>
+
         {/* Profile */}
         <Card elevation="sm" style={styles.card}>
           <Text style={s.cardTitle}>🧒 Profile</Text>
@@ -178,6 +297,43 @@ const SettingsScreen = ({ navigation }) => {
         onSuccess={runGate}
         onCancel={() => setGate(null)}
       />
+
+      <Modal
+        visible={timePickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setTimePickerVisible(false)}
+      >
+        <View style={s.modalBackdrop}>
+          <View style={s.modalCard}>
+            <Text style={s.modalTitle}>🕒 Reminder Time</Text>
+            <Text style={s.modalSubtitle}>
+              When should we remind {user?.name || 'your child'} to learn?
+            </Text>
+            {TIME_PRESETS.map((p) => {
+              const active = p.hour === hour && p.minute === minute;
+              return (
+                <TouchableOpacity
+                  key={p.label}
+                  style={[s.timeChip, active && s.timeChipActive]}
+                  onPress={() => pickTime(p.hour, p.minute)}
+                  activeOpacity={0.85}
+                >
+                  <Text style={[s.timeChipLabel, active && s.timeChipTextActive]}>{p.label}</Text>
+                  <Text style={[s.timeChipTime, active && s.timeChipTextActive]}>{p.time}</Text>
+                </TouchableOpacity>
+              );
+            })}
+            <Button
+              title="Close"
+              variant="ghost"
+              size="md"
+              onPress={() => setTimePickerVisible(false)}
+              style={{ marginTop: Spacing.sm }}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -214,7 +370,44 @@ const makeStyles = (colors) =>
     },
     linkLabel: { flex: 1, ...textStyles.bodyStrong, color: colors.textPrimary },
     chevron: { fontSize: 22, color: colors.textMuted, fontFamily: 'Baloo2_800ExtraBold' },
+    timeValue: { ...textStyles.bodyStrong, color: colors.primary, marginRight: Spacing.xs },
     versionText: { ...textStyles.caption, color: colors.textMuted, textAlign: 'center' },
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: Spacing.xl,
+    },
+    modalCard: {
+      width: '100%',
+      backgroundColor: colors.surface,
+      borderRadius: Radius.xl,
+      padding: Spacing.xl,
+    },
+    modalTitle: { ...textStyles.title, color: colors.textPrimary, textAlign: 'center' },
+    modalSubtitle: {
+      ...textStyles.body,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginTop: Spacing.xs,
+      marginBottom: Spacing.lg,
+    },
+    timeChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+      borderRadius: Radius.lg,
+      borderWidth: 1.5,
+      borderColor: colors.borderStrong,
+      marginBottom: Spacing.sm,
+    },
+    timeChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
+    timeChipLabel: { ...textStyles.bodyStrong, color: colors.textPrimary },
+    timeChipTime: { ...textStyles.body, color: colors.textSecondary },
+    timeChipTextActive: { color: colors.primary },
   });
 
 const styles = StyleSheet.create({

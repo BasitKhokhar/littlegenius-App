@@ -13,6 +13,7 @@ import { calculateStarReward } from '../../Utils/dataHelpers';
 import { Header } from '../../Components/UI';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
+import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { useThemeColors } from '../../Context/ThemeContext';
 
 const ModuleQuizScreen = ({ navigation, route }) => {
@@ -60,7 +61,7 @@ const ModuleQuizScreen = ({ navigation, route }) => {
 
     if (isCorrect) {
       setCorrectCount(nextCorrect);
-      SpeechEngine.speak('Correct! Brilliant!', 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.CORRECT_BRILLIANT, 'en-US');
     } else {
       SpeechEngine.speak(`Not quite! The correct answer is ${currentQuestion.answer}`, 'en-US');
     }

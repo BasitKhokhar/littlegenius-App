@@ -1,0 +1,209 @@
+#!/usr/bin/env node
+// generateAudio.mjs — BUILD-TIME pre-baking of the app's spoken audio.
+//
+// Reads every fixed (language, text) pair from scripts/collect.mjs, synthesises
+// each one with Azure Neural TTS in two personas (teacher / kid), writes the
+// clips to assets/audio/<persona>/<speechKey>.mp3, and regenerates
+// src/Utils/audioManifest.generated.js so React Native can require() them.
+//
+// This runs on a developer machine, NOT in the app. Nothing here ships.
+//
+// Usage:
+//   AZURE_TTS_KEY=xxx AZURE_TTS_REGION=eastus node scripts/generateAudio.mjs
+//   node scripts/generateAudio.mjs --report          # list coverage, no network
+//   node scripts/generateAudio.mjs --manifest-only   # rebuild manifest from existing files
+//   node scripts/generateAudio.mjs --only=numbers,catalog   # limit sources
+//   node scripts/generateAudio.mjs --limit=20        # cap clips (smoke test)
+//
+// Prereqs: an Azure "Speech" resource (free tier works), Node 18+ (global fetch).
+import esbuild from 'esbuild';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { speechKey, langPrefix } from '../src/Utils/speechKey.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..');
+const AUDIO_DIR = path.join(ROOT, 'assets', 'audio');
+const MANIFEST = path.join(ROOT, 'src', 'Utils', 'audioManifest.generated.js');
+const PERSONAS = ['teacher', 'kid'];
+
+// ── Voice mapping ──────────────────────────────────────────────────────────
+// Swap these for whatever Azure voices you prefer. `pitch` lets the kid persona
+// sound younger on languages that have no dedicated child voice (ur/ar).
+const VOICES = {
+  teacher: {
+    en: { name: 'en-US-JennyNeural', locale: 'en-US' },
+    ur: { name: 'ur-PK-UzmaNeural', locale: 'ur-PK' },
+    ar: { name: 'ar-SA-ZariyahNeural', locale: 'ar-SA' },
+  },
+  kid: {
+    en: { name: 'en-US-AnaNeural', locale: 'en-US' },            // genuine child voice
+    ur: { name: 'ur-PK-AsadNeural', locale: 'ur-PK', pitch: '+18%' },
+    ar: { name: 'ar-SA-HamedNeural', locale: 'ar-SA', pitch: '+18%' },
+  },
+};
+
+// Azure output: small mono MP3 is plenty for short narration and plays on both
+// platforms via expo-audio.
+const OUTPUT_FORMAT = 'audio-24khz-48kbitrate-mono-mp3';
+const EXT = 'mp3';
+
+// ── args ────────────────────────────────────────────────────────────────────
+const args = process.argv.slice(2);
+const has = (f) => args.includes(f);
+const val = (f) => {
+  const a = args.find((x) => x.startsWith(`${f}=`));
+  return a ? a.split('=')[1] : null;
+};
+const REPORT = has('--report');
+const MANIFEST_ONLY = has('--manifest-only');
+const ONLY = val('--only') ? new Set(val('--only').split(',')) : null;
+const LIMIT = val('--limit') ? parseInt(val('--limit'), 10) : Infinity;
+
+const xmlEscape = (s) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+
+const ssml = (text, voice) => {
+  const body = voice.pitch
+    ? `<prosody pitch="${voice.pitch}">${xmlEscape(text)}</prosody>`
+    : xmlEscape(text);
+  return `<speak version='1.0' xml:lang='${voice.locale}'><voice name='${voice.name}'>${body}</voice></speak>`;
+};
+
+// Load collect.mjs by bundling it (esbuild resolves the ESM data files for Node).
+async function loadPairs() {
+  const outfile = path.join(os.tmpdir(), `lg-collect-${Date.now()}.mjs`);
+  await esbuild.build({
+    entryPoints: [path.join(__dirname, 'collect.mjs')],
+    bundle: true,
+    format: 'esm',
+    platform: 'node',
+    outfile,
+    logLevel: 'silent',
+  });
+  const mod = await import(pathToFileURL(outfile).href);
+  fs.rmSync(outfile, { force: true });
+  return mod.collectPairs();
+}
+
+// Azure REST synthesis -> Buffer of MP3 bytes.
+async function synthesize(text, voice, key, region) {
+  const res = await fetch(
+    `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`,
+    {
+      method: 'POST',
+      headers: {
+        'Ocp-Apim-Subscription-Key': key,
+        'Content-Type': 'application/ssml+xml',
+        'X-Microsoft-OutputFormat': OUTPUT_FORMAT,
+        'User-Agent': 'littlegenius-audiogen',
+      },
+      body: ssml(text, voice),
+    },
+  );
+  if (!res.ok) {
+    throw new Error(`Azure TTS ${res.status} ${res.statusText}: ${await res.text().catch(() => '')}`);
+  }
+  return Buffer.from(await res.arrayBuffer());
+}
+
+// Rebuild the RN manifest from whatever clips currently exist on disk.
+function writeManifest() {
+  const forPersona = (persona) => {
+    const dir = path.join(AUDIO_DIR, persona);
+    if (!fs.existsSync(dir)) return '';
+    return fs
+      .readdirSync(dir)
+      .filter((f) => f.endsWith(`.${EXT}`))
+      .sort()
+      .map((f) => {
+        const key = f.slice(0, -(EXT.length + 1));
+        return `    '${key}': require('../../assets/audio/${persona}/${f}'),`;
+      })
+      .join('\n');
+  };
+  const body =
+    `// ⚠️  AUTO-GENERATED by scripts/generateAudio.mjs — DO NOT EDIT BY HAND.\n` +
+    `// Maps speechKey() -> bundled audio clip, per voice persona.\n\n` +
+    `export const AUDIO = {\n` +
+    `  teacher: {\n${forPersona('teacher')}\n  },\n` +
+    `  kid: {\n${forPersona('kid')}\n  },\n` +
+    `};\n\nexport default AUDIO;\n`;
+  fs.writeFileSync(MANIFEST, body);
+  console.log(`✔ Wrote manifest ${path.relative(ROOT, MANIFEST)}`);
+}
+
+async function main() {
+  if (MANIFEST_ONLY) {
+    writeManifest();
+    return;
+  }
+
+  const raw = await loadPairs();
+
+  // Dedupe by (persona-independent) speechKey; keep first text seen per key.
+  const byKey = new Map();
+  for (const p of raw) {
+    if (ONLY && !ONLY.has(p.source)) continue;
+    const key = speechKey(p.language, p.text);
+    if (!byKey.has(key)) byKey.set(key, { ...p, key, prefix: langPrefix(p.language) });
+  }
+  const items = [...byKey.values()];
+
+  // Coverage report grouped by source + language.
+  const bySource = {};
+  for (const it of items) {
+    const s = (bySource[it.source] ||= {});
+    s[it.prefix] = (s[it.prefix] || 0) + 1;
+  }
+  console.log(`\nCollected ${raw.length} pairs -> ${items.length} unique clips (x${PERSONAS.length} personas):`);
+  for (const [src, langs] of Object.entries(bySource)) {
+    console.log(`  ${src.padEnd(16)} ${Object.entries(langs).map(([l, c]) => `${l}:${c}`).join('  ')}`);
+  }
+
+  if (REPORT) {
+    console.log('\n--report: no audio generated.');
+    return;
+  }
+
+  const KEY = process.env.AZURE_TTS_KEY;
+  const REGION = process.env.AZURE_TTS_REGION;
+  if (!KEY || !REGION) {
+    console.error('\n✖ Set AZURE_TTS_KEY and AZURE_TTS_REGION to generate audio (or pass --report).');
+    process.exit(1);
+  }
+
+  for (const persona of PERSONAS) fs.mkdirSync(path.join(AUDIO_DIR, persona), { recursive: true });
+
+  let made = 0, skipped = 0, failed = 0, done = 0;
+  for (const it of items) {
+    if (done >= LIMIT) break;
+    done++;
+    for (const persona of PERSONAS) {
+      const voice = VOICES[persona][it.prefix];
+      if (!voice) { failed++; continue; } // no voice mapped for this language
+      const outPath = path.join(AUDIO_DIR, persona, `${it.key}.${EXT}`);
+      if (fs.existsSync(outPath)) { skipped++; continue; }
+      try {
+        const buf = await synthesize(it.text, voice, KEY, REGION);
+        fs.writeFileSync(outPath, buf);
+        made++;
+        if (made % 25 === 0) console.log(`  …${made} clips generated`);
+      } catch (e) {
+        failed++;
+        console.warn(`  ✖ ${persona}/${it.key} (${it.source}): ${e.message}`);
+      }
+    }
+  }
+
+  console.log(`\nDone. made=${made} skipped=${skipped} failed=${failed}`);
+  writeManifest();
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

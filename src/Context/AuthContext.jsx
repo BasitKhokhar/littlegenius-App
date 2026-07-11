@@ -78,16 +78,18 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  const addStars = useCallback(async (count) => {
+  const addStars = useCallback((count) => {
     if (!user) return;
-    try {
-      const nextStars = stars + count;
-      setStars(nextStars);
-      await AsyncStorage.setItem(`stars_${user.id}`, nextStars.toString());
-    } catch (error) {
-      console.warn('Failed to save stars:', error);
-    }
-  }, [user, stars]);
+    // Functional update so rapid successive awards (e.g. a game match plus
+    // its win bonus) can't clobber each other via a stale `stars` closure.
+    setStars((prev) => {
+      const nextStars = prev + count;
+      AsyncStorage.setItem(`stars_${user.id}`, nextStars.toString()).catch((error) => {
+        console.warn('Failed to save stars:', error);
+      });
+      return nextStars;
+    });
+  }, [user]);
 
   const value = {
     user,
