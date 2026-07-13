@@ -61,6 +61,7 @@ const UrduScreen = ({ navigation, route }) => {
               <SpeakButton
                 text={vocab.speak}
                 language="ur-PK"
+                fallbackText={vocab.speak}
                 color={letter.color}
                 label="🔊 Pronounce"
                 size="sm"

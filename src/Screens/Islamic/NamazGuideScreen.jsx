@@ -14,16 +14,34 @@ import SpeechEngine from '../../Utils/speechEngine';
 import SpeakButton from '../../Components/Common/SpeakButton';
 import PostureFigure from '../../Components/Islamic/PostureFigure';
 import namazGuideData from '../../Data/namazGuideData';
+import juzAmmaData from '../../Data/juzAmmaData';
+import { QURAN_AUDIO } from '../../Utils/quranAudioManifest.generated';
+
+// For a namaz step that recites a full surah (Fatiha / a short surah), build
+// the ordered list of that surah's bundled Qari clips so the 🔊 button plays it
+// ayah by ayah with correct tajweed. Returns null when there's no linked surah.
+const surahClips = (surahId) => {
+  if (!surahId) return null;
+  const surah = juzAmmaData.find((s) => s.id === surahId);
+  if (!surah) return null;
+  const clips = surah.ayahs.map((a) => QURAN_AUDIO[`${surahId}:${a.n}`]).filter(Boolean);
+  return clips.length ? clips : null;
+};
 
 const STEP_COLORS = ['#10B981', '#0EA5E9', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6'];
 
 const NamazGuideScreen = ({ navigation }) => {
   const colors = useThemeColors();
-  const bottomPad = useTabBarClearance();
+  // Tight clearance (small `extra`) so the Back/Next bar sits just above the
+  // floating tab bar instead of leaving a large gap beneath it.
+  const bottomPad = useTabBarClearance(6);
   const styles = makeStyles(colors);
   const [stepIdx, setStepIdx] = useState(0);
 
   const step = namazGuideData[stepIdx];
+  // When this step is a full-surah recitation, play the real Qari clips ayah by
+  // ayah; otherwise the single-phrase button (Arabic TTS → transliteration).
+  const recitationClips = surahClips(step.surahId);
   const accent = STEP_COLORS[stepIdx % STEP_COLORS.length];
   const isFirst = stepIdx === 0;
   const isLast = stepIdx === namazGuideData.length - 1;
@@ -60,7 +78,7 @@ const NamazGuideScreen = ({ navigation }) => {
         ))}
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 70 }]} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Posture illustration */}
         <View style={[styles.heroCard, { borderColor: accent }]}>
           <View style={[styles.stepBadge, { backgroundColor: accent }]}>
@@ -79,7 +97,7 @@ const NamazGuideScreen = ({ navigation }) => {
             {step.transliteration ? (
               <Text style={styles.transliteration}>{step.transliteration}</Text>
             ) : null}
-            <SpeakButton text={step.arabic} language="ar-SA" label="🔊 Hear Recitation" color={accent} />
+            <SpeakButton text={step.arabic} language="ar-SA" fallbackText={step.transliteration} audioClips={recitationClips} label="🔊 Hear Recitation" color={accent} />
           </View>
         ) : null}
 
@@ -88,12 +106,12 @@ const NamazGuideScreen = ({ navigation }) => {
           <Text style={styles.cardLabel}>✅ What to do</Text>
           <Text style={styles.instruction}>{step.englishInstruction}</Text>
           <Text style={styles.urduInstruction}>{step.urduInstruction}</Text>
-          <SpeakButton text={step.urduInstruction} language="ur-PK" label="🔊 اردو میں سنیں" color={accent} />
+          <SpeakButton text={step.urduInstruction} language="ur-PK" fallbackText={step.englishInstruction} label="🔊 اردو میں سنیں" color={accent} />
         </View>
       </ScrollView>
 
-      {/* Prev / Next bar */}
-      <View style={[styles.navBar, { bottom: bottomPad - 14 }]}>
+      {/* Prev / Next bar — kept in normal flow so it never overlaps content */}
+      <View style={styles.navBar}>
         <TouchableOpacity
           style={[styles.navBtn, isFirst && styles.navBtnDisabled]}
           disabled={isFirst}
@@ -127,7 +145,8 @@ const makeStyles = (colors) => StyleSheet.create({
   },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.border },
 
-  content: { paddingHorizontal: 16 },
+  scroll: { flex: 1 },
+  content: { paddingHorizontal: 16, paddingBottom: 0 },
   heroCard: {
     backgroundColor: colors.surface,
     borderRadius: 24,
@@ -195,11 +214,10 @@ const makeStyles = (colors) => StyleSheet.create({
   },
 
   navBar: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
     flexDirection: 'row',
     gap: 12,
+    paddingHorizontal: 16,
+    paddingTop: 10,
   },
   navBtn: {
     flex: 1,

@@ -50,9 +50,10 @@ export function collectPairs() {
   for (const d of pick(duasMod, 'duasData') || []) add('ar-SA', d.arabic, 'duas');
   for (const k of pick(kalmasMod, 'kalmasData') || []) add('ar-SA', k.arabic, 'kalmas');
 
-  // 99 Names / Names of Muhammad — spoken via transliteration (en). IslamicScreen.jsx:148,165
-  for (const n of pick(namesAllahMod, 'namesOfAllahData') || []) add('en-US', n.transliteration, 'namesAllah');
-  for (const n of pick(namesMuhammadMod, 'namesOfMuhammadData') || []) add('en-US', n.transliteration, 'namesMuhammad');
+  // 99 Names / Names of Muhammad — spoken as the Arabic name (ar), so the child
+  // hears correct Arabic pronunciation. IslamicScreen.jsx:148,165
+  for (const n of pick(namesAllahMod, 'namesOfAllahData') || []) add('ar-SA', n.arabic, 'namesAllah');
+  for (const n of pick(namesMuhammadMod, 'namesOfMuhammadData') || []) add('ar-SA', n.arabic, 'namesMuhammad');
 
   // Prophets / Manners — spoken via `speak` (en). IslamicScreen.jsx:183,199
   for (const p of pick(prophetsMod, 'prophetsData') || []) add('en-US', p.speak, 'prophets');

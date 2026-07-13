@@ -1,36 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TouchableOpacity, Text, StyleSheet, View, Alert } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import SpeechEngine from '../../Utils/speechEngine';
 import { Colors } from '../../Data/colorsTheme';
 import { Radius, coloredShadow } from '../../Theme';
 
-// Human labels + install hints for the languages that commonly lack a
-// device voice pack (Arabic/Urdu are absent on many Android phones).
-const LANG_INFO = {
-  ar: { name: 'Arabic', code: 'ar' },
-  ur: { name: 'Urdu', code: 'ur' },
-};
-// Warn at most once per language per app session so we never nag.
-const warnedLangs = new Set();
-
-const maybeWarnMissingVoice = async (language) => {
-  const prefix = `${language || ''}`.toLowerCase().split(/[-_]/)[0];
-  const info = LANG_INFO[prefix];
-  if (!info || warnedLangs.has(prefix)) return;
-  // Only warn if the device really has no voice for this language.
-  const available = await SpeechEngine.isLanguageAvailable(language);
-  if (available) return;
-  warnedLangs.add(prefix);
-  Alert.alert(
-    `${info.name} voice not installed`,
-    `Your device doesn't have a ${info.name} text-to-speech voice yet, so this audio can't play.\n\nTo enable it: open your phone's Settings → System → Languages & input → Text-to-speech output → install the ${info.name} voice data.`,
-    [{ text: 'OK' }],
-  );
-};
-
 const SpeakButton = ({
   text,
   language = 'en-US',
+  // Romanized/English text spoken with the English voice when the device has
+  // no Arabic/Urdu voice pack — guarantees the child always hears something.
+  fallbackText = null,
+  fallbackLang = 'en-US',
+  // Ordered list of bundled clips (require()'d MP3s) to play back-to-back —
+  // e.g. a full surah recited ayah by ayah. Takes priority over text when set.
+  audioClips = null,
   color = Colors.primary,
   size = 'md',
   label = '🔊 Listen',
@@ -39,12 +22,15 @@ const SpeakButton = ({
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const mountedRef = useRef(true);
+  // Increments to cancel an in-flight clip sequence (tap-to-stop / unmount).
+  const seqRef = useRef(0);
 
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       // Stop speech on unmount and block any late state updates.
       mountedRef.current = false;
+      seqRef.current++;
       SpeechEngine.stop();
     };
   }, []);
@@ -61,6 +47,7 @@ const SpeakButton = ({
     // (disabled) button. This is also the user's recovery path if a device
     // voice misbehaves.
     if (isSpeaking) {
+      seqRef.current++; // abort any running sequence
       await SpeechEngine.stop();
       finish();
       return;
@@ -69,18 +56,34 @@ const SpeakButton = ({
     setIsSpeaking(true);
     if (onSpeakStart) onSpeakStart();
 
+    // Multi-clip sequence (e.g. a whole surah): play each bundled clip in turn,
+    // chaining on completion. A token makes a stale chain a no-op after stop.
+    const clips = Array.isArray(audioClips) ? audioClips.filter(Boolean) : [];
+    if (clips.length) {
+      const token = ++seqRef.current;
+      const playAt = (i) => {
+        if (token !== seqRef.current || !mountedRef.current) return;
+        if (i >= clips.length) { finish(); return; }
+        SpeechEngine.speak('', language, {
+          audioClip: clips[i],
+          onDone: () => playAt(i + 1),
+          onError: () => playAt(i + 1),
+        });
+      };
+      playAt(0);
+      return;
+    }
+
     // Voice handled centrally by SpeechEngine: it plays the pre-baked premium
     // clip for the active persona (teacher/kid) when one exists, else falls
-    // back to device TTS. SpeechEngine guarantees exactly one of onDone/onError
-    // fires, so state can't hang.
+    // back to device TTS — and if the requested Arabic/Urdu voice isn't
+    // installed, to fallbackText spoken in English. SpeechEngine guarantees
+    // exactly one of onDone/onError fires, so state can't hang.
     await SpeechEngine.speak(text, language, {
+      fallbackText,
+      fallbackLang,
       onDone: finish,
-      onError: () => {
-        finish();
-        // If the audio never played because the device lacks this
-        // language's voice, explain how to install it (once per language).
-        maybeWarnMissingVoice(language);
-      },
+      onError: finish,
     });
   };
 

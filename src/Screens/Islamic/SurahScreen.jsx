@@ -12,6 +12,7 @@ import { useTabBarClearance } from '../../Hooks';
 import { Fonts } from '../../Theme/fonts';
 import SpeechEngine from '../../Utils/speechEngine';
 import juzAmmaData from '../../Data/juzAmmaData';
+import { QURAN_AUDIO } from '../../Utils/quranAudioManifest.generated';
 
 // ──────────────────────────────────────────────────────────────
 // SurahScreen — large Arabic text + Urdu translation per ayah,
@@ -47,6 +48,11 @@ const SurahScreen = ({ navigation, route }) => {
     }
     SpeechEngine.speak(surah.ayahs[idx].arabic, 'ar-SA', {
       rate: 0.8,
+      // Real Qari recitation (proper tajweed) when we have the bundled clip;
+      // otherwise Arabic TTS, and if that voice is missing the romanized
+      // transliteration in English — so the ayah is always audible.
+      audioClip: QURAN_AUDIO[`${surah.id}:${surah.ayahs[idx].n}`] ?? null,
+      fallbackText: surah.ayahs[idx].transliteration,
       onDone: () => {
         if (token !== sessionRef.current) return;
         if (mode === 'repeat' && rep < repeatTarget) return speakAyah(idx, rep + 1, mode, token);

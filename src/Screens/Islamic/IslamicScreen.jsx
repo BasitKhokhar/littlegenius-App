@@ -58,7 +58,7 @@ const IslamicScreen = ({ navigation, route }) => {
       <View style={styles.divider} />
       <Text style={styles.urdu}>{dua.urdu}</Text>
       <Text style={styles.english}>{dua.english}</Text>
-      <SpeakButton text={dua.arabic} language="ar-SA" label="🔊 Hear" color={dua.color} />
+      <SpeakButton text={dua.arabic} language="ar-SA" fallbackText={dua.speak || dua.transliteration} label="🔊 Hear" color={dua.color} />
     </View>
   );
 
@@ -109,7 +109,7 @@ const IslamicScreen = ({ navigation, route }) => {
               <View style={styles.divider} />
               <Text style={styles.urdu}>{kalma.urdu}</Text>
               <Text style={styles.english}>{kalma.english}</Text>
-              <SpeakButton text={kalma.arabic} language="ar-SA" label="🔊 Hear" color={kalma.color} />
+              <SpeakButton text={kalma.arabic} language="ar-SA" fallbackText={kalma.speak || kalma.transliteration} label="🔊 Hear" color={kalma.color} />
             </View>
           ))}
         {activeTab === 'pillars' &&
@@ -145,7 +145,7 @@ const IslamicScreen = ({ navigation, route }) => {
               <View style={styles.divider} />
               <Text style={styles.english}>{name.english}</Text>
               <Text style={styles.urdu}>{name.urdu}</Text>
-              <SpeakButton text={name.transliteration} language="en-US" label="🔊 Hear" color={name.color} />
+              <SpeakButton text={name.arabic} language="ar-SA" fallbackText={name.transliteration} label="🔊 Hear" color={name.color} />
             </View>
           ))}
 
@@ -162,7 +162,7 @@ const IslamicScreen = ({ navigation, route }) => {
               <View style={styles.divider} />
               <Text style={styles.english}>{name.english}</Text>
               <Text style={styles.urdu}>{name.urdu}</Text>
-              <SpeakButton text={name.transliteration} language="en-US" label="🔊 Hear" color={name.color} />
+              <SpeakButton text={name.arabic} language="ar-SA" fallbackText={name.transliteration} label="🔊 Hear" color={name.color} />
             </View>
           ))}
 

@@ -149,7 +149,11 @@ export const SpeechEngine = {
    * Always settles exactly once via onDone or onError.
    * @param {string} text     Text to speak
    * @param {string} language Language code (en-US, ur-PK, ar, …)
-   * @param {object} opts     Optional: { onDone, onError, pitch, rate }
+   * @param {object} opts     Optional:
+   *   { onStart, onDone, onError, pitch, rate,
+   *     audioClip,           // required() MP3 module to play instead of TTS
+   *     fallbackText,        // romanized text spoken in English if the
+   *     fallbackLang }       //   language's device voice is missing
    */
   speak: async (text, language = 'en-US', opts = {}) => {
     const clean = `${text ?? ''}`.trim();
@@ -173,11 +177,19 @@ export const SpeechEngine = {
       else opts.onError?.(err || new Error('speech-failed'));
     };
 
-    if (!clean) {
-      // Nothing to say — treat as a no-op completion so callers reset cleanly.
+    if (!clean && !opts.audioClip) {
+      // Nothing to say and no clip to play — treat as a no-op completion so
+      // callers reset cleanly. (A clip with empty text is still valid: e.g. a
+      // Quran ayah played purely from its bundled recitation.)
       settle(true);
       return;
     }
+
+    // Route audio so it plays even when the phone is on silent — this must run
+    // for BOTH the pre-baked-clip and device-TTS paths, otherwise a muted phone
+    // stays silent when we fall back to TTS (the common case before clips are
+    // generated).
+    ensureAudioMode();
 
     try {
       await Speech.stop();
@@ -187,17 +199,36 @@ export const SpeechEngine = {
     // Cancel any pre-baked clip still playing from a previous call.
     if (currentPlayer) releasePlayer(currentPlayer);
 
-    // ── Preferred path: play the pre-baked premium-voice clip if we have one ──
-    const clip = lookupClip(language, clean);
+    // ── Preferred path: play a bundled clip if we have one ────────────────────
+    // Either an explicit clip the caller passed (opts.audioClip — e.g. real Qari
+    // Quran recitation keyed by surah/ayah), or a pre-baked premium-voice clip
+    // matched by speechKey. Explicit clip wins.
+    const clip = opts.audioClip ?? lookupClip(language, clean);
     if (clip) {
       try {
         ensureAudioMode();
         const player = createAudioPlayer(clip);
         currentPlayer = player;
 
+        // Absolute cap so we never hang if BOTH didJustFinish and the duration
+        // update are lost. Real recitation clips can be long (slow tajweed), so
+        // this is deliberately generous and gets tightened once we know the real
+        // duration below — it must never be short enough to cut a clip off.
+        let armed = false;
+        doneTimer = setTimeout(() => settle(true), 90000);
+
         const sub = player.addListener('playbackStatusUpdate', (status) => {
           // didJustFinish fires once when the clip reaches its end.
-          if (status?.didJustFinish) settle(true);
+          if (status?.didJustFinish) { settle(true); return; }
+          // Once the real length is known, arm a precise fallback (duration +
+          // padding) in case didJustFinish is ever dropped — without risking an
+          // early cutoff the way a text-length estimate would.
+          const dur = Number(status?.duration);
+          if (!armed && dur > 0 && Number.isFinite(dur)) {
+            armed = true;
+            if (doneTimer) clearTimeout(doneTimer);
+            doneTimer = setTimeout(() => settle(true), Math.round(dur * 1000) + 3000);
+          }
         });
         // settle() runs this to release the native player + listener exactly once.
         cleanup = () => {
@@ -207,56 +238,99 @@ export const SpeechEngine = {
 
         opts.onStart?.();
         player.play();
-
-        // Safety net: if didJustFinish is ever lost, settle by estimated length.
-        doneTimer = setTimeout(() => settle(true), estimateDurationMs(clean, 1) + 4000);
         return;
       } catch (error) {
         // Clip failed to load/play — fall through to device TTS below.
-        console.warn('[SpeechEngine] Pre-baked clip failed, using TTS:', error);
+        console.warn('[SpeechEngine] Bundled clip failed, using TTS:', error);
         if (currentPlayer) releasePlayer(currentPlayer);
       }
     }
 
-    const voice = await resolveMaleVoice(language);
+    // ── Device TTS path (with graceful language fallback) ──────────────────
+    // Arabic/Urdu voice data is missing on many devices, so device TTS for
+    // those languages produces TOTAL SILENCE (and often no native callback).
+    // When the caller supplies a romanized/English fallback we speak THAT with
+    // the always-present English voice instead — so a child ALWAYS hears the
+    // pronunciation, even with no Arabic/Urdu pack installed. Authentic
+    // Arabic/Urdu is still used whenever the device actually has the voice.
+    const fallbackText = `${opts.fallbackText ?? ''}`.trim();
+    const fallbackLang = opts.fallbackLang || 'en-US';
+    // Only a non-English primary can benefit from an English fallback.
+    const hasFallback = !!fallbackText && langPrefix(language) !== 'en';
 
-    // Adult male pitch. If we found a real male voice, keep it near-natural;
-    // otherwise deepen the default voice a little so it still reads as male.
-    const pitch = opts.pitch ?? (voice ? 0.97 : 0.9);
-    const rate = opts.rate ?? 0.9; // slightly slow = clearer for kids
-
-    const utterance = {
-      language,
-      pitch,
-      rate,
-      onStart: () => {
-        // Speech genuinely began: cancel the "never started" watchdog and
-        // switch to a duration-based safety net in case onDone is lost.
-        if (startTimer) { clearTimeout(startTimer); startTimer = null; }
-        opts.onStart?.();
-        doneTimer = setTimeout(() => settle(true), estimateDurationMs(clean, rate) + 4000);
-      },
-      onDone: () => settle(true),
-      onStopped: () => settle(true),
-      onError: (error) => {
-        console.warn('[SpeechEngine] Error:', error);
-        settle(false, error);
-      },
+    // Guard so we retry the fallback at most once.
+    let retried = false;
+    const retryFallback = () => {
+      if (settled || retried) return;
+      retried = true;
+      clearTimers();
+      Speech.stop().catch(() => {}); // cancel a late-starting silent utterance
+      runTTS(fallbackText, fallbackLang, false);
     };
-    if (voice) utterance.voice = voice;
 
-    // Watchdog: if the engine never reports onStart (voice/language data not
-    // installed → total silence, no native callback), fail after a grace
-    // period so the UI recovers instead of hanging on "playing…".
-    startTimer = setTimeout(() => settle(false, new Error('speech-did-not-start')), 5000);
+    // Speak one (text, language). When canFallback is true, any failure —
+    // native error, throw, or "never started" watchdog — retries the fallback
+    // instead of settling as an error.
+    const runTTS = async (spokenText, spokenLang, canFallback) => {
+      const voice = await resolveMaleVoice(spokenLang);
+      if (settled) return; // a retry/stop may have resolved us while awaiting
 
-    try {
-      // NOTE: Speech.speak() returns void (not a Promise) — do not await it.
-      Speech.speak(clean, utterance);
-    } catch (error) {
-      console.warn('[SpeechEngine] Failed to speak:', error);
-      settle(false, error);
+      // Adult male pitch. If we found a real male voice keep it near-natural;
+      // otherwise deepen the default voice a little so it still reads as male.
+      const pitch = opts.pitch ?? (voice ? 0.97 : 0.9);
+      const rate = opts.rate ?? 0.9; // slightly slow = clearer for kids
+
+      const utterance = {
+        language: spokenLang,
+        pitch,
+        rate,
+        onStart: () => {
+          // Speech genuinely began: cancel the "never started" watchdog and
+          // switch to a duration-based safety net in case onDone is lost.
+          if (startTimer) { clearTimeout(startTimer); startTimer = null; }
+          opts.onStart?.();
+          doneTimer = setTimeout(() => settle(true), estimateDurationMs(spokenText, rate) + 4000);
+        },
+        onDone: () => settle(true),
+        onStopped: () => settle(true),
+        onError: (error) => {
+          if (canFallback) { retryFallback(); return; }
+          console.warn('[SpeechEngine] Error:', error);
+          settle(false, error);
+        },
+      };
+      if (voice) utterance.voice = voice;
+
+      // Watchdog: if the engine never reports onStart (voice/language data not
+      // installed → total silence, no native callback), recover — fall back to
+      // English if we can, else fail so the UI never hangs on "playing…".
+      // A shorter grace when a fallback is waiting keeps the delay unnoticeable.
+      startTimer = setTimeout(() => {
+        if (canFallback) { retryFallback(); return; }
+        settle(false, new Error('speech-did-not-start'));
+      }, canFallback ? 2500 : 5000);
+
+      try {
+        // NOTE: Speech.speak() returns void (not a Promise) — do not await it.
+        Speech.speak(spokenText, utterance);
+      } catch (error) {
+        if (canFallback) { retryFallback(); return; }
+        console.warn('[SpeechEngine] Failed to speak:', error);
+        settle(false, error);
+      }
+    };
+
+    // If we already KNOW the requested voice is unavailable, skip straight to
+    // the English fallback so there's no silent 2.5s wait first.
+    if (hasFallback) {
+      const available = await SpeechEngine.isLanguageAvailable(language);
+      if (settled) return;
+      if (!available) {
+        runTTS(fallbackText, fallbackLang, false);
+        return;
+      }
     }
+    runTTS(clean, language, hasFallback);
   },
 
   /**
