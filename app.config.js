@@ -70,6 +70,7 @@ export default () => ({
     },
     plugins: [
       'expo-font',
+      'expo-asset',
       'expo-audio',
       [
         'expo-notifications',
