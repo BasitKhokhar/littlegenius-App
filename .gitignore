@@ -27,3 +27,6 @@ ios/
 *.p12
 *.key
 *.keystore
+
+# Local Play Store upload keystore (never commit)
+android/app/upload.jks

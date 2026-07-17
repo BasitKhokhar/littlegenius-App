@@ -91,7 +91,7 @@ const NumbersScreen = ({ navigation, route }) => {
               </View>
 
               {/* Names */}
-              <Text style={styles.englishLabel}>{selectedNum.speak.split('.')[1]?.trim().replace('In English ', '') || selectedNum.number}</Text>
+              <Text style={styles.englishLabel}>{selectedNum.english}</Text>
               <Text style={styles.urduLabel}>{selectedNum.urdu}</Text>
 
               {/* Visual Counters */}
@@ -112,8 +112,7 @@ const NumbersScreen = ({ navigation, route }) => {
               {/* Speech */}
               <View style={styles.audioSection}>
                 <SpeakButton
-                  text={selectedNum.speak}
-                  language="en-US"
+                  phrases={selectedNum.speech}
                   color={selectedNum.color}
                   label="🔊 Hear Pronunciation"
                 />

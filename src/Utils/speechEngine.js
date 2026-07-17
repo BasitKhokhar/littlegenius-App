@@ -2,12 +2,12 @@
 //
 // Two-tier voice strategy (best available wins):
 //   1. PRE-BAKED PREMIUM AUDIO (preferred): fixed curriculum + feedback strings
-//      are generated once at build time with a neural TTS in two personas
-//      ("teacher" / "kid") and bundled as clips. speak() looks the clip up by
-//      speechKey() for the active persona and plays it via expo-audio. Result:
-//      the SAME warm, human-quality voice on every device, fully offline, with
-//      correct Urdu/Arabic pronunciation. The persona is set by VoiceContext
-//      through setPersona().
+//      are generated once at build time (scripts/generateAudio.mjs) with Azure
+//      Neural TTS in ONE male teacher voice — en-US-AndrewNeural for English,
+//      ur-PK-AsadNeural for Urdu — and bundled as clips. speak() looks the clip
+//      up by speechKey() and plays it via expo-audio. Result: the SAME warm,
+//      human-quality teacher on every device, fully offline, with correct Urdu
+//      pronunciation. One voice everywhere is deliberate — see the manifest.
 //   2. DEVICE TTS FALLBACK: dynamic strings (star counts, generated numbers)
 //      have no pre-baked clip, so they use expo-speech — the device's built-in
 //      voice, tuned toward an adult narrator (male voice selection + adult
@@ -45,12 +45,10 @@ let cachedVoices = null;          // Voice[] once a NON-EMPTY list is obtained
 const resolvedByLang = {};        // langPrefix -> identifier|null (cached only once voices are known)
 
 // ── Pre-baked audio (premium neural voice) ────────────────────────────────
-// When a clip exists for the active persona we play a bundled, human-quality
-// file that sounds identical on every device and works offline. When it
-// doesn't (dynamic strings, or before the pipeline has been run) we fall
-// through to the device-TTS path below. VoiceContext keeps `activePersona`
-// in sync via setPersona().
-let activePersona = 'teacher';    // 'teacher' | 'kid'
+// When a clip exists we play a bundled, human-quality file that sounds
+// identical on every device and works offline. When it doesn't (dynamic
+// strings like "you earned 3 stars") we fall through to the device-TTS path
+// below.
 let currentPlayer = null;         // the AudioPlayer currently playing, if any
 let audioModeReady = false;       // setAudioModeAsync() run once, lazily
 
@@ -61,12 +59,8 @@ const ensureAudioMode = () => {
   setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
 };
 
-// The bundled clip for a phrase in the active persona, or null.
-const lookupClip = (language, text) => {
-  const pack = AUDIO[activePersona];
-  if (!pack) return null;
-  return pack[speechKey(language, text)] ?? null;
-};
+// The bundled clip for a phrase, or null when it wasn't pre-baked.
+const lookupClip = (language, text) => AUDIO[speechKey(language, text)] ?? null;
 
 const releasePlayer = (player) => {
   try { player?.remove?.(); } catch { /* already gone */ }
@@ -333,18 +327,6 @@ export const SpeechEngine = {
     runTTS(clean, language, hasFallback);
   },
 
-  /**
-   * Select the voice persona used for pre-baked audio.
-   * Called by VoiceContext on boot and whenever the grown-up changes it.
-   * @param {'teacher'|'kid'} persona
-   */
-  setPersona: (persona) => {
-    if (persona === 'teacher' || persona === 'kid') activePersona = persona;
-  },
-
-  /** The current voice persona. */
-  getPersona: () => activePersona,
-
   /** Stop currently playing speech (both pre-baked audio and device TTS). */
   stop: async () => {
     if (currentPlayer) {
@@ -367,12 +349,6 @@ export const SpeechEngine = {
       console.warn('[SpeechEngine] Error checking if speaking:', error);
       return false;
     }
-  },
-
-  /** Speak a number with English + Urdu names */
-  speakNumber: async (number, englishName, urduName) => {
-    const text = `${number}. In English ${englishName}. In Urdu ${urduName}`;
-    await SpeechEngine.speak(text, 'en-US');
   },
 
   /** Speak with explicit language selection */

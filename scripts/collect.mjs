@@ -24,6 +24,7 @@ import * as learnMod from '../src/Data/learnModulesData.js';
 import * as storiesMod from '../src/Data/storiesData.js';
 import * as islamicStoriesMod from '../src/Data/islamicStoriesData.js';
 import { SPEECH_PHRASE_LIST } from '../src/Data/speechCatalog.js';
+import { getQuizBank, BASE_BANKS } from '../src/Utils/quizGenerators.js';
 
 // Resolve a dataset whether it's a named or default export.
 const pick = (mod, name) => mod[name] ?? mod.default;
@@ -35,16 +36,20 @@ export function collectPairs() {
     if (t) out.push({ language, text: t, source });
   };
 
-  // Numbers 1–100 — NumbersScreen speaks item.speak (en). numbersData.js:32
-  for (const n of pick(numbersMod, 'numbersData') || []) add('en-US', n.speak, 'numbers');
+  // Numbers 1–100 — NumbersScreen plays item.speech as a two-step sequence:
+  // the English name, then the Urdu one, each in its own voice. NumbersScreen.jsx:114
+  for (const n of pick(numbersMod, 'numbersData') || [])
+    for (const s of n.speech || []) add(s.language, s.text, 'numbers');
 
   // English alphabet vocabulary — VocabularyCard speaks word (en). VocabularyCard.jsx:51
   for (const l of pick(alphabetMod, 'alphabetData') || [])
     for (const v of l.vocabulary || []) add('en-US', v.word, 'alphabet');
 
-  // Urdu haroof vocabulary — UrduScreen speaks the romanized `speak` under ur. UrduScreen.jsx:62
+  // Urdu haroof vocabulary — UrduScreen speaks the Urdu word itself under ur.
+  // (NOT v.speak: that romanization is only the no-voice-pack fallback, and an
+  // Urdu neural voice mispronounces Latin text.) UrduScreen.jsx:66
   for (const l of pick(urduMod, 'urduData') || [])
-    for (const v of l.vocabulary || []) add('ur-PK', v.speak, 'urdu');
+    for (const v of l.vocabulary || []) add('ur-PK', v.word, 'urdu');
 
   // Duas / Kalmas — IslamicScreen speaks the Arabic. IslamicScreen.jsx:61,112
   for (const d of pick(duasMod, 'duasData') || []) add('ar-SA', d.arabic, 'duas');
@@ -82,13 +87,31 @@ export function collectPairs() {
         add('en-US', item.speak || `${item.en}. ${item.fact}`, 'learn');
 
   // Stories (moral + Islamic) — "Read Aloud" speaks page.text (en). StoriesScreen.jsx:68
-  for (const story of pick(storiesMod, 'storiesData') || [])
+  // StoryQuizScreen speaks each comprehension question verbatim (en).
+  // StoryQuizScreen.jsx:39 — these are plain prose with no emoji, so the text is
+  // taken as-is and needs no transform.
+  for (const story of pick(storiesMod, 'storiesData') || []) {
     for (const page of story.pages || []) add('en-US', page.text, 'stories');
-  for (const story of pick(islamicStoriesMod, 'islamicStoriesData') || [])
+    for (const q of story.quiz || []) add('en-US', q.q, 'storyQuiz');
+  }
+  for (const story of pick(islamicStoriesMod, 'islamicStoriesData') || []) {
     for (const page of story.pages || []) add('en-US', page.text, 'islamicStories');
+    for (const q of story.quiz || []) add('en-US', q.q, 'islamicStories');
+  }
 
   // Fixed UI / feedback phrases (game intros, praise, voice previews) — all en.
   for (const p of SPEECH_PHRASE_LIST) add(p.language, p.text, 'catalog');
+
+  // Quiz questions — ModuleQuizScreen speaks question.speech when the question
+  // changes. The banks are generated from the curriculum data, so the QUESTION
+  // text is deterministic (only the wrong options are shuffled) and can be
+  // enumerated here. Islamic banks are excluded via BASE_BANKS.
+  //
+  // `speech.text` is taken verbatim — quizGenerators.js has already stripped the
+  // emoji. Do not transform it here or the key won't match what the app asks for.
+  for (const bank of BASE_BANKS)
+    for (const q of getQuizBank(bank))
+      if (q.speech) add(q.speech.language, q.speech.text, 'quiz');
 
   return out;
 }

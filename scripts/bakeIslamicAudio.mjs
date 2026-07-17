@@ -30,7 +30,10 @@ import { speechKey } from '../src/Utils/speechKey.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const AUDIO_DIR = path.join(ROOT, 'assets', 'audio');
-const PERSONAS = ['teacher', 'kid'];
+// The app has ONE voice, so there is one clip folder. (Earlier versions wrote
+// the same bytes to a second "kid" folder; that made the persona switch a no-op
+// and is why the folder is gone.)
+const VOICE_DIR = 'teacher';
 
 // Only these sources, and only their Arabic (ar) lines. alphabet/numbers/urdu
 // deliberately stay on device TTS.
@@ -123,23 +126,19 @@ async function main() {
   const items = [...byKey.values()];
   console.log(`Baking ${items.length} unique Arabic clips (free Google TTS)…`);
 
-  for (const persona of PERSONAS) fs.mkdirSync(path.join(AUDIO_DIR, persona), { recursive: true });
+  fs.mkdirSync(path.join(AUDIO_DIR, VOICE_DIR), { recursive: true });
 
   let made = 0, skipped = 0, failed = 0, bytes = 0;
   const failures = [];
   for (const it of items) {
-    const teacherPath = path.join(AUDIO_DIR, 'teacher', `${it.key}.mp3`);
-    const kidPath = path.join(AUDIO_DIR, 'kid', `${it.key}.mp3`);
-    if (fs.existsSync(teacherPath) && fs.statSync(teacherPath).size > 256) {
+    const outPath = path.join(AUDIO_DIR, VOICE_DIR, `${it.key}.mp3`);
+    if (fs.existsSync(outPath) && fs.statSync(outPath).size > 256) {
       skipped++;
-      if (!fs.existsSync(kidPath)) fs.copyFileSync(teacherPath, kidPath);
       continue;
     }
     try {
       const buf = await synthesize(it.text);
-      // Same clip for both personas — the free source has one Arabic voice.
-      fs.writeFileSync(teacherPath, buf);
-      fs.writeFileSync(kidPath, buf);
+      fs.writeFileSync(outPath, buf);
       made++;
       bytes += buf.length;
       if (made % 20 === 0) console.log(`  …${made} baked`);
@@ -150,7 +149,7 @@ async function main() {
   }
 
   console.log(`\nDone. baked=${made} skipped=${skipped} failed=${failed}`);
-  console.log(`Size (teacher set): ${(bytes / 1024 / 1024).toFixed(2)} MB (x2 personas on disk)`);
+  console.log(`Size: ${(bytes / 1024 / 1024).toFixed(2)} MB`);
   if (failures.length) {
     console.warn('\nFailures (re-run to retry — it skips finished clips):');
     for (const f of failures) console.warn('  ✖ ' + f);

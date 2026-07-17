@@ -6,11 +6,11 @@ export default () => ({
   expo: {
     name: 'Little Genius',
     slug: 'little-genius',
-    // Bumped for the native change that adds expo-audio (pre-baked premium
-    // voice playback for the Teacher/Kid personas). A new native module cannot
-    // ship over OTA — it needs a fresh EAS build + store release, and the
-    // appVersion runtime policy ties this build's OTA channel to this version.
-    version: '1.3.0',
+    // Bumped for the native change that adds expo-notifications (local daily/
+    // comeback reminders). A new native module cannot ship over OTA — it needs
+    // a fresh build + store release, and the appVersion runtime policy ties this
+    // build's OTA channel to this version. (1.3.0 added expo-audio.)
+    version: '1.4.0',
     orientation: 'portrait',
     icon: './assets/logo.png',
     owner: 'talhabasit7016',

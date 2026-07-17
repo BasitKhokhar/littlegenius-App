@@ -2,20 +2,27 @@
 // generateAudio.mjs — BUILD-TIME pre-baking of the app's spoken audio.
 //
 // Reads every fixed (language, text) pair from scripts/collect.mjs, synthesises
-// each one with Azure Neural TTS in two personas (teacher / kid), writes the
-// clips to assets/audio/<persona>/<speechKey>.mp3, and regenerates
+// each one with Azure Neural TTS in ONE consistent male teacher voice, writes
+// the clips to assets/audio/teacher/<speechKey>.mp3, and regenerates
 // src/Utils/audioManifest.generated.js so React Native can require() them.
 //
 // This runs on a developer machine, NOT in the app. Nothing here ships.
 //
+// Credentials come from .env (AZURE_SPEECH_KEY / AZURE_SPEECH_REGION) via
+// dotenv. The key is never logged.
+//
 // Usage:
-//   AZURE_TTS_KEY=xxx AZURE_TTS_REGION=eastus node scripts/generateAudio.mjs
+//   node scripts/generateAudio.mjs                   # generate (reads .env)
 //   node scripts/generateAudio.mjs --report          # list coverage, no network
+//   node scripts/generateAudio.mjs --emit-phrases    # write scripts/phrases.json, no network
 //   node scripts/generateAudio.mjs --manifest-only   # rebuild manifest from existing files
 //   node scripts/generateAudio.mjs --only=numbers,catalog   # limit sources
 //   node scripts/generateAudio.mjs --limit=20        # cap clips (smoke test)
+//   node scripts/generateAudio.mjs --include-arabic  # also bake Islamic Arabic (off by default)
+//   node scripts/generateAudio.mjs --force           # re-synthesise even if the file exists
 //
-// Prereqs: an Azure "Speech" resource (free tier works), Node 18+ (global fetch).
+// Prereqs: an Azure "Speech" resource (free F0 works), Node 18+ (global fetch).
+import 'dotenv/config';
 import esbuild from 'esbuild';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,23 +34,33 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const AUDIO_DIR = path.join(ROOT, 'assets', 'audio');
 const MANIFEST = path.join(ROOT, 'src', 'Utils', 'audioManifest.generated.js');
-const PERSONAS = ['teacher', 'kid'];
+const PHRASES_JSON = path.join(__dirname, 'phrases.json');
+const LOG_JSON = path.join(__dirname, 'audio-generation-log.json');
+
+// Every clip lives in one folder — the app has a SINGLE voice. (The folder is
+// still named "teacher" because that is what the voice is; renaming it would
+// churn hundreds of committed files for nothing.)
+const VOICE_DIR = 'teacher';
 
 // ── Voice mapping ──────────────────────────────────────────────────────────
-// Swap these for whatever Azure voices you prefer. `pitch` lets the kid persona
-// sound younger on languages that have no dedicated child voice (ur/ar).
+// ONE professional male teacher voice for the whole app. Both languages are
+// adult male so a child hears the same "teacher" whether the phrase is English
+// or Urdu. Do not add a second persona here — consistency IS the feature.
 const VOICES = {
-  teacher: {
-    en: { name: 'en-US-JennyNeural', locale: 'en-US' },
-    ur: { name: 'ur-PK-UzmaNeural', locale: 'ur-PK' },
-    ar: { name: 'ar-SA-ZariyahNeural', locale: 'ar-SA' },
-  },
-  kid: {
-    en: { name: 'en-US-AnaNeural', locale: 'en-US' },            // genuine child voice
-    ur: { name: 'ur-PK-AsadNeural', locale: 'ur-PK', pitch: '+18%' },
-    ar: { name: 'ar-SA-HamedNeural', locale: 'ar-SA', pitch: '+18%' },
-  },
+  en: { name: 'en-US-AndrewNeural', locale: 'en-US' },
+  ur: { name: 'ur-PK-AsadNeural', locale: 'ur-PK' },
+  // Islamic Arabic recitation is out of scope and skipped unless --include-arabic.
+  // Those clips are already baked and must not be silently overwritten.
+  ar: { name: 'ar-SA-HamedNeural', locale: 'ar-SA' },
 };
+
+// Islamic sources — excluded from generation. Their Arabic clips already exist
+// (baked separately) and the Qari recitation in assets/audio/quran/ is real
+// human recitation that must never be replaced by TTS.
+const ISLAMIC_SOURCES = new Set([
+  'duas', 'kalmas', 'namesAllah', 'namesMuhammad', 'prophets',
+  'manners', 'namaz', 'juzAmma', 'islamicStories',
+]);
 
 // Azure output: small mono MP3 is plenty for short narration and plays on both
 // platforms via expo-audio.
@@ -59,6 +76,9 @@ const val = (f) => {
 };
 const REPORT = has('--report');
 const MANIFEST_ONLY = has('--manifest-only');
+const EMIT_PHRASES = has('--emit-phrases');
+const INCLUDE_ARABIC = has('--include-arabic');
+const FORCE = has('--force');
 const ONLY = val('--only') ? new Set(val('--only').split(',')) : null;
 const LIMIT = val('--limit') ? parseInt(val('--limit'), 10) : Infinity;
 
@@ -66,12 +86,16 @@ const xmlEscape = (s) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
-const ssml = (text, voice) => {
-  const body = voice.pitch
-    ? `<prosody pitch="${voice.pitch}">${xmlEscape(text)}</prosody>`
-    : xmlEscape(text);
-  return `<speak version='1.0' xml:lang='${voice.locale}'><voice name='${voice.name}'>${body}</voice></speak>`;
-};
+// Explicit neutral prosody on every clip. Azure's default already is rate/pitch
+// 0%, but stating it means a future voice swap can't quietly change the pace of
+// SOME clips and not others — every phrase in the app is spoken identically.
+const ssml = (text, voice) =>
+  `<speak version='1.0' xml:lang='${voice.locale}'>` +
+  `<voice name='${voice.name}'>` +
+  `<prosody rate="0%" pitch="0%">${xmlEscape(text)}</prosody>` +
+  `</voice></speak>`;
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Load collect.mjs by bundling it (esbuild resolves the ESM data files for Node).
 async function loadPairs() {
@@ -90,10 +114,16 @@ async function loadPairs() {
 }
 
 // Azure REST synthesis -> Buffer of MP3 bytes.
-async function synthesize(text, voice, key, region) {
-  const res = await fetch(
-    `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`,
-    {
+//
+// The free F0 tier throttles hard (~20 requests/min). A 2000-clip run WILL hit
+// 429 repeatedly, so retry with exponential backoff, honouring Retry-After when
+// Azure sends it. 5xx is retried too (transient); 4xx other than 429 is a real
+// error (bad SSML / bad voice name) and fails fast.
+async function synthesize(text, voice, key, region, attempt = 0) {
+  const MAX_ATTEMPTS = 6;
+  let res;
+  try {
+    res = await fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
       method: 'POST',
       headers: {
         'Ocp-Apim-Subscription-Key': key,
@@ -102,38 +132,90 @@ async function synthesize(text, voice, key, region) {
         'User-Agent': 'littlegenius-audiogen',
       },
       body: ssml(text, voice),
-    },
-  );
-  if (!res.ok) {
-    throw new Error(`Azure TTS ${res.status} ${res.statusText}: ${await res.text().catch(() => '')}`);
+    });
+  } catch (e) {
+    // Network blip — treat like a 5xx.
+    if (attempt >= MAX_ATTEMPTS) throw e;
+    await sleep(2 ** attempt * 1000);
+    return synthesize(text, voice, key, region, attempt + 1);
   }
-  return Buffer.from(await res.arrayBuffer());
+
+  if (res.ok) return Buffer.from(await res.arrayBuffer());
+
+  const retryable = res.status === 429 || res.status >= 500;
+  if (retryable && attempt < MAX_ATTEMPTS) {
+    const hinted = parseInt(res.headers.get('retry-after') || '', 10);
+    const waitMs = Number.isFinite(hinted) ? hinted * 1000 : 2 ** attempt * 1000;
+    if (res.status === 429) process.stdout.write(`\n  ⏳ rate-limited, waiting ${Math.round(waitMs / 1000)}s…`);
+    await sleep(waitMs);
+    return synthesize(text, voice, key, region, attempt + 1);
+  }
+
+  // NOTE: never include `key` in this message.
+  throw new Error(`Azure TTS ${res.status} ${res.statusText}: ${await res.text().catch(() => '')}`);
 }
 
 // Rebuild the RN manifest from whatever clips currently exist on disk.
 function writeManifest() {
-  const forPersona = (persona) => {
-    const dir = path.join(AUDIO_DIR, persona);
-    if (!fs.existsSync(dir)) return '';
-    return fs
-      .readdirSync(dir)
-      .filter((f) => f.endsWith(`.${EXT}`))
-      .sort()
-      .map((f) => {
-        const key = f.slice(0, -(EXT.length + 1));
-        return `    '${key}': require('../../assets/audio/${persona}/${f}'),`;
-      })
-      .join('\n');
-  };
+  const dir = path.join(AUDIO_DIR, VOICE_DIR);
+  const entries = !fs.existsSync(dir)
+    ? ''
+    : fs
+        .readdirSync(dir)
+        .filter((f) => f.endsWith(`.${EXT}`))
+        .sort()
+        .map((f) => {
+          const key = f.slice(0, -(EXT.length + 1));
+          return `  '${key}': require('../../assets/audio/${VOICE_DIR}/${f}'),`;
+        })
+        .join('\n');
+
   const body =
     `// ⚠️  AUTO-GENERATED by scripts/generateAudio.mjs — DO NOT EDIT BY HAND.\n` +
-    `// Maps speechKey() -> bundled audio clip, per voice persona.\n\n` +
-    `export const AUDIO = {\n` +
-    `  teacher: {\n${forPersona('teacher')}\n  },\n` +
-    `  kid: {\n${forPersona('kid')}\n  },\n` +
-    `};\n\nexport default AUDIO;\n`;
+    `// Maps speechKey() -> the bundled audio clip for that phrase.\n` +
+    `// The app has one voice, so this is a flat map (no persona dimension).\n\n` +
+    `export const AUDIO = {\n${entries}\n};\n\nexport default AUDIO;\n`;
   fs.writeFileSync(MANIFEST, body);
-  console.log(`✔ Wrote manifest ${path.relative(ROOT, MANIFEST)}`);
+  console.log(`✔ Wrote manifest ${path.relative(ROOT, MANIFEST)} (${entries ? entries.split('\n').length : 0} clips)`);
+}
+
+// scripts/audio-generation-log.json — what each clip on disk actually says and
+// which voice said it. Merged, not overwritten: a run that skips existing files
+// must not erase their history, so previous entries are preserved and only the
+// clips synthesised this run get a fresh `generatedAt`.
+function writeLog(freshEntries) {
+  let previous = [];
+  try {
+    previous = JSON.parse(fs.readFileSync(LOG_JSON, 'utf8'));
+    if (!Array.isArray(previous)) previous = [];
+  } catch {
+    previous = []; // no log yet, or it's corrupt — start clean
+  }
+
+  const byFile = new Map(previous.map((e) => [e.file, e]));
+  for (const e of freshEntries) byFile.set(e.file, e); // fresh wins
+
+  // Drop entries whose clip no longer exists (e.g. after a manual delete).
+  const dir = path.join(AUDIO_DIR, VOICE_DIR);
+  const rows = [...byFile.values()]
+    .filter((e) => fs.existsSync(path.join(dir, e.file)))
+    .sort((a, b) => a.file.localeCompare(b.file));
+
+  fs.writeFileSync(LOG_JSON, `${JSON.stringify(rows, null, 2)}\n`);
+  console.log(`✔ Wrote ${path.relative(ROOT, LOG_JSON)} (${rows.length} clips tracked)`);
+}
+
+// scripts/phrases.json — the human-readable inventory of everything the app
+// speaks. Generated (never hand-edited) so it cannot drift from collect.mjs.
+function writePhrases(items) {
+  const rows = items.map((it) => ({
+    id: it.key,
+    text: it.text,
+    lang: it.language,
+    category: it.source,
+  }));
+  fs.writeFileSync(PHRASES_JSON, `${JSON.stringify(rows, null, 2)}\n`);
+  console.log(`✔ Wrote ${path.relative(ROOT, PHRASES_JSON)} (${rows.length} phrases)`);
 }
 
 async function main() {
@@ -144,62 +226,90 @@ async function main() {
 
   const raw = await loadPairs();
 
-  // Dedupe by (persona-independent) speechKey; keep first text seen per key.
+  // Dedupe by speechKey; keep first text seen per key.
   const byKey = new Map();
   for (const p of raw) {
-    if (ONLY && !ONLY.has(p.source)) continue;
+    // --only names sources explicitly, so honour it even for Islamic ones;
+    // otherwise Islamic content is left alone unless --include-arabic.
+    if (ONLY) {
+      if (!ONLY.has(p.source)) continue;
+    } else if (!INCLUDE_ARABIC && ISLAMIC_SOURCES.has(p.source)) {
+      continue;
+    }
     const key = speechKey(p.language, p.text);
     if (!byKey.has(key)) byKey.set(key, { ...p, key, prefix: langPrefix(p.language) });
   }
   const items = [...byKey.values()];
 
-  // Coverage report grouped by source + language.
+  // Coverage report grouped by source + language, with the character counts
+  // that decide whether a run fits the Azure free tier.
   const bySource = {};
+  let totalChars = 0;
   for (const it of items) {
-    const s = (bySource[it.source] ||= {});
-    s[it.prefix] = (s[it.prefix] || 0) + 1;
+    const s = (bySource[it.source] ||= { langs: {}, chars: 0 });
+    s.langs[it.prefix] = (s.langs[it.prefix] || 0) + 1;
+    s.chars += it.text.length;
+    totalChars += it.text.length;
   }
-  console.log(`\nCollected ${raw.length} pairs -> ${items.length} unique clips (x${PERSONAS.length} personas):`);
-  for (const [src, langs] of Object.entries(bySource)) {
-    console.log(`  ${src.padEnd(16)} ${Object.entries(langs).map(([l, c]) => `${l}:${c}`).join('  ')}`);
+  console.log(`\nCollected ${raw.length} pairs -> ${items.length} unique clips:`);
+  for (const [src, s] of Object.entries(bySource)) {
+    const langs = Object.entries(s.langs).map(([l, c]) => `${l}:${c}`).join('  ');
+    console.log(`  ${src.padEnd(16)} ${langs.padEnd(18)} ${String(s.chars).padStart(6)} chars`);
   }
+  console.log(`  ${''.padEnd(16)} ${'TOTAL'.padEnd(18)} ${String(totalChars).padStart(6)} chars ` +
+    `(${((totalChars / 500000) * 100).toFixed(1)}% of the 500K free F0 tier)`);
+  if (!INCLUDE_ARABIC) console.log('  (Islamic/Arabic sources excluded — pass --include-arabic to bake them)');
 
-  if (REPORT) {
-    console.log('\n--report: no audio generated.');
+  if (EMIT_PHRASES) writePhrases(items);
+  if (REPORT || EMIT_PHRASES) {
+    console.log('\nNo audio generated (report/emit only).');
     return;
   }
 
-  const KEY = process.env.AZURE_TTS_KEY;
-  const REGION = process.env.AZURE_TTS_REGION;
+  // Prefer the .env names; accept the older AZURE_TTS_* so an existing shell
+  // export keeps working. Never print these values.
+  const KEY = process.env.AZURE_SPEECH_KEY || process.env.AZURE_TTS_KEY;
+  const REGION = process.env.AZURE_SPEECH_REGION || process.env.AZURE_TTS_REGION;
   if (!KEY || !REGION) {
-    console.error('\n✖ Set AZURE_TTS_KEY and AZURE_TTS_REGION to generate audio (or pass --report).');
+    console.error('\n✖ AZURE_SPEECH_KEY and AZURE_SPEECH_REGION must be set (in .env or the shell).');
+    console.error('  Pass --report or --emit-phrases to inspect the corpus without credentials.');
     process.exit(1);
   }
 
-  for (const persona of PERSONAS) fs.mkdirSync(path.join(AUDIO_DIR, persona), { recursive: true });
+  const outDir = path.join(AUDIO_DIR, VOICE_DIR);
+  fs.mkdirSync(outDir, { recursive: true });
 
+  const log = [];
   let made = 0, skipped = 0, failed = 0, done = 0;
   for (const it of items) {
     if (done >= LIMIT) break;
     done++;
-    for (const persona of PERSONAS) {
-      const voice = VOICES[persona][it.prefix];
-      if (!voice) { failed++; continue; } // no voice mapped for this language
-      const outPath = path.join(AUDIO_DIR, persona, `${it.key}.${EXT}`);
-      if (fs.existsSync(outPath)) { skipped++; continue; }
-      try {
-        const buf = await synthesize(it.text, voice, KEY, REGION);
-        fs.writeFileSync(outPath, buf);
-        made++;
-        if (made % 25 === 0) console.log(`  …${made} clips generated`);
-      } catch (e) {
-        failed++;
-        console.warn(`  ✖ ${persona}/${it.key} (${it.source}): ${e.message}`);
-      }
+    const voice = VOICES[it.prefix];
+    if (!voice) {
+      failed++;
+      console.warn(`  ✖ ${it.key} (${it.source}): no voice mapped for "${it.prefix}"`);
+      continue;
+    }
+    const file = `${it.key}.${EXT}`;
+    const outPath = path.join(outDir, file);
+    if (fs.existsSync(outPath) && !FORCE) { skipped++; continue; }
+    try {
+      const buf = await synthesize(it.text, voice, KEY, REGION);
+      fs.writeFileSync(outPath, buf);
+      made++;
+      log.push({
+        file, text: it.text, lang: it.language, voice: voice.name,
+        source: it.source, chars: it.text.length, generatedAt: new Date().toISOString(),
+      });
+      if (made % 25 === 0) console.log(`  …${made} clips generated`);
+    } catch (e) {
+      failed++;
+      console.warn(`  ✖ ${it.key} (${it.source}): ${e.message}`);
     }
   }
 
   console.log(`\nDone. made=${made} skipped=${skipped} failed=${failed}`);
+  writeLog(log);
   writeManifest();
 }
 

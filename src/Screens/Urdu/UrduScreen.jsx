@@ -58,8 +58,13 @@ const UrduScreen = ({ navigation, route }) => {
                   <Text style={styles.vocabMeaning}>{vocab.meaning}</Text>
                 </View>
               </View>
+              {/* Speak the Urdu WORD, not its romanization: the pre-baked clip
+                  is an Urdu neural voice, which pronounces native script
+                  correctly and Latin ("Anaar") unreliably. The romanization
+                  stays as fallbackText for devices with no Urdu voice pack and
+                  no clip. */}
               <SpeakButton
-                text={vocab.speak}
+                text={vocab.word}
                 language="ur-PK"
                 fallbackText={vocab.speak}
                 color={letter.color}

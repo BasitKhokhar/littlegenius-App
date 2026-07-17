@@ -218,6 +218,7 @@ const makeStyles = (colors) => StyleSheet.create({
     gap: 12,
     paddingHorizontal: 16,
     paddingTop: 10,
+    paddingBottom: 90,
   },
   navBtn: {
     flex: 1,

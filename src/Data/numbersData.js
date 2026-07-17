@@ -1,36 +1,52 @@
 // Numbers 1-100 Data with Urdu translations
+import { numberToEnglish } from '../Utils/dataHelpers';
+
+// Urdu numerals 1-100, in order. These are irregular (they are not composed
+// from "twenty" + "one" the way English is — 21 is اکیس, not بیس ایک), so every
+// one is spelled out rather than generated.
+//
+// ⚠️  NEEDS NATIVE-SPEAKER REVIEW — this is teaching content that children hear
+//     and repeat. 1-20 are the original hand-checked values; 21-100 were added
+//     with the audio pipeline and have not yet been verified by a native
+//     speaker. Fixing a word here means re-running scripts/generateAudio.mjs
+//     (the text change gives the clip a new speechKey).
+const URDU_NUMBERS = [
+  'ایک', 'دو', 'تین', 'چار', 'پانچ', 'چھ', 'سات', 'آٹھ', 'نو', 'دس',
+  'گیارہ', 'بارہ', 'تیرہ', 'چودہ', 'پندرہ', 'سولہ', 'سترہ', 'اٹھارہ', 'انیس', 'بیس',
+  'اکیس', 'بائیس', 'تئیس', 'چوبیس', 'پچیس', 'چھبیس', 'ستائیس', 'اٹھائیس', 'انتیس', 'تیس',
+  'اکتیس', 'بتیس', 'تینتیس', 'چونتیس', 'پینتیس', 'چھتیس', 'سینتیس', 'اڑتیس', 'انتالیس', 'چالیس',
+  'اکتالیس', 'بیالیس', 'تینتالیس', 'چوالیس', 'پینتالیس', 'چھیالیس', 'سینتالیس', 'اڑتالیس', 'انچاس', 'پچاس',
+  'اکاون', 'باون', 'ترپن', 'چون', 'پچپن', 'چھپن', 'ستاون', 'اٹھاون', 'انسٹھ', 'ساٹھ',
+  'اکسٹھ', 'باسٹھ', 'ترسٹھ', 'چونسٹھ', 'پینسٹھ', 'چھیاسٹھ', 'سڑسٹھ', 'اڑسٹھ', 'انہتر', 'ستر',
+  'اکہتر', 'بہتر', 'تہتر', 'چوہتر', 'پچہتر', 'چھہتر', 'ستتر', 'اٹھہتر', 'اناسی', 'اسی',
+  'اکیاسی', 'بیاسی', 'تراسی', 'چوراسی', 'پچاسی', 'چھیاسی', 'ستاسی', 'اٹھاسی', 'نواسی', 'نوے',
+  'اکانوے', 'بانوے', 'ترانوے', 'چورانوے', 'پچانوے', 'چھیانوے', 'ستانوے', 'اٹھانوے', 'ننانوے', 'سو',
+];
+
 export const generateNumbersData = () => {
-  const baseUrduNumbers = [
-    'ایک', 'دو', 'تین', 'چار', 'پانچ', 'چھ', 'سات', 'آٹھ', 'نو', 'دس',
-    'گیارہ', 'بارہ', 'تیرہ', 'چودہ', 'پندرہ', 'سولہ', 'سترہ', 'اٹھارہ', 'انیس', 'بیس',
-  ];
-
-  const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
-    'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-  const numberToEnglish = (num) => {
-    if (num === 100) return 'One Hundred';
-    if (num < 20) return ones[num];
-    const digit = num % 10;
-    return tens[Math.floor(num / 10)] + (digit ? ' ' + ones[digit] : '');
-  };
-
   const fruitEmojis = ['🍎', '⭐', '🍓', '🍉', '🎈', '🍩', '🍪', '🍭', '🧩', '🍊', '🍒', '🧸'];
   const colors = ['#F85A9B', '#FFAF3A', '#3EC38B', '#3C97F9', '#8A6FF0', '#FF6B5A', '#8B5CF6', '#EC4899', '#06B6D4', '#F59E0B'];
 
   return Array.from({ length: 100 }, (_, i) => {
     const n = i + 1;
     const selectedFruit = fruitEmojis[i % fruitEmojis.length];
-    const urduNum = baseUrduNumbers[i] || `عدد ${n}`;
+    const english = numberToEnglish(n);
+    const urduNum = URDU_NUMBERS[i];
 
     return {
       number: n,
+      english,
       urdu: urduNum,
       emoji: n <= 10 ? '⭐'.repeat(n) : `${selectedFruit} x${n}`,
       color: colors[i % colors.length],
-      speak: `${n}. In English ${numberToEnglish(n)}. In Urdu ${urduNum}`,
-      objects: Array.from({ length: Math.min(n, 12) }, () => selectedFruit)
+      // Two clips played back-to-back, each in its own language, so the English
+      // voice never has to read Urdu script (and vice versa). Keep these strings
+      // EXACTLY in sync with scripts/collect.mjs — the text is the audio key.
+      speech: [
+        { text: `${n}. ${english}`, language: 'en-US' },
+        { text: urduNum, language: 'ur-PK' },
+      ],
+      objects: Array.from({ length: Math.min(n, 12) }, () => selectedFruit),
     };
   });
 };

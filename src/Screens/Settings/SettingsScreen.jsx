@@ -12,7 +12,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Header, ParentalGate } from '../../Components/UI';
 import { Card, Button, Badge } from '../../Components/Common';
-import { useAuth, useDialog, useNotifications, useVoice } from '../../Context';
+import { useAuth, useDialog, useNotifications } from '../../Context';
 import { useTheme } from '../../Context/ThemeContext';
 import { LEGAL_URLS, SUPPORT_EMAIL } from '../../Constants';
 import SpeechEngine from '../../Utils/speechEngine';
@@ -37,17 +37,9 @@ const SettingsScreen = ({ navigation }) => {
   const { user, stars, logout, deleteAccount } = useAuth();
   const { showConfirm } = useDialog();
   const { colors, isDark, toggle } = useTheme();
-  const { persona, setPersona } = useVoice();
   const { enabled: remindersOn, hour, minute, setEnabled, setTime } = useNotifications();
 
-  // Preview the chosen voice by speaking a short line in it.
-  const previewVoice = (next) => {
-    setPersona(next);
-    SpeechEngine.speak(
-      next === 'kid' ? SPEECH_PHRASES.VOICE_PREVIEW_KID : SPEECH_PHRASES.VOICE_PREVIEW_TEACHER,
-      'en-US',
-    );
-  };
+  const previewVoice = () => SpeechEngine.speak(SPEECH_PHRASES.VOICE_PREVIEW_TEACHER, 'en-US');
   const bottomPad = useTabBarClearance();
 
   const [gate, setGate] = useState(null);
@@ -176,35 +168,27 @@ const SettingsScreen = ({ navigation }) => {
           </View>
         </Card>
 
-        {/* Voice */}
+        {/* Voice — the app has one teacher voice, so there is nothing to pick.
+            The button just lets a grown-up check the sound is working. */}
         <Card elevation="sm" style={styles.card}>
           <Text style={s.cardTitle}>🎙️ Voice</Text>
           <Text style={[s.aboutText, { marginBottom: Spacing.md }]}>
-            Choose who reads the lessons aloud. Tap to hear a preview.
+            Lessons are read aloud by your teacher. Tap to hear a preview.
           </Text>
-          {[
-            { key: 'teacher', emoji: '👩‍🏫', label: 'Teacher', hint: 'Warm, clear grown-up voice' },
-            { key: 'kid', emoji: '🧒', label: 'Kid Voice', hint: 'Playful and fun' },
-          ].map((v) => {
-            const active = persona === v.key;
-            return (
-              <TouchableOpacity
-                key={v.key}
-                style={[s.timeChip, active && s.timeChipActive]}
-                onPress={() => previewVoice(v.key)}
-                activeOpacity={0.85}
-              >
-                <View style={s.infoIconCircle}>
-                  <Text style={styles.infoIcon}>{v.emoji}</Text>
-                </View>
-                <View style={[styles.infoTextBlock, { marginLeft: Spacing.md }]}>
-                  <Text style={[s.timeChipLabel, active && s.timeChipTextActive]}>{v.label}</Text>
-                  <Text style={s.infoLabel}>{v.hint}</Text>
-                </View>
-                {active && <Text style={[s.timeValue, { marginRight: 0 }]}>✓</Text>}
-              </TouchableOpacity>
-            );
-          })}
+          <TouchableOpacity
+            style={s.timeChip}
+            onPress={previewVoice}
+            activeOpacity={0.85}
+          >
+            <View style={s.infoIconCircle}>
+              <Text style={styles.infoIcon}>👨‍🏫</Text>
+            </View>
+            <View style={[styles.infoTextBlock, { marginLeft: Spacing.md }]}>
+              <Text style={s.timeChipLabel}>Teacher</Text>
+              <Text style={s.infoLabel}>Warm, clear grown-up voice</Text>
+            </View>
+            <Text style={[s.timeValue, { marginRight: 0 }]}>▶</Text>
+          </TouchableOpacity>
         </Card>
 
         {/* Reminders */}

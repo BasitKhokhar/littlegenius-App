@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
 import { storiesData } from '../../Data/storiesData';
 import islamicStoriesData from '../../Data/islamicStoriesData';
 import { Header } from '../../Components/UI';
+import SpeakButton from '../../Components/Common/SpeakButton';
 import { useAuth } from '../../Context';
 import { useThemeColors } from '../../Context/ThemeContext';
 import SpeechEngine from '../../Utils/speechEngine';
@@ -41,6 +42,17 @@ const StoryQuizScreen = ({ navigation, route }) => {
     }));
   }, [story, round]);
 
+  const question = questions[currentIdx];
+
+  // Read each question aloud as it appears, and stop on the way out. Declared
+  // above the early return below to keep the hook order stable.
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+    if (question?.q) SpeechEngine.speak(question.q, 'en-US');
+  }, [question, gameState]);
+
+  useEffect(() => () => { SpeechEngine.stop(); }, []);
+
   if (!story || questions.length === 0) {
     return (
       <View style={styles.container}>
@@ -55,31 +67,40 @@ const StoryQuizScreen = ({ navigation, route }) => {
     );
   }
 
-  const currentQuestion = questions[currentIdx];
+  const currentQuestion = question;
 
   const handleAnswer = (option) => {
     const isCorrect = option.isCorrect;
-    if (isCorrect) {
-      setCorrectCount(prev => prev + 1);
-      SpeechEngine.speak(SPEECH_PHRASES.CORRECT_EXCELLENT, 'en-US');
-    } else {
-      const correctText = currentQuestion.options.find(o => o.isCorrect)?.text;
-      SpeechEngine.speak(`Not quite! The right answer is ${correctText}`, 'en-US');
-    }
+    if (isCorrect) setCorrectCount(prev => prev + 1);
 
-    if (currentIdx < questions.length - 1) {
-      setTimeout(() => {
+    const advance = () => {
+      if (currentIdx < questions.length - 1) {
         setCurrentIdx(prev => prev + 1);
-      }, 1000);
-    } else {
-      setTimeout(() => {
-        const finalCorrect = isCorrect ? correctCount + 1 : correctCount;
-        const reward = calculateStarReward(finalCorrect, questions.length, 5);
-        addStars(reward);
-        setGameState('finished');
-        SpeechEngine.speak(`Story Quiz completed! You got ${finalCorrect} out of ${questions.length} right and earned ${reward} stars!`, 'en-US');
-      }, 1000);
-    }
+        return;
+      }
+      const finalCorrect = isCorrect ? correctCount + 1 : correctCount;
+      const reward = calculateStarReward(finalCorrect, questions.length, 5);
+      addStars(reward);
+      setGameState('finished');
+      SpeechEngine.speak(`Story Quiz completed! You got ${finalCorrect} out of ${questions.length} right and earned ${reward} stars!`, 'en-US');
+    };
+
+    // Wait for the feedback to finish before moving on — starting the next
+    // question's audio would otherwise cut off the answer the child needs to
+    // hear. SpeechEngine settles exactly once, so `advance` runs once.
+    let advanced = false;
+    const then = () => {
+      if (advanced) return;
+      advanced = true;
+      setTimeout(advance, 400);
+    };
+
+    const correctText = currentQuestion.options.find(o => o.isCorrect)?.text;
+    SpeechEngine.speak(
+      isCorrect ? SPEECH_PHRASES.CORRECT_EXCELLENT : `Not quite! The right answer is ${correctText}`,
+      'en-US',
+      { onDone: then, onError: then },
+    );
   };
 
   const restartQuiz = () => {
@@ -103,6 +124,15 @@ const StoryQuizScreen = ({ navigation, route }) => {
             <Text style={styles.progText}>Question {currentIdx + 1} of {questions.length}</Text>
             <View style={styles.questionCard}>
               <Text style={styles.questionText}>{currentQuestion.q}</Text>
+              <View style={styles.questionAudio}>
+                <SpeakButton
+                  text={currentQuestion.q}
+                  language="en-US"
+                  color={colors.primary}
+                  label="🔊 Hear again"
+                  size="sm"
+                />
+              </View>
             </View>
 
             <View style={styles.optionsContainer}>
@@ -185,6 +215,10 @@ const makeStyles = (colors) => StyleSheet.create({
     fontWeight: '900',
     color: colors.textPrimary,
     textAlign: 'center',
+  },
+  questionAudio: {
+    marginTop: 16,
+    alignItems: 'center',
   },
   optionsContainer: {
     width: '100%',

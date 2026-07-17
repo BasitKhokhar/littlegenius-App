@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import { getQuizBank } from '../../Utils/quizGenerators';
 import { createQuizSession, QUIZ_QUESTION_COUNT } from '../../Utils/quizHelpers';
 import { calculateStarReward } from '../../Utils/dataHelpers';
 import { Header } from '../../Components/UI';
+import SpeakButton from '../../Components/Common/SpeakButton';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
@@ -38,6 +39,21 @@ const ModuleQuizScreen = ({ navigation, route }) => {
   const [correctCount, setCorrectCount] = useState(0);
   const [gameState, setGameState] = useState('playing');
 
+  const question = questions[currentIdx];
+
+  // Read each question aloud as it appears — many players are still learning to
+  // read, so a silent question is unanswerable for them. Declared above the
+  // early return below to keep the hook order stable.
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+    const line = question?.speech;
+    if (!line?.text) return;
+    SpeechEngine.speak(line.text, line.language);
+  }, [question, gameState]);
+
+  // Never let a question keep talking after the player has left the screen.
+  useEffect(() => () => { SpeechEngine.stop(); }, []);
+
   if (!pack || questions.length === 0) {
     return (
       <View style={styles.container}>
@@ -52,33 +68,48 @@ const ModuleQuizScreen = ({ navigation, route }) => {
     );
   }
 
-  const currentQuestion = questions[currentIdx];
+  const currentQuestion = question;
   const total = questions.length;
 
   const handleAnswer = (selected) => {
     const isCorrect = selected === currentQuestion.answer;
     const nextCorrect = isCorrect ? correctCount + 1 : correctCount;
 
-    if (isCorrect) {
-      setCorrectCount(nextCorrect);
-      SpeechEngine.speak(SPEECH_PHRASES.CORRECT_BRILLIANT, 'en-US');
-    } else {
-      SpeechEngine.speak(`Not quite! The correct answer is ${currentQuestion.answer}`, 'en-US');
-    }
+    const advance = () => {
+      if (currentIdx < total - 1) {
+        setCurrentIdx((prev) => prev + 1);
+        return;
+      }
+      const reward = calculateStarReward(nextCorrect, total, 5);
+      addStars(reward);
+      setGameState('finished');
+      SpeechEngine.speak(
+        `Quiz finished! You answered ${nextCorrect} out of ${total} correctly and earned ${reward} stars!`,
+        'en-US'
+      );
+    };
 
-    if (currentIdx < total - 1) {
-      setTimeout(() => setCurrentIdx((prev) => prev + 1), 1000);
-    } else {
-      setTimeout(() => {
-        const reward = calculateStarReward(nextCorrect, total, 5);
-        addStars(reward);
-        setGameState('finished');
-        SpeechEngine.speak(
-          `Quiz finished! You answered ${nextCorrect} out of ${total} correctly and earned ${reward} stars!`,
-          'en-US'
-        );
-      }, 1000);
-    }
+    // Move on only once the feedback has finished speaking. A fixed delay would
+    // cut it off, because starting the next question's audio stops whatever is
+    // already playing — and "Not quite! The correct answer is …" is exactly the
+    // line the child most needs to hear in full. SpeechEngine guarantees one of
+    // onDone/onError fires, so `advance` runs exactly once either way; the short
+    // pause is just breathing room before the next question.
+    let advanced = false;
+    const then = () => {
+      if (advanced) return;
+      advanced = true;
+      setTimeout(advance, 400);
+    };
+
+    if (isCorrect) setCorrectCount(nextCorrect);
+    SpeechEngine.speak(
+      isCorrect
+        ? SPEECH_PHRASES.CORRECT_BRILLIANT
+        : `Not quite! The correct answer is ${currentQuestion.answer}`,
+      'en-US',
+      { onDone: then, onError: then },
+    );
   };
 
   const restartQuiz = () => {
@@ -104,6 +135,17 @@ const ModuleQuizScreen = ({ navigation, route }) => {
             </Text>
             <View style={styles.questionCard}>
               <Text style={styles.questionText}>{currentQuestion.q}</Text>
+              {currentQuestion.speech?.text ? (
+                <View style={styles.questionAudio}>
+                  <SpeakButton
+                    text={currentQuestion.speech.text}
+                    language={currentQuestion.speech.language}
+                    color={colors.primary}
+                    label="🔊 Hear again"
+                    size="sm"
+                  />
+                </View>
+              ) : null}
             </View>
 
             <View style={styles.optionsContainer}>
@@ -183,6 +225,7 @@ const makeStyles = (colors) => StyleSheet.create({
     textAlign: 'center',
     lineHeight: 28,
   },
+  questionAudio: { marginTop: 16 },
   optionsContainer: { width: '100%', gap: 12 },
   optionBtn: {
     backgroundColor: colors.surface,

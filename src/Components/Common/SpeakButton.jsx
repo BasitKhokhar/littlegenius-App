@@ -11,6 +11,11 @@ const SpeakButton = ({
   // no Arabic/Urdu voice pack — guarantees the child always hears something.
   fallbackText = null,
   fallbackLang = 'en-US',
+  // Ordered [{ text, language }] spoken back-to-back, each in its OWN language
+  // — e.g. a number said in English then Urdu. Unlike audioClips these still go
+  // through SpeechEngine, so each phrase gets its pre-baked clip when one exists
+  // and falls back to device TTS when it doesn't. Takes priority over text.
+  phrases = null,
   // Ordered list of bundled clips (require()'d MP3s) to play back-to-back —
   // e.g. a full surah recited ayah by ayah. Takes priority over text when set.
   audioClips = null,
@@ -74,11 +79,34 @@ const SpeakButton = ({
       return;
     }
 
-    // Voice handled centrally by SpeechEngine: it plays the pre-baked premium
-    // clip for the active persona (teacher/kid) when one exists, else falls
-    // back to device TTS — and if the requested Arabic/Urdu voice isn't
-    // installed, to fallbackText spoken in English. SpeechEngine guarantees
-    // exactly one of onDone/onError fires, so state can't hang.
+    // Multi-language phrase sequence (e.g. "42. Forty Two" then "بیالیس").
+    // Same chaining/token discipline as above, but each step is a normal
+    // SpeechEngine.speak() so it keeps the clip lookup and the TTS fallback.
+    // onError advances rather than aborting: one missing voice pack must not
+    // swallow the rest of the sequence.
+    const steps = Array.isArray(phrases) ? phrases.filter((p) => p?.text) : [];
+    if (steps.length) {
+      const token = ++seqRef.current;
+      const speakAt = (i) => {
+        if (token !== seqRef.current || !mountedRef.current) return;
+        if (i >= steps.length) { finish(); return; }
+        const step = steps[i];
+        SpeechEngine.speak(step.text, step.language || language, {
+          fallbackText: step.fallbackText ?? null,
+          fallbackLang: step.fallbackLang ?? fallbackLang,
+          onDone: () => speakAt(i + 1),
+          onError: () => speakAt(i + 1),
+        });
+      };
+      speakAt(0);
+      return;
+    }
+
+    // Voice handled centrally by SpeechEngine: it plays the pre-baked teacher
+    // clip when one exists, else falls back to device TTS — and if the
+    // requested Arabic/Urdu voice isn't installed, to fallbackText spoken in
+    // English. SpeechEngine guarantees exactly one of onDone/onError fires, so
+    // state can't hang.
     await SpeechEngine.speak(text, language, {
       fallbackText,
       fallbackLang,

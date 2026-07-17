@@ -4,7 +4,7 @@
 //   1. Screens import a named constant instead of an inline literal, so the
 //      exact spoken string can never drift out of sync with its audio clip.
 //   2. The build-time generator (scripts/generateAudio.mjs) enumerates
-//      SPEECH_PHRASE_LIST to pre-bake a clip for each phrase per persona.
+//      SPEECH_PHRASE_LIST to pre-bake a teacher-voice clip for each phrase.
 //
 // The VALUES are the exact strings passed to SpeechEngine.speak(); changing a
 // value means the audio must be regenerated (its speechKey changes).
@@ -36,9 +36,8 @@ export const SPEECH_PHRASES = {
   GAME_COLOR: 'Color Match! Pick the right color name!',
   GAME_SHAPE: 'Shape Quiz! Name the shapes correctly!',
 
-  // Voice-persona preview lines (spoken from Settings when switching voice)
+  // Voice preview line (spoken from Settings to check the sound is working)
   VOICE_PREVIEW_TEACHER: "Hello! I'm your teacher. Let's learn together!",
-  VOICE_PREVIEW_KID: 'Hi! Let us learn and play together!',
 };
 
 // Flat list the audio generator consumes. All fixed phrases are English.
