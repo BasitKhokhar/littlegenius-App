@@ -52,6 +52,18 @@ const resolvedByLang = {};        // langPrefix -> identifier|null (cached only 
 let currentPlayer = null;         // the AudioPlayer currently playing, if any
 let audioModeReady = false;       // setAudioModeAsync() run once, lazily
 
+// Delivery tuning — makes the teacher sound crisp and professional rather than
+// slow/dragging. Kids stay engaged when a tap responds quickly and the word is
+// said briskly but clearly.
+//   • CLIP_PLAYBACK_RATE: pre-baked clips are baked at a neutral speed; we play
+//     them a touch faster so a single letter/word doesn't drag. Pitch is
+//     corrected so it still sounds like the same warm human teacher, not a
+//     sped-up chipmunk. 1.0 = as baked; kept modest so pronunciation stays
+//     perfectly intelligible for young learners.
+//   • TTS_RATE: matching brisk-but-clear speed for the device-TTS fallback.
+const CLIP_PLAYBACK_RATE = 1.12;
+const TTS_RATE = 1.0;
+
 // Kids often hold the phone on silent — make sure narration is still audible.
 const ensureAudioMode = () => {
   if (audioModeReady) return;
@@ -197,12 +209,30 @@ export const SpeechEngine = {
     // Either an explicit clip the caller passed (opts.audioClip — e.g. real Qari
     // Quran recitation keyed by surah/ayah), or a pre-baked premium-voice clip
     // matched by speechKey. Explicit clip wins.
-    const clip = opts.audioClip ?? lookupClip(language, clean);
+    // A pre-baked teacher clip (letter/word/number/feedback) may be sped up for
+    // a crisper delivery. An explicit opts.audioClip — real Qari Quran
+    // recitation, a surah sequence — must play EXACTLY as recorded, untouched.
+    const bakedClip = lookupClip(language, clean);
+    const clip = opts.audioClip ?? bakedClip;
+    const isTeacherClip = !opts.audioClip && !!bakedClip;
     if (clip) {
       try {
         ensureAudioMode();
         const player = createAudioPlayer(clip);
         currentPlayer = player;
+
+        // Snappier, professional delivery: play the pre-baked teacher clip a
+        // little faster than baked with pitch correction on, so it stays the
+        // same natural voice — just crisper and more responsive for kids. Only
+        // teacher clips; an explicit audioClip (Qari recitation) plays at 1x.
+        // Guarded because pitch-corrected rate needs a recent native build; on
+        // an older one this throws and the clip simply plays at normal speed.
+        if (isTeacherClip) {
+          try {
+            player.shouldCorrectPitch = true;
+            player.setPlaybackRate(CLIP_PLAYBACK_RATE, 'high');
+          } catch { /* older expo-audio native — play at 1x */ }
+        }
 
         // Absolute cap so we never hang if BOTH didJustFinish and the duration
         // update are lost. Real recitation clips can be long (slow tajweed), so
@@ -272,7 +302,7 @@ export const SpeechEngine = {
       // Adult male pitch. If we found a real male voice keep it near-natural;
       // otherwise deepen the default voice a little so it still reads as male.
       const pitch = opts.pitch ?? (voice ? 0.97 : 0.9);
-      const rate = opts.rate ?? 0.9; // slightly slow = clearer for kids
+      const rate = opts.rate ?? TTS_RATE; // brisk but clear for kids
 
       const utterance = {
         language: spokenLang,

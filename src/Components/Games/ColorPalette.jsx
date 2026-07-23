@@ -25,24 +25,31 @@ const ColorPalette = ({
   widths,
   width,
   onWidthChange,
-}) => (
+  large = false,
+}) => {
+  // Bigger swatches on the coloring book — easier for little fingers to hit.
+  const dim = large ? 48 : 36;
+  const sizeStyle = { width: dim, height: dim, borderRadius: dim / 2 };
+  return (
   <View style={styles.container}>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.row, large && styles.rowLarge]}>
       {swatches.map((c) => (
         <TouchableOpacity
           key={c}
-          style={[styles.swatch, { backgroundColor: c }, value === c && styles.swatchActive]}
+          style={[styles.swatch, sizeStyle, { backgroundColor: c }, value === c && styles.swatchActive]}
           onPress={() => onChange(c)}
           activeOpacity={0.85}
-        />
+        >
+          {value === c ? <Text style={[styles.check, large && styles.checkLarge]}>✓</Text> : null}
+        </TouchableOpacity>
       ))}
       {eraser ? (
         <TouchableOpacity
-          style={[styles.swatch, styles.eraser, value === ERASER && styles.swatchActive]}
+          style={[styles.swatch, sizeStyle, styles.eraser, value === ERASER && styles.swatchActive]}
           onPress={() => onChange(ERASER)}
           activeOpacity={0.85}
         >
-          <Text style={styles.eraserIcon}>🧽</Text>
+          <Text style={[styles.eraserIcon, large && { fontSize: 22 }]}>🧽</Text>
         </TouchableOpacity>
       ) : null}
     </ScrollView>
@@ -69,17 +76,30 @@ const ColorPalette = ({
       </View>
     ) : null}
   </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   container: { width: '100%' },
   row: { gap: 10, paddingVertical: 8, paddingHorizontal: 4, alignItems: 'center' },
+  rowLarge: { gap: 14, paddingVertical: 6 },
+  check: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '900',
+    textShadowColor: 'rgba(0,0,0,0.35)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  checkLarge: { fontSize: 20 },
   swatch: {
     width: 36,
     height: 36,
     borderRadius: 18,
     borderWidth: 2.5,
     borderColor: 'rgba(255,255,255,0.65)',
+    alignItems: 'center',
+    justifyContent: 'center',
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },

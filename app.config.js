@@ -50,7 +50,10 @@ export default () => ({
       // survive a reboot). Block sensitive permissions that libraries may
       // inject; they are a Families-policy rejection risk. We deliberately block
       // the exact-alarm permissions because reminders use daily INEXACT
-      // scheduling and don't need them.
+      // scheduling and don't need them, and RECORD_AUDIO because expo-audio
+      // injects it for its recording API which we never use — we only PLAY
+      // audio. Removing it keeps the manifest matching the privacy policy's
+      // "no microphone" statement (a hard requirement for a children's app).
       permissions: [
         'android.permission.INTERNET',
         'android.permission.VIBRATE',
@@ -62,7 +65,8 @@ export default () => ({
         'android.permission.READ_EXTERNAL_STORAGE',
         'android.permission.WRITE_EXTERNAL_STORAGE',
         'android.permission.SCHEDULE_EXACT_ALARM',
-        'android.permission.USE_EXACT_ALARM'
+        'android.permission.USE_EXACT_ALARM',
+        'android.permission.RECORD_AUDIO'
       ]
     },
     web: {

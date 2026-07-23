@@ -43,37 +43,64 @@ const ColoringBookScreen = ({ navigation }) => {
   const [selectedColor, setSelectedColor] = useState(PALETTE[0]);
   // fills[sceneId] = { regionId: color }
   const [fills, setFills] = useState({});
-  const rewardedRef = useRef({});
+  const rewardedRef = useRef({});            // scenes that already gave the completion bonus
+  const rewardedRegionsRef = useRef({});     // { sceneId: Set(regionId) } already awarded per-fill points
   const [celebrating, setCelebrating] = useState(false);
   const pop = useRef(new Animated.Value(0)).current;
 
+  // Floating "+2 ⭐" that pops up each time a new region is coloured.
+  const [floatLabel, setFloatLabel] = useState(null);
+  const floatY = useRef(new Animated.Value(0)).current;
+  const floatOpacity = useRef(new Animated.Value(0)).current;
+
   const scene = coloringData.find((s) => s.id === sceneId) || coloringData[0];
   const sceneFills = fills[sceneId] || {};
+  const filledCount = scene.regions.filter((r) => sceneFills[r.id]).length;
+  const totalRegions = scene.regions.length;
+
+  const showFloat = (label) => {
+    setFloatLabel(label);
+    floatY.setValue(0);
+    floatOpacity.setValue(1);
+    Animated.parallel([
+      Animated.timing(floatY, { toValue: -70, duration: 850, useNativeDriver: true }),
+      Animated.timing(floatOpacity, { toValue: 0, duration: 850, useNativeDriver: true }),
+    ]).start(() => setFloatLabel(null));
+  };
 
   const handleRegionPress = (regionId) => {
     Haptics.selectionAsync().catch(() => {});
-    setFills((prev) => {
-      const cur = { ...(prev[sceneId] || {}) };
-      if (selectedColor === ERASER) {
-        delete cur[regionId];
-      } else {
-        cur[regionId] = selectedColor;
-      }
-      const next = { ...prev, [sceneId]: cur };
+    const isErase = selectedColor === ERASER;
+    const wasFilled = !!sceneFills[regionId];
 
-      // Fully coloured for the first time? Celebrate + reward.
-      const allFilled = scene.regions.every((r) => cur[r.id]);
-      if (allFilled && !rewardedRef.current[sceneId]) {
-        rewardedRef.current[sceneId] = true;
-        addStars(15);
-        setCelebrating(true);
-        pop.setValue(0);
-        Animated.spring(pop, { toValue: 1, friction: 5, useNativeDriver: true }).start();
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-        SpeechEngine.speak(`Beautiful! You colored the whole ${scene.name} and earned 15 stars!`, 'en-US');
+    const cur = { ...sceneFills };
+    if (isErase) delete cur[regionId];
+    else cur[regionId] = selectedColor;
+    setFills((prev) => ({ ...prev, [sceneId]: cur }));
+
+    if (isErase) return;
+
+    // Award a couple of stars the first time each region gets coloured.
+    if (!wasFilled) {
+      const set = rewardedRegionsRef.current[sceneId] || (rewardedRegionsRef.current[sceneId] = new Set());
+      if (!set.has(regionId)) {
+        set.add(regionId);
+        addStars(2);
+        showFloat('+2 ⭐');
       }
-      return next;
-    });
+    }
+
+    // Fully coloured for the first time? Celebrate + bonus.
+    const allFilled = scene.regions.every((r) => cur[r.id]);
+    if (allFilled && !rewardedRef.current[sceneId]) {
+      rewardedRef.current[sceneId] = true;
+      addStars(10);
+      setCelebrating(true);
+      pop.setValue(0);
+      Animated.spring(pop, { toValue: 1, friction: 5, useNativeDriver: true }).start();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      SpeechEngine.speak(`Beautiful! You colored the whole ${scene.name} and earned a big bonus!`, 'en-US');
+    }
   };
 
   const handleReset = () => {
@@ -106,7 +133,23 @@ const ColoringBookScreen = ({ navigation }) => {
           })}
         </ScrollView>
 
-        <Text style={styles.hint}>Pick a color below, then tap a part of the picture to fill it! 👆</Text>
+        {/* Selected colour + live hint */}
+        <View style={styles.hintRow}>
+          <View style={[styles.colorChip, { backgroundColor: selectedColor === ERASER ? '#E5E7EB' : selectedColor }]}>
+            {selectedColor === ERASER ? <Text style={styles.colorChipIcon}>🧽</Text> : null}
+          </View>
+          <Text style={styles.hint}>
+            {selectedColor === ERASER ? 'Tap a part to erase it' : 'Tap any white part to fill it!'} 👆
+          </Text>
+        </View>
+
+        {/* Progress */}
+        <View style={styles.progressWrap}>
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { width: `${(filledCount / totalRegions) * 100}%` }]} />
+          </View>
+          <Text style={styles.progressText}>{filledCount}/{totalRegions} ⭐</Text>
+        </View>
 
         {/* Canvas */}
         <View style={styles.canvasWrap}>
@@ -135,12 +178,21 @@ const ColoringBookScreen = ({ navigation }) => {
             ))}
           </Svg>
 
+          {floatLabel && (
+            <Animated.View
+              pointerEvents="none"
+              style={[styles.floatBadge, { opacity: floatOpacity, transform: [{ translateY: floatY }] }]}
+            >
+              <Text style={styles.floatText}>{floatLabel}</Text>
+            </Animated.View>
+          )}
+
           {celebrating && (
             <View style={styles.celebrateOverlay} pointerEvents="box-none">
               <Animated.View style={[styles.celebrateCard, { transform: [{ scale: pop }] }]}>
                 <Text style={styles.celebrateEmoji}>🎉</Text>
                 <Text style={styles.celebrateTitle}>Masterpiece!</Text>
-                <Text style={styles.celebrateSub}>+15 ⭐ earned</Text>
+                <Text style={styles.celebrateSub}>Completion bonus +10 ⭐</Text>
                 <TouchableOpacity style={styles.celebrateBtn} onPress={() => setCelebrating(false)} activeOpacity={0.85}>
                   <Text style={styles.celebrateBtnText}>Keep coloring 🎨</Text>
                 </TouchableOpacity>
@@ -155,6 +207,7 @@ const ColoringBookScreen = ({ navigation }) => {
           value={selectedColor}
           onChange={setSelectedColor}
           eraser
+          large
         />
         <TouchableOpacity style={styles.resetBtn} onPress={handleReset} activeOpacity={0.85}>
           <Text style={styles.resetBtnText}>↺ Start this picture over</Text>
@@ -185,7 +238,64 @@ const makeStyles = (colors) => StyleSheet.create({
   sceneName: { fontSize: 12, fontWeight: '900', color: colors.textSecondary },
   sceneDone: { fontSize: 12 },
 
-  hint: { fontSize: 12, fontWeight: '700', color: colors.textSecondary, marginVertical: 10, textAlign: 'center' },
+  hintRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  colorChip: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+  },
+  colorChipIcon: { fontSize: 13 },
+  hint: { fontSize: 13, fontWeight: '800', color: colors.textSecondary, textAlign: 'center' },
+
+  progressWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    width: CANVAS,
+    marginBottom: 12,
+  },
+  progressTrack: {
+    flex: 1,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.surfaceAlt,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 6,
+    backgroundColor: colors.primary,
+  },
+  progressText: { fontSize: 13, fontWeight: '900', color: colors.textPrimary, minWidth: 48, textAlign: 'right' },
+
+  floatBadge: {
+    position: 'absolute',
+    top: '34%',
+    alignSelf: 'center',
+    backgroundColor: '#F59E0B',
+    borderRadius: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    elevation: 6,
+  },
+  floatText: { color: '#FFFFFF', fontSize: 18, fontWeight: '900' },
 
   canvasWrap: {
     width: CANVAS,

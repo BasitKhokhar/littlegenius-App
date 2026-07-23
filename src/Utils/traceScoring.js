@@ -96,3 +96,54 @@ export const scoreTrace = (guidePts, strokes, size) => {
   const marks = Math.max(1, Math.round(score * 10));
   return { marks, coverage, stray };
 };
+
+/**
+ * Heuristic score for glyphs we have NO skeleton for (e.g. Urdu haroof).
+ * We can't match an exact shape, but we can honestly reward writing that
+ * fills the guide area neatly and penalise tiny dots or ink dumped in a
+ * corner — so the marks genuinely vary with effort & placement instead of
+ * being a fixed reward.
+ * @param {Array} strokes  [{ points: [{x,y}] }] from DrawCanvas
+ * @param {number} size    cell size in px (square)
+ * @returns {{ marks:number, coverage:number, stray:number }}
+ */
+export const scoreFreeform = (strokes, size) => {
+  const pts = [];
+  let length = 0;
+  for (const s of strokes) {
+    for (let i = 0; i < s.points.length; i++) {
+      pts.push(s.points[i]);
+      if (i > 0) {
+        length += Math.hypot(
+          s.points[i].x - s.points[i - 1].x,
+          s.points[i].y - s.points[i - 1].y
+        );
+      }
+    }
+  }
+  if (pts.length === 0) return { marks: 0, coverage: 0, stray: 0 };
+
+  // The guide glyph lives roughly in the middle ~76% of the cell.
+  const lo = size * 0.12;
+  const hi = size * 0.88;
+  let inZone = 0;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const p of pts) {
+    if (p.x >= lo && p.x <= hi && p.y >= lo && p.y <= hi) inZone++;
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+  const inZoneRatio = inZone / pts.length;             // stay inside the guide
+  const spanX = (maxX - minX) / size;
+  const spanY = (maxY - minY) / size;
+  const extent = Math.min(1, spanX / 0.45) * Math.min(1, spanY / 0.45); // fills area
+  const lengthScore = Math.min(1, length / (size * 1.4)); // enough ink, not a dot
+  const fill = 0.5 * extent + 0.5 * lengthScore;
+
+  // Placement gates the whole score; a good full trace inside the guide wins.
+  const score = Math.max(0, Math.min(1, inZoneRatio * (0.35 + 0.65 * fill)));
+  const marks = Math.max(1, Math.round(score * 10));
+  return { marks, coverage: inZoneRatio, stray: 1 - inZoneRatio };
+};

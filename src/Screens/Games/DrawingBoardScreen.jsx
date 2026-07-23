@@ -35,7 +35,7 @@ const DrawingBoardScreen = ({ navigation }) => {
   const canvasRef = useRef(null);
 
   const canvasW = SCREEN_W - 24;
-  const canvasH = Math.max(280, SCREEN_H - bottomPad - 330);
+  const canvasH = Math.max(420, SCREEN_H - bottomPad - 330);
 
   const isEraser = color === ERASER;
 

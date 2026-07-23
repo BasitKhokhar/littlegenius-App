@@ -1,14 +1,22 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
-  Alert,
+  Animated,
 } from 'react-native';
-import { patternData, memoryCardsList, oddOneOutData, colorMatchData, shapeQuizData } from '../../Data/gamesData';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
+import {
+  gamesList,
+  patternData,
+  memoryCardsList,
+  oddOneOutData,
+  colorMatchData,
+  shapeQuizData,
+} from '../../Data/gamesData';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
 import { Header } from '../../Components/UI';
@@ -17,7 +25,91 @@ import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { generateMathProblem, shuffleArray } from '../../Utils/dataHelpers';
 
-const { width } = Dimensions.get('window');
+// ──────────────────────────────────────────────────────────────
+// GamePlayScreen — the premium "arcade" gameplay surface.
+//
+// Six mini-games share one polished shell: a live progress HUD
+// (accent-themed bar + score chip + streak), juicy answer feedback
+// (correct tiles flash green & pop, wrong tiles flash red & shake),
+// haptics on every tap, and a celebratory animated victory screen.
+// ──────────────────────────────────────────────────────────────
+
+const MEMORY_PAIRS = memoryCardsList.length / 2;
+
+// ── Reusable answer tile (pattern / math / color / shape) ─────
+const OptionTile = ({ value, display, textStyle, correctValue, picked, onPress, colors }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  let state = 'idle';
+  if (picked) {
+    if (value === correctValue) state = 'correct';
+    else if (value === picked.value) state = 'wrong';
+    else state = 'dim';
+  }
+
+  const pressIn = () =>
+    Animated.spring(scale, { toValue: 0.93, useNativeDriver: true, speed: 40, bounciness: 0 }).start();
+  const pressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 24, bounciness: 10 }).start();
+
+  const stateStyle =
+    state === 'correct'
+      ? { backgroundColor: colors.success, borderColor: colors.successDeep, borderBottomColor: colors.successDeep }
+      : state === 'wrong'
+      ? { backgroundColor: colors.error, borderColor: colors.errorDeep, borderBottomColor: colors.errorDeep }
+      : null;
+
+  const isFilled = state === 'correct' || state === 'wrong';
+
+  return (
+    <Animated.View style={{ width: '47%', opacity: state === 'dim' ? 0.45 : 1, transform: [{ scale }] }}>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        disabled={!!picked}
+        onPressIn={pressIn}
+        onPressOut={pressOut}
+        onPress={() => onPress(value)}
+        style={[optionStyles(colors).tile, stateStyle]}
+      >
+        <Text style={[optionStyles(colors).text, textStyle, isFilled && { color: '#FFFFFF' }]}>
+          {display}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
+// ── Memory card with flip pop ─────────────────────────────────
+const MemoryCard = ({ card, isFlipped, isMatched, onPress, accent, colors }) => {
+  const pop = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isFlipped) {
+      pop.setValue(0.4);
+      Animated.spring(pop, { toValue: 1, friction: 5, tension: 120, useNativeDriver: true }).start();
+    }
+  }, [isFlipped, pop]);
+
+  return (
+    <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={memoStyles(colors).cardWrap}>
+      {isFlipped ? (
+        <Animated.View
+          style={[
+            memoStyles(colors).cardFace,
+            isMatched ? memoStyles(colors).cardMatched : memoStyles(colors).cardOpen,
+            { transform: [{ scale: pop }] },
+          ]}
+        >
+          <Text style={memoStyles(colors).emoji}>{card.emoji}</Text>
+        </Animated.View>
+      ) : (
+        <LinearGradient colors={accent} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={memoStyles(colors).cardFace}>
+          <Text style={memoStyles(colors).back}>?</Text>
+        </LinearGradient>
+      )}
+    </TouchableOpacity>
+  );
+};
 
 const GamePlayScreen = ({ navigation, route }) => {
   const { gameId } = route.params;
@@ -25,60 +117,71 @@ const GamePlayScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
   const bottomPad = useTabBarClearance();
   const styles = makeStyles(colors);
+
+  const meta = gamesList.find((g) => g.id === gameId) || {};
+  const accent = [meta.gradStart || colors.primary, meta.gradEnd || colors.primaryDark];
+
   const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
   const [gameState, setGameState] = useState('playing'); // playing, won
+  const [picked, setPicked] = useState(null); // { value, correct } for option games
+  const [session, setSession] = useState(0);
 
-  // Pattern Match Game State
+  // Per-game state
   const [patternIdx, setPatternIdx] = useState(0);
-
-  // Memory Game State
   const [cards, setCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
-
-  // Odd One Out Game State
   const [oddIdx, setOddIdx] = useState(0);
+  const [oddPick, setOddPick] = useState(null);
   const [oddExplain, setOddExplain] = useState(null);
-
-  // Math Race Game State
   const [mathIdx, setMathIdx] = useState(0);
   const [mathProblem, setMathProblem] = useState(null);
-
-  // Color Match Game State
   const [colorIdx, setColorIdx] = useState(0);
-
-  // Shape Quiz Game State
   const [shapeIdx, setShapeIdx] = useState(0);
 
-  // Initialize game
+  // Animations
+  const shake = useRef(new Animated.Value(0)).current;
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const victoryScale = useRef(new Animated.Value(0)).current;
+  const trophyBounce = useRef(new Animated.Value(1)).current;
+
+  // Stable, shuffled options (avoid reshuffle on every re-render)
+  const colorOptions = useMemo(
+    () => shuffleArray(colorMatchData[colorIdx].options),
+    [colorIdx, session]
+  );
+  const shapeOptions = useMemo(
+    () => shuffleArray(shapeQuizData[shapeIdx].options),
+    [shapeIdx, session]
+  );
+
   useEffect(() => {
     initGame();
   }, [gameId]);
 
   const initGame = () => {
     setScore(0);
+    setStreak(0);
+    setPicked(null);
     setGameState('playing');
+    victoryScale.setValue(0);
+    setSession((s) => s + 1);
     if (gameId === 1) {
-      // Pattern Match
       setPatternIdx(0);
       SpeechEngine.speak(SPEECH_PHRASES.GAME_PATTERN, 'en-US');
     } else if (gameId === 2) {
-      // Memory Game
-      const shuffled = shuffleArray(memoryCardsList).map((emoji, index) => ({
-        id: index,
-        emoji,
-      }));
+      const shuffled = shuffleArray(memoryCardsList).map((emoji, index) => ({ id: index, emoji }));
       setCards(shuffled);
       setSelectedCards([]);
       setMatchedCards([]);
       SpeechEngine.speak(SPEECH_PHRASES.GAME_MEMORY, 'en-US');
     } else if (gameId === 3) {
-      // Odd One Out
       setOddIdx(0);
+      setOddPick(null);
       setOddExplain(null);
       SpeechEngine.speak(SPEECH_PHRASES.GAME_ODD, 'en-US');
     } else if (gameId === 4) {
-      // Math Race
       setMathIdx(0);
       setMathProblem(generateMathProblem('+'));
       SpeechEngine.speak(SPEECH_PHRASES.GAME_MATH, 'en-US');
@@ -91,218 +194,264 @@ const GamePlayScreen = ({ navigation, route }) => {
     }
   };
 
+  // ── Progress (drives the HUD bar) ───────────────────────────
+  const getProgress = () => {
+    if (gameId === 1) return { current: patternIdx, total: patternData.length };
+    if (gameId === 2) return { current: matchedCards.length / 2, total: MEMORY_PAIRS };
+    if (gameId === 3) return { current: oddIdx, total: oddOneOutData.length };
+    if (gameId === 4) return { current: mathIdx, total: 10 };
+    if (gameId === 5) return { current: colorIdx, total: colorMatchData.length };
+    return { current: shapeIdx, total: shapeQuizData.length };
+  };
+  const { current: progCurrent, total: progTotal } = getProgress();
+
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: progTotal ? progCurrent / progTotal : 0,
+      duration: 420,
+      useNativeDriver: false,
+    }).start();
+  }, [progCurrent, progTotal, progressAnim]);
+
+  // ── Feedback helpers ────────────────────────────────────────
+  const runShake = () => {
+    shake.setValue(0);
+    Animated.sequence([
+      Animated.timing(shake, { toValue: 1, duration: 55, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: -1, duration: 55, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: 1, duration: 55, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: 0, duration: 55, useNativeDriver: true }),
+    ]).start();
+  };
+
+  const onCorrect = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    setScore((s) => s + 1);
+    setStreak((s) => s + 1);
+  };
+  const onWrong = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+    setStreak(0);
+    runShake();
+  };
+
   const handleGameWin = (starsReward = 15) => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     setGameState('won');
     addStars(starsReward);
+    victoryScale.setValue(0);
+    Animated.spring(victoryScale, { toValue: 1, friction: 6, tension: 80, useNativeDriver: true }).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(trophyBounce, { toValue: 1.12, duration: 620, useNativeDriver: true }),
+        Animated.timing(trophyBounce, { toValue: 1, duration: 620, useNativeDriver: true }),
+      ])
+    ).start();
     SpeechEngine.speak(`Congratulations! You won the game and earned ${starsReward} stars!`, 'en-US');
   };
 
-  // --- Pattern Match Logic ---
-  const handlePatternAnswer = (selected) => {
-    const current = patternData[patternIdx];
-    if (selected === current.answer) {
+  // ── Generic option-game answer (pattern / math / color / shape) ──
+  const answerOption = (selected, correctValue, advance) => {
+    if (picked) return;
+    const correct = selected === correctValue;
+    setPicked({ value: selected, correct });
+    if (correct) {
+      onCorrect();
       SpeechEngine.speak(SPEECH_PHRASES.CORRECT_NICE_JOB, 'en-US');
-      if (patternIdx < patternData.length - 1) {
-        setPatternIdx(prev => prev + 1);
-      } else {
-        handleGameWin(15);
-      }
+      setTimeout(() => {
+        setPicked(null);
+        advance();
+      }, 700);
     } else {
+      onWrong();
       SpeechEngine.speak(SPEECH_PHRASES.OOPS_TRY_AGAIN, 'en-US');
+      setTimeout(() => setPicked(null), 750);
     }
   };
 
-  // --- Memory Game Logic ---
-  const handleCardPress = (cardIndex) => {
-    if (selectedCards.length >= 2 || selectedCards.includes(cardIndex) || matchedCards.includes(cardIndex)) {
-      return;
-    }
+  // ── Pattern ─────────────────────────────────────────────────
+  const handlePatternAnswer = (selected) => {
+    const current = patternData[patternIdx];
+    answerOption(selected, current.answer, () => {
+      if (patternIdx < patternData.length - 1) setPatternIdx((p) => p + 1);
+      else handleGameWin(15);
+    });
+  };
 
+  // ── Memory ──────────────────────────────────────────────────
+  const handleCardPress = (cardIndex) => {
+    if (selectedCards.length >= 2 || selectedCards.includes(cardIndex) || matchedCards.includes(cardIndex)) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     const newSelected = [...selectedCards, cardIndex];
     setSelectedCards(newSelected);
 
     if (newSelected.length === 2) {
       const firstCard = cards[newSelected[0]];
       const secondCard = cards[newSelected[1]];
-
       if (firstCard.emoji === secondCard.emoji) {
-        // Match found
-        setMatchedCards(prev => {
+        onCorrect();
+        setMatchedCards((prev) => {
           const nextMatched = [...prev, newSelected[0], newSelected[1]];
-          if (nextMatched.length === cards.length) {
-            setTimeout(() => handleGameWin(15), 500);
-          }
+          if (nextMatched.length === cards.length) setTimeout(() => handleGameWin(15), 550);
           return nextMatched;
         });
         setSelectedCards([]);
         SpeechEngine.speak(SPEECH_PHRASES.MATCHED, 'en-US');
       } else {
-        // Not a match, flip back
+        onWrong();
         SpeechEngine.speak(SPEECH_PHRASES.NO_MATCH, 'en-US');
-        setTimeout(() => {
-          setSelectedCards([]);
-        }, 1000);
+        setTimeout(() => setSelectedCards([]), 900);
       }
     }
   };
 
-  // --- Odd One Out Logic ---
+  // ── Odd One Out ─────────────────────────────────────────────
   const handleOddAnswer = (idx) => {
+    if (oddExplain !== null || oddPick !== null) return;
     const current = oddOneOutData[oddIdx];
+    setOddPick(idx);
     if (idx === current.odd) {
+      onCorrect();
       setOddExplain(current.explain);
       SpeechEngine.speak(`Excellent! ${current.explain}`, 'en-US');
     } else {
+      onWrong();
       SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
+      setTimeout(() => setOddPick(null), 750);
     }
   };
 
   const nextOddQuestion = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     setOddExplain(null);
-    if (oddIdx < oddOneOutData.length - 1) {
-      setOddIdx(prev => prev + 1);
-    } else {
-      handleGameWin(15);
-    }
+    setOddPick(null);
+    if (oddIdx < oddOneOutData.length - 1) setOddIdx((p) => p + 1);
+    else handleGameWin(15);
   };
 
-  // --- Math Race Logic ---
+  // ── Math ────────────────────────────────────────────────────
   const handleMathAnswer = (selected) => {
-    if (selected === mathProblem.answer) {
-      SpeechEngine.speak(SPEECH_PHRASES.CORRECT, 'en-US');
+    answerOption(selected, mathProblem.answer, () => {
       if (mathIdx < 9) {
-        setMathIdx(prev => prev + 1);
-        const op = Math.random() > 0.5 ? '+' : '-';
-        setMathProblem(generateMathProblem(op));
+        setMathIdx((p) => p + 1);
+        setMathProblem(generateMathProblem(Math.random() > 0.5 ? '+' : '-'));
       } else {
         handleGameWin(15);
       }
-    } else {
-      SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
-    }
+    });
   };
 
-  // --- Color Match Logic ---
+  // ── Color ───────────────────────────────────────────────────
   const handleColorAnswer = (selected) => {
     const current = colorMatchData[colorIdx];
-    if (selected === current.name) {
-      SpeechEngine.speak(SPEECH_PHRASES.CORRECT, 'en-US');
-      if (colorIdx < colorMatchData.length - 1) {
-        setColorIdx((prev) => prev + 1);
-      } else {
-        handleGameWin(15);
-      }
-    } else {
-      SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
-    }
+    answerOption(selected, current.name, () => {
+      if (colorIdx < colorMatchData.length - 1) setColorIdx((p) => p + 1);
+      else handleGameWin(15);
+    });
   };
 
-  // --- Shape Quiz Logic ---
+  // ── Shape ───────────────────────────────────────────────────
   const handleShapeAnswer = (selected) => {
     const current = shapeQuizData[shapeIdx];
-    if (selected === current.name) {
-      SpeechEngine.speak(SPEECH_PHRASES.CORRECT, 'en-US');
-      if (shapeIdx < shapeQuizData.length - 1) {
-        setShapeIdx((prev) => prev + 1);
-      } else {
-        handleGameWin(15);
-      }
-    } else {
-      SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
-    }
+    answerOption(selected, current.name, () => {
+      if (shapeIdx < shapeQuizData.length - 1) setShapeIdx((p) => p + 1);
+      else handleGameWin(15);
+    });
   };
 
-  // --- Render Functions ---
+  const shakeX = shake.interpolate({ inputRange: [-1, 1], outputRange: [-9, 9] });
+
+  // ── Renderers ───────────────────────────────────────────────
   const renderPatternGame = () => {
     const current = patternData[patternIdx];
     return (
       <View style={styles.gameContent}>
-        <Text style={styles.questionText}>What comes next in the pattern?</Text>
-        <Text style={styles.progText}>Pattern {patternIdx + 1} of {patternData.length}</Text>
-        
-        <View style={styles.patternBox}>
+        <Text style={styles.questionText}>What comes next?</Text>
+        <Text style={styles.hint}>Look at the pattern and pick the missing piece</Text>
+
+        <Animated.View style={[styles.patternBox, { transform: [{ translateX: shakeX }] }]}>
           {current.pattern.map((emoji, idx) => (
             <Text key={idx} style={styles.patternEmoji}>{emoji}</Text>
           ))}
-          <View style={styles.questionMarkBox}>
+          <LinearGradient colors={accent} style={styles.questionMarkBox}>
             <Text style={styles.questionMark}>?</Text>
-          </View>
-        </View>
+          </LinearGradient>
+        </Animated.View>
 
         <View style={styles.optionsGrid}>
           {current.options.map((option, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={styles.optionCard}
-              onPress={() => handlePatternAnswer(option)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.optionEmoji}>{option}</Text>
-            </TouchableOpacity>
+            <OptionTile
+              key={`${patternIdx}-${idx}`}
+              value={option}
+              display={option}
+              textStyle={styles.optionEmoji}
+              correctValue={current.answer}
+              picked={picked}
+              onPress={handlePatternAnswer}
+              colors={colors}
+            />
           ))}
         </View>
       </View>
     );
   };
 
-  const renderMemoryGame = () => {
-    return (
-      <View style={styles.gameContent}>
-        <Text style={styles.questionText}>Match all the emoji pairs!</Text>
-        <Text style={styles.progText}>Pairs Matched: {matchedCards.length / 2} / 8</Text>
-        
-        <View style={styles.memoryGrid}>
-          {cards.map((card, index) => {
-            const isFlipped = selectedCards.includes(index) || matchedCards.includes(index);
-            return (
-              <TouchableOpacity
-                key={card.id}
-                style={[
-                  styles.memoryCard,
-                  isFlipped && styles.memoryCardFlipped,
-                ]}
-                onPress={() => handleCardPress(index)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.memoryEmoji}>
-                  {isFlipped ? card.emoji : '⭐'}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+  const renderMemoryGame = () => (
+    <View style={styles.gameContent}>
+      <Text style={styles.questionText}>Match all the pairs!</Text>
+      <Text style={styles.hint}>Pairs found: {matchedCards.length / 2} / {MEMORY_PAIRS}</Text>
+
+      <View style={styles.memoryGrid}>
+        {cards.map((card, index) => (
+          <MemoryCard
+            key={card.id}
+            card={card}
+            isFlipped={selectedCards.includes(index) || matchedCards.includes(index)}
+            isMatched={matchedCards.includes(index)}
+            onPress={() => handleCardPress(index)}
+            accent={accent}
+            colors={colors}
+          />
+        ))}
       </View>
-    );
-  };
+    </View>
+  );
 
   const renderOddGame = () => {
     const current = oddOneOutData[oddIdx];
     return (
       <View style={styles.gameContent}>
-        <Text style={styles.questionText}>Find the odd item out!</Text>
-        <Text style={styles.progText}>Puzzle {oddIdx + 1} of {oddOneOutData.length}</Text>
+        <Text style={styles.questionText}>Find the odd one out!</Text>
+        <Text style={styles.hint}>Tap the item that does not belong</Text>
 
-        <View style={styles.oddGrid}>
-          {current.items.map((emoji, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={styles.oddCard}
-              onPress={() => handleOddAnswer(idx)}
-              activeOpacity={0.8}
-              disabled={oddExplain !== null}
-            >
-              <Text style={styles.oddEmoji}>{emoji}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <Animated.View style={[styles.oddGrid, { transform: [{ translateX: shakeX }] }]}>
+          {current.items.map((emoji, idx) => {
+            const answered = oddExplain !== null || oddPick !== null;
+            const isCorrect = idx === current.odd;
+            let stateStyle = null;
+            if (answered && isCorrect && (oddPick === idx || oddExplain !== null)) stateStyle = styles.oddCorrect;
+            else if (oddPick === idx && !isCorrect) stateStyle = styles.oddWrong;
+            return (
+              <TouchableOpacity
+                key={idx}
+                style={[styles.oddCard, stateStyle]}
+                onPress={() => handleOddAnswer(idx)}
+                activeOpacity={0.85}
+                disabled={oddExplain !== null}
+              >
+                <Text style={styles.oddEmoji}>{emoji}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </Animated.View>
 
         {oddExplain && (
-          <View style={styles.explainCard}>
+          <LinearGradient colors={accent} style={styles.explainCard}>
             <Text style={styles.explainText}>🎉 {oddExplain}</Text>
-            <TouchableOpacity style={styles.nextBtn} onPress={nextOddQuestion}>
-              <Text style={styles.nextBtnText}>Next Question ➔</Text>
+            <TouchableOpacity style={styles.nextBtn} onPress={nextOddQuestion} activeOpacity={0.85}>
+              <Text style={styles.nextBtnText}>Next ➔</Text>
             </TouchableOpacity>
-          </View>
+          </LinearGradient>
         )}
       </View>
     );
@@ -313,22 +462,26 @@ const GamePlayScreen = ({ navigation, route }) => {
     return (
       <View style={styles.gameContent}>
         <Text style={styles.questionText}>Solve the math race!</Text>
-        <Text style={styles.progText}>Equation {mathIdx + 1} of 10</Text>
+        <Text style={styles.hint}>Tap the correct answer</Text>
 
-        <View style={styles.mathBox}>
-          <Text style={styles.mathText}>{mathProblem.question} = ?</Text>
-        </View>
+        <Animated.View style={{ transform: [{ translateX: shakeX }] }}>
+          <LinearGradient colors={accent} style={styles.mathBox}>
+            <Text style={styles.mathText}>{mathProblem.question} = ?</Text>
+          </LinearGradient>
+        </Animated.View>
 
         <View style={styles.optionsGrid}>
           {mathProblem.options.map((option, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={[styles.optionCard, { paddingVertical: 18 }]}
-              onPress={() => handleMathAnswer(option)}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.optionEmoji, { fontSize: 24 }]}>{option}</Text>
-            </TouchableOpacity>
+            <OptionTile
+              key={`${mathIdx}-${idx}`}
+              value={option}
+              display={String(option)}
+              textStyle={styles.optionNumber}
+              correctValue={mathProblem.answer}
+              picked={picked}
+              onPress={handleMathAnswer}
+              colors={colors}
+            />
           ))}
         </View>
       </View>
@@ -337,24 +490,27 @@ const GamePlayScreen = ({ navigation, route }) => {
 
   const renderColorGame = () => {
     const current = colorMatchData[colorIdx];
-    const shuffledOptions = shuffleArray(current.options);
     return (
       <View style={styles.gameContent}>
         <Text style={styles.questionText}>What color is this?</Text>
-        <Text style={styles.progText}>Color {colorIdx + 1} of {colorMatchData.length}</Text>
-        <View style={[styles.colorBox, { backgroundColor: current.color }]}>
+        <Text style={styles.hint}>Pick the right color name</Text>
+
+        <Animated.View style={[styles.colorBox, { backgroundColor: current.color, transform: [{ translateX: shakeX }] }]}>
           <Text style={styles.colorEmoji}>{current.emoji}</Text>
-        </View>
+        </Animated.View>
+
         <View style={styles.optionsGrid}>
-          {shuffledOptions.map((option, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={[styles.optionCard, { paddingVertical: 18 }]}
-              onPress={() => handleColorAnswer(option)}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.optionEmoji, { fontSize: 16, fontWeight: '900' }]}>{option}</Text>
-            </TouchableOpacity>
+          {colorOptions.map((option, idx) => (
+            <OptionTile
+              key={`${colorIdx}-${idx}`}
+              value={option}
+              display={option}
+              textStyle={styles.optionWord}
+              correctValue={current.name}
+              picked={picked}
+              onPress={handleColorAnswer}
+              colors={colors}
+            />
           ))}
         </View>
       </View>
@@ -363,25 +519,30 @@ const GamePlayScreen = ({ navigation, route }) => {
 
   const renderShapeGame = () => {
     const current = shapeQuizData[shapeIdx];
-    const shuffledOptions = shuffleArray(current.options);
     return (
       <View style={styles.gameContent}>
         <Text style={styles.questionText}>What shape is this?</Text>
-        <Text style={styles.progText}>Shape {shapeIdx + 1} of {shapeQuizData.length}</Text>
-        <View style={styles.shapeBox}>
-          <Text style={styles.shapeEmoji}>{current.shape}</Text>
-          <Text style={styles.shapeUrdu}>{current.urdu}</Text>
-        </View>
+        <Text style={styles.hint}>Name the shape below</Text>
+
+        <Animated.View style={{ transform: [{ translateX: shakeX }] }}>
+          <LinearGradient colors={accent} style={styles.shapeBox}>
+            <Text style={styles.shapeEmoji}>{current.shape}</Text>
+            <Text style={styles.shapeUrdu}>{current.urdu}</Text>
+          </LinearGradient>
+        </Animated.View>
+
         <View style={styles.optionsGrid}>
-          {shuffledOptions.map((option, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={[styles.optionCard, { paddingVertical: 18 }]}
-              onPress={() => handleShapeAnswer(option)}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.optionEmoji, { fontSize: 16, fontWeight: '900' }]}>{option}</Text>
-            </TouchableOpacity>
+          {shapeOptions.map((option, idx) => (
+            <OptionTile
+              key={`${shapeIdx}-${idx}`}
+              value={option}
+              display={option}
+              textStyle={styles.optionWord}
+              correctValue={current.name}
+              picked={picked}
+              onPress={handleShapeAnswer}
+              colors={colors}
+            />
           ))}
         </View>
       </View>
@@ -397,13 +558,43 @@ const GamePlayScreen = ({ navigation, route }) => {
     return 'Shape Quiz';
   };
 
+  const barWidth = progressAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
+
   return (
     <View style={styles.container}>
-      <Header
-        title={getHeaderTitle()}
-        showBack={true}
-        onBackPress={() => navigation.goBack()}
-      />
+      <Header title={getHeaderTitle()} showBack onBackPress={() => navigation.goBack()} />
+
+      {/* Live HUD */}
+      {gameState === 'playing' && (
+        <View style={styles.hud}>
+          <View style={styles.hudRow}>
+            <View style={styles.hudChip}>
+              <Text style={styles.hudChipEmoji}>{meta.icon}</Text>
+              <Text style={styles.hudChipLabel}>{Math.round(progCurrent)} / {progTotal}</Text>
+            </View>
+            <View style={styles.hudRight}>
+              {streak >= 2 && (
+                <View style={styles.streakChip}>
+                  <Text style={styles.streakText}>🔥 {streak}</Text>
+                </View>
+              )}
+              <View style={styles.scoreChip}>
+                <Text style={styles.scoreText}>⭐ {score}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.progressTrack}>
+            <Animated.View style={[styles.progressFill, { width: barWidth }]}>
+              <LinearGradient
+                colors={accent}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={StyleSheet.absoluteFill}
+              />
+            </Animated.View>
+          </View>
+        </View>
+      )}
 
       <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad }]}>
         {gameState === 'playing' ? (
@@ -416,303 +607,356 @@ const GamePlayScreen = ({ navigation, route }) => {
             {gameId === 6 && renderShapeGame()}
           </>
         ) : (
-          <View style={styles.victoryCard}>
-            <Text style={styles.victoryEmoji}>🏆</Text>
-            <Text style={styles.victoryTitle}>Awesome Job!</Text>
-            <Text style={styles.victorySubtitle}>You completed the challenge and earned +15 Stars!</Text>
-            
-            <View style={styles.victoryButtons}>
-              <TouchableOpacity style={styles.victoryBtn} onPress={initGame}>
-                <Text style={styles.victoryBtnText}>Play Again 🔁</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.victoryBtn, { backgroundColor: colors.secondary }]}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.victoryBtnText}>Back to Games ➔</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <Animated.View style={{ transform: [{ scale: victoryScale }], opacity: victoryScale, width: '100%' }}>
+            <LinearGradient colors={accent} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.victoryCard}>
+              <View style={styles.victoryDecor} />
+              <Animated.Text style={[styles.victoryEmoji, { transform: [{ scale: trophyBounce }] }]}>🏆</Animated.Text>
+              <Text style={styles.victoryTitle}>Awesome Job!</Text>
+              <Text style={styles.victorySubtitle}>You completed {getHeaderTitle()}!</Text>
+
+              <View style={styles.victoryStatsRow}>
+                <View style={styles.victoryStat}>
+                  <Text style={styles.victoryStatValue}>{score}</Text>
+                  <Text style={styles.victoryStatLabel}>Correct</Text>
+                </View>
+                <View style={styles.victoryStatDivider} />
+                <View style={styles.victoryStat}>
+                  <Text style={styles.victoryStatValue}>+15</Text>
+                  <Text style={styles.victoryStatLabel}>Stars ⭐</Text>
+                </View>
+              </View>
+
+              <View style={styles.victoryButtons}>
+                <TouchableOpacity style={styles.victoryBtnPrimary} onPress={initGame} activeOpacity={0.9}>
+                  <Text style={styles.victoryBtnPrimaryText}>Play Again 🔁</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.victoryBtnGhost} onPress={() => navigation.goBack()} activeOpacity={0.9}>
+                  <Text style={styles.victoryBtnGhostText}>Back to Games ➔</Text>
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </Animated.View>
         )}
       </ScrollView>
     </View>
   );
 };
 
-const makeStyles = (colors) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.bg,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  gameContent: {
-    alignItems: 'center',
-    width: '100%',
-  },
-  questionText: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  progText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    marginBottom: 24,
-    letterSpacing: 0.5,
-  },
-  // Pattern Matching
-  patternBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: colors.border,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginBottom: 36,
-    gap: 10,
-    elevation: 1,
-  },
-  patternEmoji: {
-    fontSize: 32,
-  },
-  questionMarkBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  questionMark: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: colors.primary,
-  },
-  optionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    width: '100%',
-    gap: 12,
-  },
-  optionCard: {
-    width: '47%',
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: colors.border,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.12)',
-  },
-  optionEmoji: {
-    fontSize: 32,
-  },
-  // Memory Game
-  memoryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    width: '100%',
-    justifyContent: 'center',
-  },
-  memoryCard: {
-    width: '22%',
-    height: 70,
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.2)',
-  },
-  memoryCardFlipped: {
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 2,
-  },
-  memoryEmoji: {
-    fontSize: 26,
-    color: '#FFF',
-  },
-  // Odd One Out
-  oddGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    width: '100%',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  oddCard: {
-    width: '40%',
-    height: 110,
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.12)',
-  },
-  oddEmoji: {
-    fontSize: 48,
-  },
-  explainCard: {
-    width: '100%',
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: colors.secondary,
-    padding: 16,
-    alignItems: 'center',
-    gap: 12,
-  },
-  explainText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
-  nextBtn: {
-    backgroundColor: colors.secondary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    elevation: 1,
-  },
-  nextBtnText: {
-    color: '#FFF',
-    fontWeight: '900',
-    fontSize: 12,
-  },
-  // Math Race
-  mathBox: {
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    borderWidth: 3,
-    borderColor: colors.primary,
-    paddingVertical: 24,
-    paddingHorizontal: 40,
-    marginBottom: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2,
-  },
-  mathText: {
-    fontSize: 40,
-    fontWeight: '900',
-    color: colors.textPrimary,
-  },
-  colorBox: {
-    width: 120,
-    height: 120,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 36,
-    borderWidth: 3,
-    borderColor: colors.border,
-    elevation: 2,
-  },
-  colorEmoji: { fontSize: 48 },
-  shapeBox: {
-    backgroundColor: colors.surface,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: colors.border,
-    paddingVertical: 28,
-    paddingHorizontal: 40,
-    marginBottom: 36,
-    alignItems: 'center',
-    elevation: 2,
-  },
-  shapeEmoji: { fontSize: 64, marginBottom: 8 },
-  shapeUrdu: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textSecondary,
-  },
-  // Victory Screen
-  victoryCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 32,
-    borderWidth: 2,
-    borderColor: colors.border,
-    padding: 28,
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-  },
-  victoryEmoji: {
-    fontSize: 80,
-    marginBottom: 16,
-  },
-  victoryTitle: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: colors.textPrimary,
-    marginBottom: 8,
-  },
-  victorySubtitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 28,
-    lineHeight: 20,
-  },
-  victoryButtons: {
-    width: '100%',
-    gap: 12,
-  },
-  victoryBtn: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 16,
-    alignItems: 'center',
-    elevation: 2,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.15)',
-  },
-  victoryBtnText: {
-    color: '#FFF',
-    fontWeight: '900',
-    fontSize: 14,
-  },
-});
+// ── Shared option-tile styles (need colors) ───────────────────
+const optionStyles = (colors) =>
+  StyleSheet.create({
+    tile: {
+      width: '100%',
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: colors.border,
+      paddingVertical: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 3,
+      borderBottomWidth: 5,
+      borderBottomColor: 'rgba(0,0,0,0.12)',
+    },
+    text: { fontSize: 30, fontWeight: '900', color: colors.textPrimary },
+  });
+
+const memoStyles = (colors) =>
+  StyleSheet.create({
+    cardWrap: { width: '22%', aspectRatio: 0.92 },
+    cardFace: {
+      flex: 1,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      elevation: 3,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.12,
+      shadowRadius: 3,
+    },
+    cardOpen: {
+      backgroundColor: colors.surface,
+      borderWidth: 2,
+      borderColor: colors.borderStrong,
+    },
+    cardMatched: {
+      backgroundColor: colors.surface,
+      borderWidth: 2.5,
+      borderColor: colors.success,
+    },
+    emoji: { fontSize: 26 },
+    back: { fontSize: 26, fontWeight: '900', color: 'rgba(255,255,255,0.9)' },
+  });
+
+const makeStyles = (colors) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bg },
+
+    // HUD
+    hud: {
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 14,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    hudRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+    hudChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      backgroundColor: colors.surfaceAlt,
+      borderRadius: 12,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+    },
+    hudChipEmoji: { fontSize: 15 },
+    hudChipLabel: { fontSize: 13, fontWeight: '900', color: colors.textPrimary, letterSpacing: 0.3 },
+    hudRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    streakChip: {
+      backgroundColor: 'rgba(245,158,11,0.16)',
+      borderRadius: 12,
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+    },
+    streakText: { fontSize: 13, fontWeight: '900', color: colors.warning },
+    scoreChip: {
+      backgroundColor: 'rgba(99,102,241,0.14)',
+      borderRadius: 12,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+    },
+    scoreText: { fontSize: 13, fontWeight: '900', color: colors.primary },
+    progressTrack: {
+      height: 12,
+      borderRadius: 6,
+      backgroundColor: colors.surfaceSunken,
+      overflow: 'hidden',
+    },
+    progressFill: { height: '100%', borderRadius: 6, overflow: 'hidden' },
+
+    scrollContent: {
+      paddingHorizontal: 16,
+      paddingVertical: 24,
+      flexGrow: 1,
+      justifyContent: 'center',
+    },
+    gameContent: { alignItems: 'center', width: '100%' },
+    questionText: {
+      fontSize: 24,
+      fontWeight: '900',
+      color: colors.textPrimary,
+      textAlign: 'center',
+      marginBottom: 6,
+      letterSpacing: -0.4,
+    },
+    hint: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      marginBottom: 26,
+      textAlign: 'center',
+    },
+
+    // Pattern
+    patternBox: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexWrap: 'wrap',
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      borderWidth: 2,
+      borderColor: colors.border,
+      paddingVertical: 18,
+      paddingHorizontal: 20,
+      marginBottom: 32,
+      gap: 10,
+      elevation: 2,
+    },
+    patternEmoji: { fontSize: 34 },
+    questionMarkBox: {
+      width: 48,
+      height: 48,
+      borderRadius: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    questionMark: { fontSize: 26, fontWeight: '900', color: '#FFFFFF' },
+
+    optionsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      width: '100%',
+      rowGap: 14,
+    },
+    optionEmoji: { fontSize: 32 },
+    optionNumber: { fontSize: 26, fontWeight: '900' },
+    optionWord: { fontSize: 17, fontWeight: '900' },
+
+    // Memory
+    memoryGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+      width: '100%',
+      justifyContent: 'center',
+    },
+
+    // Odd
+    oddGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 16,
+      width: '100%',
+      justifyContent: 'center',
+      marginBottom: 24,
+    },
+    oddCard: {
+      width: '40%',
+      height: 112,
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      borderWidth: 2,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      elevation: 2,
+      borderBottomWidth: 5,
+      borderBottomColor: 'rgba(0,0,0,0.12)',
+    },
+    oddCorrect: { backgroundColor: colors.success, borderColor: colors.successDeep, borderBottomColor: colors.successDeep },
+    oddWrong: { backgroundColor: colors.error, borderColor: colors.errorDeep, borderBottomColor: colors.errorDeep },
+    oddEmoji: { fontSize: 48 },
+    explainCard: {
+      width: '100%',
+      borderRadius: 20,
+      padding: 18,
+      alignItems: 'center',
+      gap: 12,
+      elevation: 3,
+    },
+    explainText: { fontSize: 15, fontWeight: '900', color: '#FFFFFF', textAlign: 'center', lineHeight: 20 },
+    nextBtn: {
+      backgroundColor: 'rgba(255,255,255,0.25)',
+      paddingVertical: 10,
+      paddingHorizontal: 24,
+      borderRadius: 14,
+    },
+    nextBtnText: { color: '#FFFFFF', fontWeight: '900', fontSize: 13 },
+
+    // Math
+    mathBox: {
+      borderRadius: 24,
+      paddingVertical: 28,
+      paddingHorizontal: 48,
+      marginBottom: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+      elevation: 4,
+    },
+    mathText: { fontSize: 42, fontWeight: '900', color: '#FFFFFF' },
+
+    // Color
+    colorBox: {
+      width: 130,
+      height: 130,
+      borderRadius: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 32,
+      borderWidth: 4,
+      borderColor: '#FFFFFF',
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.18,
+      shadowRadius: 8,
+    },
+    colorEmoji: { fontSize: 52 },
+
+    // Shape
+    shapeBox: {
+      borderRadius: 28,
+      paddingVertical: 30,
+      paddingHorizontal: 48,
+      marginBottom: 32,
+      alignItems: 'center',
+      elevation: 4,
+    },
+    shapeEmoji: { fontSize: 68, marginBottom: 6 },
+    shapeUrdu: { fontSize: 18, fontWeight: '800', color: 'rgba(255,255,255,0.92)' },
+
+    // Victory
+    victoryCard: {
+      borderRadius: 32,
+      padding: 30,
+      alignItems: 'center',
+      overflow: 'hidden',
+      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.25,
+      shadowRadius: 16,
+    },
+    victoryDecor: {
+      position: 'absolute',
+      top: -50,
+      right: -30,
+      width: 160,
+      height: 160,
+      borderRadius: 80,
+      backgroundColor: 'rgba(255,255,255,0.12)',
+    },
+    victoryEmoji: { fontSize: 84, marginBottom: 12 },
+    victoryTitle: { fontSize: 30, fontWeight: '900', color: '#FFFFFF', marginBottom: 4, letterSpacing: -0.5 },
+    victorySubtitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: 'rgba(255,255,255,0.9)',
+      textAlign: 'center',
+      marginBottom: 22,
+    },
+    victoryStatsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255,255,255,0.18)',
+      borderRadius: 18,
+      paddingVertical: 14,
+      paddingHorizontal: 24,
+      marginBottom: 24,
+      gap: 20,
+    },
+    victoryStat: { alignItems: 'center', minWidth: 64 },
+    victoryStatValue: { fontSize: 26, fontWeight: '900', color: '#FFFFFF' },
+    victoryStatLabel: { fontSize: 11, fontWeight: '800', color: 'rgba(255,255,255,0.85)', letterSpacing: 0.4, marginTop: 2 },
+    victoryStatDivider: { width: 1.5, height: 34, backgroundColor: 'rgba(255,255,255,0.25)' },
+    victoryButtons: { width: '100%', gap: 12 },
+    victoryBtnPrimary: {
+      backgroundColor: '#FFFFFF',
+      paddingVertical: 15,
+      borderRadius: 16,
+      alignItems: 'center',
+      borderBottomWidth: 4,
+      borderBottomColor: 'rgba(0,0,0,0.12)',
+    },
+    victoryBtnPrimaryText: { color: colors.textPrimary, fontWeight: '900', fontSize: 15 },
+    victoryBtnGhost: {
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      paddingVertical: 15,
+      borderRadius: 16,
+      alignItems: 'center',
+      borderWidth: 1.5,
+      borderColor: 'rgba(255,255,255,0.35)',
+    },
+    victoryBtnGhostText: { color: '#FFFFFF', fontWeight: '900', fontSize: 15 },
+  });
 
 export default GamePlayScreen;
