@@ -63,9 +63,12 @@ export const configureNotifications = async () => {
   });
 
   if (Platform.OS === 'android') {
+    // HIGH importance => the reminder "peeks" (a heads-up banner slides down
+    // over the screen) and plays sound, matching how a normal app notification
+    // appears in the status bar. DEFAULT only lands silently-ish in the tray.
     await Notifications.setNotificationChannelAsync(DAILY_CHANNEL_ID, {
       name: 'Learning Reminders',
-      importance: Notifications.AndroidImportance.DEFAULT,
+      importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     });
@@ -88,7 +91,12 @@ export const scheduleDailyReminder = async (hour, minute) => {
   const msg = pickDaily();
   await Notifications.scheduleNotificationAsync({
     identifier: DAILY_ID,
-    content: { title: msg.title, body: msg.body },
+    content: {
+      title: msg.title,
+      body: msg.body,
+      sound: 'default',
+      priority: Notifications.AndroidNotificationPriority.HIGH,
+    },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour,
@@ -104,7 +112,12 @@ export const scheduleComebackReminder = async (days = COMEBACK_DAYS) => {
   await Notifications.cancelScheduledNotificationAsync(COMEBACK_ID).catch(() => {});
   await Notifications.scheduleNotificationAsync({
     identifier: COMEBACK_ID,
-    content: { title: COMEBACK_MESSAGE.title, body: COMEBACK_MESSAGE.body },
+    content: {
+      title: COMEBACK_MESSAGE.title,
+      body: COMEBACK_MESSAGE.body,
+      sound: 'default',
+      priority: Notifications.AndroidNotificationPriority.HIGH,
+    },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: days * 24 * 60 * 60,

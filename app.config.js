@@ -10,7 +10,7 @@ export default () => ({
     // comeback reminders). A new native module cannot ship over OTA — it needs
     // a fresh build + store release, and the appVersion runtime policy ties this
     // build's OTA channel to this version. (1.3.0 added expo-audio.)
-    version: '1.4.0',
+    version: '1.4.1',
     orientation: 'portrait',
     icon: './assets/logo.png',
     owner: 'talhabasit7016',
@@ -66,7 +66,13 @@ export default () => ({
         'android.permission.WRITE_EXTERNAL_STORAGE',
         'android.permission.SCHEDULE_EXACT_ALARM',
         'android.permission.USE_EXACT_ALARM',
-        'android.permission.RECORD_AUDIO'
+        'android.permission.RECORD_AUDIO',
+        // expo-audio injects these for background/locked-screen media playback,
+        // which we never do (narration only plays while the child is on-screen).
+        // Blocking them removes the Play Console FOREGROUND_SERVICE_MEDIA_PLAYBACK
+        // declaration requirement and keeps the manifest minimal for Families policy.
+        'android.permission.FOREGROUND_SERVICE',
+        'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK'
       ]
     },
     web: {
@@ -81,6 +87,17 @@ export default () => ({
         {
           icon: './assets/logo.png',
           color: '#1E1B4B',
+        },
+      ],
+      // Pin Android target/compile API level to 36 (Play Store policy). Already
+      // the Expo 54 default, set explicitly so it can never silently regress.
+      [
+        'expo-build-properties',
+        {
+          android: {
+            compileSdkVersion: 36,
+            targetSdkVersion: 36,
+          },
         },
       ],
     ],
