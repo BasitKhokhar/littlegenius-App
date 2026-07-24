@@ -28,6 +28,21 @@ export const SPEECH_PHRASES = {
   TRACE_GOOD: 'Good job!',
   TRACE_WRONG: 'Oops! You have written it wrong. Try again!',
 
+  // Session/result praise — spoken in place of dynamic "you scored X" lines so
+  // the whole app stays on the teacher voice. The exact score/stars still show
+  // on screen; only the audio is a fixed phrase.
+  SKETCH_COMPLETE: "Fantastic writing! You've earned your stars!",
+  WORKSHEET_COMPLETE: "Worksheet complete! Wonderful writing! You've earned your stars!",
+  GAME_WON: "Congratulations! You won the game! You've earned your stars!",
+  PUZZLE_COMPLETE: "Puzzle finished! Brilliant work! You've earned your stars!",
+  QUIZ_COMPLETE: "Quiz finished! Great job! You've earned your stars!",
+  STORY_QUIZ_COMPLETE: "Story quiz complete! Well done! You've earned your stars!",
+  COLORING_DONE: "Beautiful colouring! You've earned a big bonus!",
+
+  // Wrong-answer lead-in — spoken first, then the correct answer word is spoken
+  // as its own pre-baked clip so the child hears the answer in the teacher voice.
+  INCORRECT_LEAD: 'Not quite! The correct answer is',
+
   // Game intros
   GAME_PATTERN: 'Pattern Match! Find the emoji that fits next!',
   GAME_MEMORY: 'Memory Game! Match all pairs of emojis!',

@@ -81,7 +81,10 @@ const LetterPuzzleScreen = ({ navigation }) => {
       setSolved(true);
       slotPop.setValue(0.3);
       Animated.spring(slotPop, { toValue: 1, friction: 4, tension: 100, useNativeDriver: true }).start();
-      SpeechEngine.speak(`${round.word}!`, 'en-US');
+      // Speak the plain word (no trailing "!") so it matches the pre-baked
+      // alphabet word clip and plays in the teacher voice. speechKey lowercases,
+      // so the uppercased puzzle word still resolves to the baked clip.
+      SpeechEngine.speak(round.word, 'en-US');
       setTimeout(nextRound, 1200);
     } else {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
@@ -101,10 +104,9 @@ const LetterPuzzleScreen = ({ navigation }) => {
       const finalCount = correctRef.current;
       const reward = calculateStarReward(finalCount, ROUNDS, 3);
       addStars(reward);
-      SpeechEngine.speak(
-        `Puzzle finished! You solved ${finalCount} out of ${ROUNDS} on the first try and earned ${reward} stars!`,
-        'en-US'
-      );
+      // Fixed praise phrase (pre-baked teacher voice); the score/stars show on
+      // screen rather than being read as dynamic numbers.
+      SpeechEngine.speak(SPEECH_PHRASES.PUZZLE_COMPLETE, 'en-US');
     }
   };
 

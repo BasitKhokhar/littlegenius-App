@@ -24,6 +24,9 @@ module.exports = function (api) {
           },
         },
       ],
+      // Reanimated 4 worklets — MUST be the last plugin. Powers the
+      // pinch-to-zoom / pan gestures on the Coloring Book canvas.
+      'react-native-worklets/plugin',
     ],
   };
 };

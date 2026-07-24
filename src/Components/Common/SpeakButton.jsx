@@ -19,6 +19,11 @@ const SpeakButton = ({
   // Ordered list of bundled clips (require()'d MP3s) to play back-to-back —
   // e.g. a full surah recited ayah by ayah. Takes priority over text when set.
   audioClips = null,
+  // Slow the delivery for single letters / vocabulary words so young learners
+  // can copy the pronunciation. clipRate applies to the pre-baked teacher clip;
+  // rate slows the device-TTS fallback to match. Omit for normal speed.
+  clipRate = null,
+  rate = null,
   color = Colors.primary,
   size = 'md',
   label = '🔊 Listen',
@@ -94,6 +99,8 @@ const SpeakButton = ({
         SpeechEngine.speak(step.text, step.language || language, {
           fallbackText: step.fallbackText ?? null,
           fallbackLang: step.fallbackLang ?? fallbackLang,
+          clipRate: step.clipRate ?? clipRate,
+          rate: step.rate ?? rate,
           onDone: () => speakAt(i + 1),
           onError: () => speakAt(i + 1),
         });
@@ -110,6 +117,8 @@ const SpeakButton = ({
     await SpeechEngine.speak(text, language, {
       fallbackText,
       fallbackLang,
+      clipRate,
+      rate,
       onDone: finish,
       onError: finish,
     });

@@ -14,6 +14,7 @@ import { Header } from '../../Components/UI';
 import AlphabetCard from '../../Components/Educational/AlphabetCard';
 import VocabularyCard from '../../Components/Educational/VocabularyCard';
 import { SketchButton, SketchCanvas } from '../../Components/Educational';
+import SpeakButton from '../../Components/Common/SpeakButton';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 
 const { width } = Dimensions.get('window');
@@ -43,8 +44,19 @@ const AlphabetScreen = ({ navigation, route }) => {
             <View style={styles.letterHeroDecor} />
             <Text style={styles.letterHeroBig}>{letter.letter}</Text>
             <Text style={styles.letterHeroSmall}>{letter.letter.toLowerCase()}</Text>
+            <View style={styles.letterHeroSpeak}>
+              <SpeakButton
+                text={letter.letter}
+                language="en-US"
+                color="rgba(0,0,0,0.25)"
+                label={`🔊 Hear "${letter.letter}"`}
+                size="sm"
+                clipRate={0.7}
+                rate={0.75}
+              />
+            </View>
             <View style={styles.letterHeroBadge}>
-              <Text style={styles.letterHeroBadgeText}>Tap cards to hear pronunciation 🔊</Text>
+              <Text style={styles.letterHeroBadgeText}>Tap the letter or the word cards to hear them 🔊</Text>
             </View>
           </View>
 
@@ -183,6 +195,9 @@ const makeStyles = (colors) => StyleSheet.create({
     color: 'rgba(255,255,255,0.7)',
     marginTop: -8,
     marginBottom: 16,
+  },
+  letterHeroSpeak: {
+    marginBottom: 14,
   },
   letterHeroBadge: {
     backgroundColor: 'rgba(255,255,255,0.22)',

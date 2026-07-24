@@ -26,13 +26,18 @@ const ColorPalette = ({
   width,
   onWidthChange,
   large = false,
+  // `wrap` lays the swatches out as a centred two-row grid (like a real
+  // coloring app's palette) instead of a single horizontally-scrolling row.
+  // `compact` shrinks the circles so a fuller palette still fits neatly.
+  wrap = false,
+  compact = false,
 }) => {
   // Bigger swatches on the coloring book — easier for little fingers to hit.
-  const dim = large ? 48 : 36;
+  const dim = compact ? 34 : large ? 48 : 36;
   const sizeStyle = { width: dim, height: dim, borderRadius: dim / 2 };
-  return (
-  <View style={styles.container}>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.row, large && styles.rowLarge]}>
+
+  const items = (
+    <>
       {swatches.map((c) => (
         <TouchableOpacity
           key={c}
@@ -52,7 +57,18 @@ const ColorPalette = ({
           <Text style={[styles.eraserIcon, large && { fontSize: 22 }]}>🧽</Text>
         </TouchableOpacity>
       ) : null}
-    </ScrollView>
+    </>
+  );
+
+  return (
+  <View style={styles.container}>
+    {wrap ? (
+      <View style={styles.wrapRow}>{items}</View>
+    ) : (
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.row, large && styles.rowLarge]}>
+        {items}
+      </ScrollView>
+    )}
 
     {widths ? (
       <View style={styles.widthRow}>
@@ -83,6 +99,16 @@ const styles = StyleSheet.create({
   container: { width: '100%' },
   row: { gap: 10, paddingVertical: 8, paddingHorizontal: 4, alignItems: 'center' },
   rowLarge: { gap: 14, paddingVertical: 6 },
+  wrapRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    columnGap: 10,
+    rowGap: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
   check: {
     color: '#FFFFFF',
     fontSize: 15,

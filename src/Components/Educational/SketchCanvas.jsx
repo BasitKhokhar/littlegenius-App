@@ -21,7 +21,7 @@ import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 const { width: SCREEN_W } = Dimensions.get('window');
 
 // How many times the child writes the glyph in one practice session.
-const ATTEMPTS = 3;
+const ATTEMPTS = 5;
 // A pass mark: below this we call the writing "wrong" and offer a retry.
 const PASS = 5;
 
@@ -154,10 +154,9 @@ const SketchCanvas = ({
         const reward = rewardFor(total);
         setStarsAwarded(reward);
         addStars(reward);
-        SpeechEngine.speak(
-          `You scored ${total} out of ${ATTEMPTS * 10} and earned ${reward} stars!`,
-          'en-US'
-        );
+        // Fixed praise phrase (pre-baked teacher voice); the score/stars are
+        // shown on the summary screen rather than read as dynamic numbers.
+        SpeechEngine.speak(SPEECH_PHRASES.SKETCH_COMPLETE, 'en-US');
       }
       return next;
     });

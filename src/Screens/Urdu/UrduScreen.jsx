@@ -37,6 +37,21 @@ const UrduScreen = ({ navigation, route }) => {
               {letter.letter}
             </Text>
             <Text style={styles.letterName}>{letter.name}</Text>
+            {/* Hear the letter itself. Speak the Urdu glyph (not the romanized
+                name) so the pre-baked Urdu voice pronounces it correctly; the
+                romanized name is the no-voice-pack fallback. */}
+            <View style={styles.letterSpeak}>
+              <SpeakButton
+                text={letter.letter}
+                language="ur-PK"
+                fallbackText={letter.name}
+                color={letter.color}
+                label="🔊 Hear letter"
+                size="sm"
+                clipRate={0.7}
+                rate={0.75}
+              />
+            </View>
           </View>
 
           {/* Sketch / handwriting practice */}
@@ -70,6 +85,8 @@ const UrduScreen = ({ navigation, route }) => {
                 color={letter.color}
                 label="🔊 Pronounce"
                 size="sm"
+                clipRate={0.7}
+                rate={0.75}
               />
             </View>
           ))}
@@ -209,6 +226,9 @@ const makeStyles = (colors) => StyleSheet.create({
     color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  letterSpeak: {
+    marginTop: 16,
   },
   sketchSection: {
     marginBottom: 24,

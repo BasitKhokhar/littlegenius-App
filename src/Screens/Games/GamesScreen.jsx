@@ -8,8 +8,10 @@ import {
   Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { gamesList } from '../../Data/gamesData';
+import coloringData from '../../Data/coloringData';
 import { Header } from '../../Components/UI';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
@@ -50,6 +52,23 @@ const tap = (fn, game) => {
   fn(game);
 };
 
+// A pre-coloured dino so the Coloring Book card previews the real art
+// a child fills in — not a flat emoji. Colours come straight from the
+// scene's own `preview` map (same source the in-game "original" uses).
+const PREVIEW_SCENE = coloringData.find((s) => s.id === 'trex') || coloringData[0];
+const PREVIEW_FILLS = PREVIEW_SCENE.preview || {};
+
+const ColoringPreview = ({ size }) => (
+  <Svg width={size} height={size} viewBox={PREVIEW_SCENE.viewBox}>
+    {PREVIEW_SCENE.regions.map((r) => (
+      <Path key={r.id} d={r.d} fill={PREVIEW_FILLS[r.id] || '#FFFFFF'} stroke="#2B2B3A" strokeWidth={4} strokeLinejoin="round" />
+    ))}
+    {PREVIEW_SCENE.outlines.map((o, i) => (
+      <Path key={`o${i}`} d={o.d} fill={o.fill ? '#2B2B3A' : 'none'} stroke="#2B2B3A" strokeWidth={3} strokeLinecap="round" />
+    ))}
+  </Svg>
+);
+
 // ── Large featured showcase card ──────────────────────────────
 const FeaturedCard = ({ game, index, styles, onPress }) => {
   const enter = useEnter(index);
@@ -68,9 +87,15 @@ const FeaturedCard = ({ game, index, styles, onPress }) => {
           <View style={styles.featuredDecorLg} />
           <View style={styles.featuredDecorSm} />
 
-          <View style={styles.featuredIconWrap}>
-            <Text style={styles.featuredIcon}>{game.icon}</Text>
-          </View>
+          {game.preview ? (
+            <View style={styles.featuredPreview}>
+              <ColoringPreview size={104} />
+            </View>
+          ) : (
+            <View style={styles.featuredIconWrap}>
+              <Text style={styles.featuredIcon}>{game.icon}</Text>
+            </View>
+          )}
 
           <View style={styles.featuredBody}>
             <View style={styles.featuredTag}>
@@ -138,7 +163,13 @@ const GamesScreen = ({ navigation }) => {
     else navigation.navigate('GamePlay', { gameId: game.id });
   };
 
-  const [featured, ...rest] = gamesList;
+  // Coloring Book leads as the big showcase card; everything else fills
+  // the grid. Fall back to the first game if the route is ever renamed.
+  const coloring = gamesList.find((g) => g.route === 'ColoringBook');
+  const featured = coloring
+    ? { ...coloring, preview: true, tag: 'ART' }
+    : gamesList[0];
+  const rest = gamesList.filter((g) => g.id !== featured.id);
 
   return (
     <View style={styles.container}>
@@ -166,8 +197,8 @@ const GamesScreen = ({ navigation }) => {
           </View>
         </LinearGradient>
 
-        {/* Featured */}
-        <Text style={styles.sectionLabel}>🔥 Today's Pick</Text>
+        {/* Featured — Coloring Book showcase */}
+        <Text style={styles.sectionLabel}>🎨 Featured Activity</Text>
         <FeaturedCard game={featured} index={0} styles={styles} onPress={openGame} />
 
         {/* Grid */}
@@ -281,6 +312,22 @@ const makeStyles = (colors) =>
       borderColor: 'rgba(255,255,255,0.3)',
     },
     featuredIcon: { fontSize: 52 },
+    featuredPreview: {
+      width: 116,
+      height: 116,
+      borderRadius: 24,
+      backgroundColor: '#FFFFFF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 16,
+      borderWidth: 3,
+      borderColor: 'rgba(255,255,255,0.55)',
+      elevation: 4,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.18,
+      shadowRadius: 8,
+    },
     featuredBody: { flex: 1 },
     featuredTag: {
       alignSelf: 'flex-start',

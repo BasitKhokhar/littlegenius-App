@@ -247,7 +247,9 @@ const GamePlayScreen = ({ navigation, route }) => {
         Animated.timing(trophyBounce, { toValue: 1, duration: 620, useNativeDriver: true }),
       ])
     ).start();
-    SpeechEngine.speak(`Congratulations! You won the game and earned ${starsReward} stars!`, 'en-US');
+    // Fixed praise phrase (pre-baked teacher voice); the stars earned show on
+    // screen rather than being read as a dynamic number.
+    SpeechEngine.speak(SPEECH_PHRASES.GAME_WON, 'en-US');
   };
 
   // ── Generic option-game answer (pattern / math / color / shape) ──

@@ -83,10 +83,9 @@ const ModuleQuizScreen = ({ navigation, route }) => {
       const reward = calculateStarReward(nextCorrect, total, 5);
       addStars(reward);
       setGameState('finished');
-      SpeechEngine.speak(
-        `Quiz finished! You answered ${nextCorrect} out of ${total} correctly and earned ${reward} stars!`,
-        'en-US'
-      );
+      // Fixed praise phrase (pre-baked teacher voice); the exact score/stars are
+      // shown on the results screen rather than read as dynamic numbers.
+      SpeechEngine.speak(SPEECH_PHRASES.QUIZ_COMPLETE, 'en-US');
     };
 
     // Move on only once the feedback has finished speaking. A fixed delay would
@@ -103,13 +102,18 @@ const ModuleQuizScreen = ({ navigation, route }) => {
     };
 
     if (isCorrect) setCorrectCount(nextCorrect);
-    SpeechEngine.speak(
-      isCorrect
-        ? SPEECH_PHRASES.CORRECT_BRILLIANT
-        : `Not quite! The correct answer is ${currentQuestion.answer}`,
-      'en-US',
-      { onDone: then, onError: then },
-    );
+    if (isCorrect) {
+      SpeechEngine.speak(SPEECH_PHRASES.CORRECT_BRILLIANT, 'en-US', { onDone: then, onError: then });
+    } else {
+      // Two pre-baked clips so the whole thing stays in the teacher voice:
+      // "Not quite! The correct answer is" → the answer word (baked separately).
+      const sayAnswer = () =>
+        SpeechEngine.speak(`${currentQuestion.answer}`, 'en-US', { onDone: then, onError: then });
+      SpeechEngine.speak(SPEECH_PHRASES.INCORRECT_LEAD, 'en-US', {
+        onDone: sayAnswer,
+        onError: sayAnswer,
+      });
+    }
   };
 
   const restartQuiz = () => {

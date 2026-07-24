@@ -23,6 +23,7 @@ import * as pakistanMod from '../src/Data/pakistanData.js';
 import * as learnMod from '../src/Data/learnModulesData.js';
 import * as storiesMod from '../src/Data/storiesData.js';
 import * as islamicStoriesMod from '../src/Data/islamicStoriesData.js';
+import * as gamesMod from '../src/Data/gamesData.js';
 import { SPEECH_PHRASE_LIST } from '../src/Data/speechCatalog.js';
 import { getQuizBank, BASE_BANKS } from '../src/Utils/quizGenerators.js';
 
@@ -45,11 +46,19 @@ export function collectPairs() {
   for (const l of pick(alphabetMod, 'alphabetData') || [])
     for (const v of l.vocabulary || []) add('en-US', v.word, 'alphabet');
 
+  // English alphabet LETTERS — AlphabetScreen hero speaks letter.letter (en).
+  // AlphabetScreen.jsx (hero SpeakButton).
+  for (const l of pick(alphabetMod, 'alphabetData') || []) add('en-US', l.letter, 'alphabetLetters');
+
   // Urdu haroof vocabulary — UrduScreen speaks the Urdu word itself under ur.
   // (NOT v.speak: that romanization is only the no-voice-pack fallback, and an
   // Urdu neural voice mispronounces Latin text.) UrduScreen.jsx:66
   for (const l of pick(urduMod, 'urduData') || [])
     for (const v of l.vocabulary || []) add('ur-PK', v.word, 'urdu');
+
+  // Urdu LETTERS — UrduScreen letter card speaks the letter glyph under ur.
+  // (romanized name is only the no-voice-pack fallbackText.) UrduScreen.jsx.
+  for (const l of pick(urduMod, 'urduData') || []) add('ur-PK', l.letter, 'urduLetters');
 
   // Duas / Kalmas — IslamicScreen speaks the Arabic. IslamicScreen.jsx:61,112
   for (const d of pick(duasMod, 'duasData') || []) add('ar-SA', d.arabic, 'duas');
@@ -99,6 +108,19 @@ export function collectPairs() {
     for (const q of story.quiz || []) add('en-US', q.q, 'islamicStories');
   }
 
+  // Story-quiz ANSWERS — on a wrong answer StoryQuizScreen speaks the correct
+  // option text as its own clip (after the "Not quite!" lead-in). Bake every
+  // correct option so it stays in the teacher voice. StoryQuizScreen.jsx.
+  for (const story of pick(storiesMod, 'storiesData') || [])
+    for (const q of story.quiz || []) add('en-US', (q.options || [])[q.answer], 'storyQuizAnswers');
+  for (const story of pick(islamicStoriesMod, 'islamicStoriesData') || [])
+    for (const q of story.quiz || []) add('en-US', (q.options || [])[q.answer], 'storyQuizAnswers');
+
+  // Odd-One-Out explanations — GamePlayScreen speaks `Excellent! ${explain}`
+  // verbatim on a correct pick. Mirror the composed string EXACTLY so the key
+  // matches. GamePlayScreen.jsx:316.
+  for (const o of pick(gamesMod, 'oddOneOutData') || []) add('en-US', `Excellent! ${o.explain}`, 'games');
+
   // Fixed UI / feedback phrases (game intros, praise, voice previews) — all en.
   for (const p of SPEECH_PHRASE_LIST) add(p.language, p.text, 'catalog');
 
@@ -112,6 +134,13 @@ export function collectPairs() {
   for (const bank of BASE_BANKS)
     for (const q of getQuizBank(bank))
       if (q.speech) add(q.speech.language, q.speech.text, 'quiz');
+
+  // Quiz ANSWERS — on a wrong answer ModuleQuizScreen speaks the correct answer
+  // word as its own clip (after the "Not quite!" lead-in), so bake every answer.
+  // ModuleQuizScreen.jsx handleAnswer.
+  for (const bank of BASE_BANKS)
+    for (const q of getQuizBank(bank))
+      add('en-US', `${q.answer ?? ''}`, 'quizAnswers');
 
   return out;
 }

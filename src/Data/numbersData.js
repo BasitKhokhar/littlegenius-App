@@ -42,8 +42,10 @@ export const generateNumbersData = () => {
       // Two clips played back-to-back, each in its own language, so the English
       // voice never has to read Urdu script (and vice versa). Keep these strings
       // EXACTLY in sync with scripts/collect.mjs — the text is the audio key.
+      // Speak ONLY the English word (not "5. Five"): a leading numeral was voiced
+      // as the number too, so the child heard the English number twice.
       speech: [
-        { text: `${n}. ${english}`, language: 'en-US' },
+        { text: english, language: 'en-US' },
         { text: urduNum, language: 'ur-PK' },
       ],
       objects: Array.from({ length: Math.min(n, 12) }, () => selectedFruit),

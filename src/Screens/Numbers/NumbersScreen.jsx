@@ -115,6 +115,8 @@ const NumbersScreen = ({ navigation, route }) => {
                   phrases={selectedNum.speech}
                   color={selectedNum.color}
                   label="🔊 Hear Pronunciation"
+                  clipRate={0.7}
+                  rate={0.75}
                 />
               </View>
 

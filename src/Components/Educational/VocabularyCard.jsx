@@ -53,6 +53,8 @@ const VocabularyCard = ({
           color={categoryColor}
           label="🔊"
           size="sm"
+          clipRate={0.7}
+          rate={0.75}
           onPress={onSpeak}
         />
       </TouchableOpacity>

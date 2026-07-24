@@ -52,6 +52,14 @@ const QUICK_ACTIONS = [
   { name: 'IQ Games', icon: '🧠', mod: 'games', screen: 'Games' },
 ];
 
+const getTimeGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 17) return 'Good Afternoon';
+  if (hour < 21) return 'Good Evening';
+  return 'Good Night';
+};
+
 const ModuleCard = ({ module, onPress, delay }) => {
   const scale = useRef(new Animated.Value(0.92)).current;
   const opacity = useRef(new Animated.Value(0)).current;
@@ -122,7 +130,7 @@ const HomeScreen = ({ navigation }) => {
             style={[styles.heroCard, coloredShadow(colors.brandSurface, 'lg')]}
           >
             <View style={styles.heroLeft}>
-              <Text style={s.heroGreeting}>ASSALAM-O-ALAIKUM!</Text>
+              <Text style={s.heroGreeting}>{getTimeGreeting()}, 👋</Text>
               <Text style={styles.heroName}>{userProfile.name} 🎓</Text>
               <Badge label="PG • Nursery • Class 1" tone="glass" style={styles.heroBadge} />
             </View>

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -56,20 +57,24 @@ export default function App() {
   // re-running its entrance animation — that's what made the logo look like it
   // appeared twice. One mount → one splash.
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <AuthProvider>
-          <NotificationProvider>
-            <DialogProvider>
-              <AppContainer>
-                <NavigationContainer>
-                  <RootNavigator fontsReady={fontsLoaded} />
-                </NavigationContainer>
-              </AppContainer>
-            </DialogProvider>
-          </NotificationProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    // GestureHandlerRootView must wrap the whole tree or RNGH gestures
+    // (pinch/pan on the Coloring Book canvas) silently fail on Android.
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <DialogProvider>
+                <AppContainer>
+                  <NavigationContainer>
+                    <RootNavigator fontsReady={fontsLoaded} />
+                  </NavigationContainer>
+                </AppContainer>
+              </DialogProvider>
+            </NotificationProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

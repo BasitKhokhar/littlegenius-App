@@ -56,13 +56,14 @@ let audioModeReady = false;       // setAudioModeAsync() run once, lazily
 // slow/dragging. Kids stay engaged when a tap responds quickly and the word is
 // said briskly but clearly.
 //   • CLIP_PLAYBACK_RATE: pre-baked clips are baked at a neutral speed; we play
-//     them a touch faster so a single letter/word doesn't drag. Pitch is
-//     corrected so it still sounds like the same warm human teacher, not a
-//     sped-up chipmunk. 1.0 = as baked; kept modest so pronunciation stays
-//     perfectly intelligible for young learners.
-//   • TTS_RATE: matching brisk-but-clear speed for the device-TTS fallback.
-const CLIP_PLAYBACK_RATE = 1.12;
-const TTS_RATE = 1.0;
+//     them slightly SLOWER than baked so young learners can hear each word
+//     clearly. Pitch is corrected so it still sounds like the same warm human
+//     teacher, not a slowed-down drone. 1.0 = as baked. Callers can override
+//     per-phrase via opts.clipRate (e.g. single letters/words are played even
+//     slower ~0.7 so a child can copy the pronunciation).
+//   • TTS_RATE: matching calm-but-clear speed for the device-TTS fallback.
+const CLIP_PLAYBACK_RATE = 0.9;
+const TTS_RATE = 0.9;
 
 // Kids often hold the phone on silent — make sure narration is still audible.
 const ensureAudioMode = () => {
@@ -229,8 +230,9 @@ export const SpeechEngine = {
         // an older one this throws and the clip simply plays at normal speed.
         if (isTeacherClip) {
           try {
+            const clipRate = opts.clipRate ?? CLIP_PLAYBACK_RATE;
             player.shouldCorrectPitch = true;
-            player.setPlaybackRate(CLIP_PLAYBACK_RATE, 'high');
+            player.setPlaybackRate(clipRate, 'high');
           } catch { /* older expo-audio native — play at 1x */ }
         }
 

@@ -3,9 +3,15 @@
 //
 // The guide skeleton (normalized polylines, see traceSkeletons.js)
 // is densified into evenly-spaced sample points inside the drawing
-// cell. Marks out of 10 combine:
-//   coverage — how much of the letter the child actually traced
-//   stray    — how much ink landed far away from the letter (scribble)
+// cell. A mark out of 10 combines TWO honest measures so a careless
+// scribble can't score high just by covering the cell:
+//   recall    — how much of the letter the child actually traced
+//               (did ink land near each guide point?)
+//   precision — how much of the child's ink actually lay ON the letter
+//               (a scribble/blob has lots of ink far from the thin line)
+// A big scribble has high recall but LOW precision, so recall×precision
+// (with a light stray penalty) keeps it low. Only a stroke that follows
+// the letter scores well.
 // Brute-force nearest-neighbour is plenty fast (< a few ms per cell).
 // ──────────────────────────────────────────────────────────────
 
@@ -75,26 +81,39 @@ export const scoreTrace = (guidePts, strokes, size) => {
     return { marks: 0, coverage: 0, stray: 0 };
   }
 
-  const nearR = size * 0.09;   // guide point counts as traced within this radius
-  const strayR = size * 0.18;  // ink farther than this from the letter is scribble
+  // Tighter than before: ink must hug the line, not just wander near it.
+  const nearR = size * 0.08;   // a guide point counts as traced within this radius
+  const onR = size * 0.09;     // ink counts as "on the letter" within this radius
+  const strayR = size * 0.16;  // ink farther than this from the letter is a scribble
   const nearR2 = nearR * nearR;
+  const onR2 = onR * onR;
   const strayR2 = strayR * strayR;
 
+  // recall — did the child cover the letter?
   let covered = 0;
   for (const g of guidePts) {
     if (minDistSq(g, inkPts) <= nearR2) covered++;
   }
-  const coverage = covered / guidePts.length;
+  const recall = covered / guidePts.length;
 
+  // precision — did the child's ink stay ON the letter (vs. scribbling)?
+  let onLetter = 0;
   let strayCount = 0;
   for (const p of inkPts) {
-    if (minDistSq(p, guidePts) > strayR2) strayCount++;
+    const d = minDistSq(p, guidePts);
+    if (d <= onR2) onLetter++;
+    if (d > strayR2) strayCount++;
   }
+  const precision = onLetter / inkPts.length;
   const stray = strayCount / inkPts.length;
 
-  const score = Math.max(0, Math.min(1, coverage - 0.5 * stray));
-  const marks = Math.max(1, Math.round(score * 10));
-  return { marks, coverage, stray };
+  // recall×precision is the core: a scribble that fills the cell has high recall
+  // but low precision, so it can no longer score high. The stray term is an
+  // extra penalty for ink dumped well away from the letter. No floor at 1 — a
+  // wrong or careless attempt must be allowed to score low so the retry is real.
+  const score = Math.max(0, Math.min(1, recall * precision - 0.3 * stray));
+  const marks = Math.max(0, Math.round(score * 10));
+  return { marks, coverage: recall, stray };
 };
 
 /**
@@ -139,11 +158,22 @@ export const scoreFreeform = (strokes, size) => {
   const spanX = (maxX - minX) / size;
   const spanY = (maxY - minY) / size;
   const extent = Math.min(1, spanX / 0.45) * Math.min(1, spanY / 0.45); // fills area
-  const lengthScore = Math.min(1, length / (size * 1.4)); // enough ink, not a dot
-  const fill = 0.5 * extent + 0.5 * lengthScore;
+  const lengthScore = Math.min(1, length / (size * 1.2)); // enough ink, not a dot
 
-  // Placement gates the whole score; a good full trace inside the guide wins.
-  const score = Math.max(0, Math.min(1, inZoneRatio * (0.35 + 0.65 * fill)));
-  const marks = Math.max(1, Math.round(score * 10));
+  // Overdraw penalty: a real glyph's ink length is a small multiple of its
+  // bounding-box diagonal; a back-and-forth scribble is many times longer.
+  // Full credit up to ~4× the diagonal, then falls off — this is what stops a
+  // scribble that fills the cell from scoring high without a target shape.
+  const diag = Math.hypot(spanX, spanY) * size;
+  const lengthRatio = length / Math.max(1, diag);
+  const neat = Math.max(0, Math.min(1, 1 - Math.max(0, lengthRatio - 4) / 8));
+
+  const fill = 0.4 * extent + 0.3 * lengthScore + 0.3 * neat;
+
+  // Placement gates the whole score hard (squared), and the ceiling is lower
+  // than a true traced letter would earn — honest for a shape we can't verify.
+  // No floor at 1, so a corner scribble or a tiny mark genuinely scores low.
+  const score = Math.max(0, Math.min(1, Math.pow(inZoneRatio, 1.5) * fill));
+  const marks = Math.max(0, Math.round(score * 10));
   return { marks, coverage: inZoneRatio, stray: 1 - inZoneRatio };
 };

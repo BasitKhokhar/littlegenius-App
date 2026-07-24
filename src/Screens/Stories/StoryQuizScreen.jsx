@@ -82,7 +82,9 @@ const StoryQuizScreen = ({ navigation, route }) => {
       const reward = calculateStarReward(finalCorrect, questions.length, 5);
       addStars(reward);
       setGameState('finished');
-      SpeechEngine.speak(`Story Quiz completed! You got ${finalCorrect} out of ${questions.length} right and earned ${reward} stars!`, 'en-US');
+      // Fixed praise phrase (pre-baked teacher voice); the score/stars show on
+      // the results screen instead of being read as dynamic numbers.
+      SpeechEngine.speak(SPEECH_PHRASES.STORY_QUIZ_COMPLETE, 'en-US');
     };
 
     // Wait for the feedback to finish before moving on — starting the next
@@ -96,11 +98,18 @@ const StoryQuizScreen = ({ navigation, route }) => {
     };
 
     const correctText = currentQuestion.options.find(o => o.isCorrect)?.text;
-    SpeechEngine.speak(
-      isCorrect ? SPEECH_PHRASES.CORRECT_EXCELLENT : `Not quite! The right answer is ${correctText}`,
-      'en-US',
-      { onDone: then, onError: then },
-    );
+    if (isCorrect) {
+      SpeechEngine.speak(SPEECH_PHRASES.CORRECT_EXCELLENT, 'en-US', { onDone: then, onError: then });
+    } else {
+      // Two pre-baked clips so it stays in the teacher voice: the fixed lead-in
+      // "Not quite! The correct answer is" → the correct option text (baked).
+      const sayAnswer = () =>
+        SpeechEngine.speak(`${correctText ?? ''}`, 'en-US', { onDone: then, onError: then });
+      SpeechEngine.speak(SPEECH_PHRASES.INCORRECT_LEAD, 'en-US', {
+        onDone: sayAnswer,
+        onError: sayAnswer,
+      });
+    }
   };
 
   const restartQuiz = () => {

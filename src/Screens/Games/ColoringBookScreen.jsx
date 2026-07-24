@@ -5,32 +5,52 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   Animated,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Reanimated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+} from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Header } from '../../Components/UI';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
+import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { ColorPalette, ERASER } from '../../Components/Games';
 import coloringData from '../../Data/coloringData';
 
 // ──────────────────────────────────────────────────────────────
-// ColoringBookScreen — tap-to-fill coloring pages. Pick a colour,
-// tap a region to fill it. Fills are kept per scene so switching
-// pictures never loses work. Fully colouring a scene celebrates
-// and awards stars (once per scene per visit).
+// ColoringBookScreen — premium tap-to-fill coloring pages.
+//
+// • Big full-height editing canvas that fills the screen.
+// • Pinch to zoom + drag to pan, so tiny parts of detailed art can be
+//   reached (double-tap resets). Fills still work by tapping.
+// • Top-right button reveals the finished "original" (same paths, filled
+//   from each scene's `preview` map) and flips back to the child's sketch.
+// • Fills are kept per scene so switching pictures never loses work; fully
+//   colouring a scene celebrates and awards bonus stars.
 // ──────────────────────────────────────────────────────────────
 
-const { width: SCREEN_W } = Dimensions.get('window');
-const CANVAS = Math.min(SCREEN_W - 32, 380);
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 4;
 
+const clampW = (v, min, max) => {
+  'worklet';
+  return Math.min(Math.max(v, min), max);
+};
+
+// Two rows of bright + soft colours, like a real coloring app's palette.
 const PALETTE = [
-  '#EF4444', '#F97316', '#FBBF24', '#4ADE80', '#10B981', '#22D3EE',
-  '#3B82F6', '#6366F1', '#A78BFA', '#EC4899', '#8B4513', '#111827',
+  '#EF4444', '#F97316', '#F59E0B', '#FBBF24', '#84CC16', '#22C55E',
+  '#10B981', '#14B8A6', '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6',
+  '#A855F7', '#EC4899', '#F472B6', '#FBCFE8', '#8B4513', '#9CA3AF',
+  '#FFFFFF', '#111827',
 ];
 
 const ColoringBookScreen = ({ navigation }) => {
@@ -41,6 +61,8 @@ const ColoringBookScreen = ({ navigation }) => {
 
   const [sceneId, setSceneId] = useState(coloringData[0].id);
   const [selectedColor, setSelectedColor] = useState(PALETTE[0]);
+  const [showReference, setShowReference] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
   // fills[sceneId] = { regionId: color }
   const [fills, setFills] = useState({});
   const rewardedRef = useRef({});            // scenes that already gave the completion bonus
@@ -48,15 +70,94 @@ const ColoringBookScreen = ({ navigation }) => {
   const [celebrating, setCelebrating] = useState(false);
   const pop = useRef(new Animated.Value(0)).current;
 
+  // Size of the (square) drawing, measured from the flexible canvas box.
+  const [canvasSize, setCanvasSize] = useState(0);
+
   // Floating "+2 ⭐" that pops up each time a new region is coloured.
   const [floatLabel, setFloatLabel] = useState(null);
   const floatY = useRef(new Animated.Value(0)).current;
   const floatOpacity = useRef(new Animated.Value(0)).current;
 
+  // ── Zoom / pan shared values ──────────────────────────────────
+  const scale = useSharedValue(1);
+  const savedScale = useSharedValue(1);
+  const tx = useSharedValue(0);
+  const ty = useSharedValue(0);
+  const savedTx = useSharedValue(0);
+  const savedTy = useSharedValue(0);
+  // JS guard so a pan-drag never paints a region (SVG onPress can fire on
+  // the finger-lift at the end of a drag). Kept true briefly after a pan.
+  const panningRef = useRef(false);
+
   const scene = coloringData.find((s) => s.id === sceneId) || coloringData[0];
   const sceneFills = fills[sceneId] || {};
   const filledCount = scene.regions.filter((r) => sceneFills[r.id]).length;
   const totalRegions = scene.regions.length;
+
+  const resetZoom = () => {
+    scale.value = withTiming(1);
+    savedScale.value = 1;
+    tx.value = withTiming(0);
+    ty.value = withTiming(0);
+    savedTx.value = 0;
+    savedTy.value = 0;
+    setZoomed(false);
+  };
+
+  const switchScene = (id) => {
+    setSceneId(id);
+    setCelebrating(false);
+    setShowReference(false);
+    resetZoom();
+  };
+
+  const setPanning = (v) => { panningRef.current = v; };
+  const endPanSoon = () => { setTimeout(() => { panningRef.current = false; }, 70); };
+
+  const pinch = Gesture.Pinch()
+    .onUpdate((e) => {
+      scale.value = clampW(savedScale.value * e.scale, MIN_ZOOM, MAX_ZOOM);
+    })
+    .onEnd(() => {
+      savedScale.value = scale.value;
+      const isZoomed = scale.value > MIN_ZOOM + 0.01;
+      if (!isZoomed) {
+        tx.value = withTiming(0);
+        ty.value = withTiming(0);
+        savedTx.value = 0;
+        savedTy.value = 0;
+      }
+      runOnJS(setZoomed)(isZoomed);
+    });
+
+  const pan = Gesture.Pan()
+    .minDistance(12)
+    .onStart(() => {
+      runOnJS(setPanning)(true);
+    })
+    .onUpdate((e) => {
+      if (scale.value <= MIN_ZOOM + 0.01) return; // only pan when zoomed in
+      const bound = (canvasSize * (scale.value - 1)) / 2;
+      tx.value = clampW(savedTx.value + e.translationX, -bound, bound);
+      ty.value = clampW(savedTy.value + e.translationY, -bound, bound);
+    })
+    .onEnd(() => {
+      savedTx.value = tx.value;
+      savedTy.value = ty.value;
+      runOnJS(endPanSoon)();
+    });
+
+  // Pinch + pan run together. No tap gesture here — single taps pass
+  // straight through to the SVG regions so filling stays instant.
+  const composed = Gesture.Simultaneous(pinch, pan);
+
+  const canvasStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: tx.value },
+      { translateY: ty.value },
+      { scale: scale.value },
+    ],
+  }));
 
   const showFloat = (label) => {
     setFloatLabel(label);
@@ -69,6 +170,7 @@ const ColoringBookScreen = ({ navigation }) => {
   };
 
   const handleRegionPress = (regionId) => {
+    if (panningRef.current || showReference) return; // don't paint while panning / viewing original
     Haptics.selectionAsync().catch(() => {});
     const isErase = selectedColor === ERASER;
     const wasFilled = !!sceneFills[regionId];
@@ -99,7 +201,7 @@ const ColoringBookScreen = ({ navigation }) => {
       pop.setValue(0);
       Animated.spring(pop, { toValue: 1, friction: 5, useNativeDriver: true }).start();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      SpeechEngine.speak(`Beautiful! You colored the whole ${scene.name} and earned a big bonus!`, 'en-US');
+      SpeechEngine.speak(SPEECH_PHRASES.COLORING_DONE, 'en-US');
     }
   };
 
@@ -108,13 +210,19 @@ const ColoringBookScreen = ({ navigation }) => {
     setCelebrating(false);
   };
 
+  const onCanvasLayout = (e) => {
+    const { width, height } = e.nativeEvent.layout;
+    const size = Math.max(0, Math.floor(Math.min(width, height)) - 16);
+    if (size !== canvasSize) setCanvasSize(size);
+  };
+
   return (
     <View style={styles.container}>
       <Header title="Coloring Book 🎨" showBack onBackPress={() => navigation.goBack()} />
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
+      <View style={[styles.body, { paddingBottom: bottomPad }]}>
         {/* Scene picker */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sceneStrip}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sceneStrip} style={styles.sceneStripWrap}>
           {coloringData.map((s) => {
             const active = s.id === sceneId;
             const done = (fills[s.id] && s.regions.every((r) => fills[s.id][r.id]));
@@ -122,7 +230,7 @@ const ColoringBookScreen = ({ navigation }) => {
               <TouchableOpacity
                 key={s.id}
                 style={[styles.sceneChip, active && styles.sceneChipActive]}
-                onPress={() => { setSceneId(s.id); setCelebrating(false); }}
+                onPress={() => switchScene(s.id)}
                 activeOpacity={0.85}
               >
                 <Text style={styles.sceneEmoji}>{s.emoji}</Text>
@@ -133,50 +241,81 @@ const ColoringBookScreen = ({ navigation }) => {
           })}
         </ScrollView>
 
-        {/* Selected colour + live hint */}
-        <View style={styles.hintRow}>
+        {/* Slim status bar: selected colour + progress */}
+        <View style={styles.statusRow}>
           <View style={[styles.colorChip, { backgroundColor: selectedColor === ERASER ? '#E5E7EB' : selectedColor }]}>
             {selectedColor === ERASER ? <Text style={styles.colorChipIcon}>🧽</Text> : null}
           </View>
-          <Text style={styles.hint}>
-            {selectedColor === ERASER ? 'Tap a part to erase it' : 'Tap any white part to fill it!'} 👆
-          </Text>
-        </View>
-
-        {/* Progress */}
-        <View style={styles.progressWrap}>
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: `${(filledCount / totalRegions) * 100}%` }]} />
           </View>
           <Text style={styles.progressText}>{filledCount}/{totalRegions} ⭐</Text>
         </View>
 
-        {/* Canvas */}
-        <View style={styles.canvasWrap}>
-          <Svg width={CANVAS} height={CANVAS} viewBox={scene.viewBox}>
-            {scene.regions.map((r) => (
-              <Path
-                key={r.id}
-                d={r.d}
-                fill={sceneFills[r.id] || colors.surface}
-                stroke={colors.textPrimary}
-                strokeWidth={3.5}
-                strokeLinejoin="round"
-                onPress={() => handleRegionPress(r.id)}
-              />
-            ))}
-            {scene.outlines.map((o, i) => (
-              <Path
-                key={`o${i}`}
-                d={o.d}
-                fill={o.fill ? colors.textPrimary : 'none'}
-                stroke={colors.textPrimary}
-                strokeWidth={3}
-                strokeLinecap="round"
-                pointerEvents="none"
-              />
-            ))}
-          </Svg>
+        {/* Large editing canvas */}
+        <View style={styles.canvasWrap} onLayout={onCanvasLayout}>
+          {canvasSize > 0 && (
+            <GestureDetector gesture={composed}>
+              <Reanimated.View style={[styles.canvasInner, canvasStyle]}>
+                <Svg width={canvasSize} height={canvasSize} viewBox={scene.viewBox}>
+                  {scene.regions.map((r) => (
+                    <Path
+                      key={r.id}
+                      d={r.d}
+                      fill={
+                        showReference
+                          ? (scene.preview?.[r.id] || colors.surface)
+                          : (sceneFills[r.id] || colors.surface)
+                      }
+                      stroke={colors.textPrimary}
+                      strokeWidth={3.2}
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                      onPress={showReference ? undefined : () => handleRegionPress(r.id)}
+                    />
+                  ))}
+                  {scene.outlines.map((o, i) => (
+                    <Path
+                      key={`o${i}`}
+                      d={o.d}
+                      fill={o.fill ? colors.textPrimary : 'none'}
+                      stroke={colors.textPrimary}
+                      strokeWidth={2.6}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      pointerEvents="none"
+                    />
+                  ))}
+                </Svg>
+              </Reanimated.View>
+            </GestureDetector>
+          )}
+
+          {/* Hint pill (bottom-left) */}
+          <View style={styles.hintPill}>
+            <Text style={styles.hintPillText}>
+              {showReference ? '👀 This is the finished picture' : '👆 Tap a part · pinch to zoom'}
+            </Text>
+          </View>
+
+          {/* Reference (original) toggle — top-right */}
+          <TouchableOpacity
+            style={[styles.refBtn, showReference && styles.refBtnActive]}
+            onPress={() => setShowReference((v) => !v)}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.refBtnIcon}>{showReference ? '✏️' : '🖼️'}</Text>
+          </TouchableOpacity>
+          {showReference && (
+            <View style={styles.refBadge}><Text style={styles.refBadgeText}>ORIGINAL</Text></View>
+          )}
+
+          {/* Reset zoom — only while zoomed in */}
+          {zoomed && (
+            <TouchableOpacity style={styles.zoomResetBtn} onPress={resetZoom} activeOpacity={0.85}>
+              <Text style={styles.zoomResetIcon}>⤢</Text>
+            </TouchableOpacity>
+          )}
 
           {floatLabel && (
             <Animated.View
@@ -202,26 +341,30 @@ const ColoringBookScreen = ({ navigation }) => {
         </View>
 
         {/* Palette + reset */}
-        <ColorPalette
-          colors={PALETTE}
-          value={selectedColor}
-          onChange={setSelectedColor}
-          eraser
-          large
-        />
-        <TouchableOpacity style={styles.resetBtn} onPress={handleReset} activeOpacity={0.85}>
-          <Text style={styles.resetBtnText}>↺ Start this picture over</Text>
-        </TouchableOpacity>
-      </ScrollView>
+        <View style={styles.bottomBar}>
+          <ColorPalette
+            colors={PALETTE}
+            value={selectedColor}
+            onChange={setSelectedColor}
+            eraser
+            wrap
+            compact
+          />
+          <TouchableOpacity style={styles.resetBtn} onPress={handleReset} activeOpacity={0.85}>
+            <Text style={styles.resetBtnText}>↺ Start this picture over</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };
 
 const makeStyles = (colors) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  content: { paddingHorizontal: 16, paddingTop: 10, alignItems: 'center' },
+  body: { flex: 1, paddingHorizontal: 12, paddingTop: 8 },
 
-  sceneStrip: { gap: 8, paddingVertical: 6 },
+  sceneStripWrap: { flexGrow: 0 },
+  sceneStrip: { gap: 8, paddingVertical: 4, paddingHorizontal: 2 },
   sceneChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -230,25 +373,26 @@ const makeStyles = (colors) => StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1.5,
     borderColor: colors.border,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 7,
+    paddingHorizontal: 11,
   },
   sceneChipActive: { borderColor: colors.primary, backgroundColor: colors.surfaceAlt },
-  sceneEmoji: { fontSize: 18 },
+  sceneEmoji: { fontSize: 17 },
   sceneName: { fontSize: 12, fontWeight: '900', color: colors.textSecondary },
   sceneDone: { fontSize: 12 },
 
-  hintRow: {
+  statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginTop: 12,
+    gap: 10,
+    marginTop: 8,
     marginBottom: 8,
+    paddingHorizontal: 2,
   },
   colorChip: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: '#FFFFFF',
     alignItems: 'center',
@@ -259,16 +403,7 @@ const makeStyles = (colors) => StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 2,
   },
-  colorChipIcon: { fontSize: 13 },
-  hint: { fontSize: 13, fontWeight: '800', color: colors.textSecondary, textAlign: 'center' },
-
-  progressWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    width: CANVAS,
-    marginBottom: 12,
-  },
+  colorChipIcon: { fontSize: 12 },
   progressTrack: {
     flex: 1,
     height: 12,
@@ -278,12 +413,85 @@ const makeStyles = (colors) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  progressFill: {
-    height: '100%',
-    borderRadius: 6,
-    backgroundColor: colors.primary,
+  progressFill: { height: '100%', borderRadius: 6, backgroundColor: colors.primary },
+  progressText: { fontSize: 13, fontWeight: '900', color: colors.textPrimary, minWidth: 46, textAlign: 'right' },
+
+  // Big flexible editing area
+  canvasWrap: {
+    flex: 1,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
   },
-  progressText: { fontSize: 13, fontWeight: '900', color: colors.textPrimary, minWidth: 48, textAlign: 'right' },
+  canvasInner: { alignItems: 'center', justifyContent: 'center' },
+
+  hintPill: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  hintPillText: { fontSize: 11, fontWeight: '800', color: colors.textSecondary },
+
+  refBtn: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+  },
+  refBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  refBtnIcon: { fontSize: 22 },
+  zoomResetBtn: {
+    position: 'absolute',
+    top: 66,
+    right: 12,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+  },
+  zoomResetIcon: { fontSize: 22, fontWeight: '900', color: colors.textPrimary },
+  refBadge: {
+    position: 'absolute',
+    top: 20,
+    left: 12,
+    backgroundColor: colors.primary,
+    borderRadius: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+  },
+  refBadgeText: { fontSize: 10, fontWeight: '900', color: '#FFFFFF', letterSpacing: 1 },
 
   floatBadge: {
     position: 'absolute',
@@ -296,18 +504,6 @@ const makeStyles = (colors) => StyleSheet.create({
     elevation: 6,
   },
   floatText: { color: '#FFFFFF', fontSize: 18, fontWeight: '900' },
-
-  canvasWrap: {
-    width: CANVAS,
-    height: CANVAS,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 
   celebrateOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -327,21 +523,18 @@ const makeStyles = (colors) => StyleSheet.create({
   celebrateEmoji: { fontSize: 44 },
   celebrateTitle: { fontSize: 20, fontWeight: '900', color: colors.textPrimary },
   celebrateSub: { fontSize: 14, fontWeight: '800', color: colors.textSecondary, marginBottom: 8 },
-  celebrateBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-  },
+  celebrateBtn: { backgroundColor: colors.primary, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 18 },
   celebrateBtnText: { color: '#FFF', fontWeight: '900', fontSize: 13 },
 
+  bottomBar: { paddingTop: 2 },
   resetBtn: {
-    marginTop: 10,
+    marginTop: 6,
+    alignSelf: 'center',
     backgroundColor: colors.surfaceAlt,
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: 14,
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 20,
   },
   resetBtnText: { fontSize: 13, fontWeight: '900', color: colors.textPrimary },

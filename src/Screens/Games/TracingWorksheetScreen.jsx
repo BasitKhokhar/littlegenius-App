@@ -116,10 +116,9 @@ const TracingWorksheetScreen = ({ navigation }) => {
         setStarsAwarded(reward);
         addStars(reward);
         setRowDone(true);
-        SpeechEngine.speak(
-          `Worksheet complete! You scored ${total} out of ${ATTEMPTS * 10} and earned ${reward} stars!`,
-          'en-US'
-        );
+        // Fixed praise phrase (pre-baked teacher voice); the score/stars show
+        // on screen rather than being read as dynamic numbers.
+        SpeechEngine.speak(SPEECH_PHRASES.WORKSHEET_COMPLETE, 'en-US');
       } else {
         setActiveIdx(activeIdx + 1);
       }
