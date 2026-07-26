@@ -105,12 +105,15 @@ const VocabularyTile = ({
 };
 
 const styles = StyleSheet.create({
+  // The stack below (bubble + word + badge + pill) has to fit inside the row's
+  // capped height, or `overflow: hidden` shears the speak pill off the bottom.
+  // Equal top/bottom padding keeps the gap under the pill matching the gap
+  // above the emoji bubble.
   tile: {
     flex: 1,
     borderRadius: Radius.lg,
     borderWidth: StyleSheet.hairlineWidth,
-    paddingTop: 10,
-    paddingBottom: 8,
+    paddingVertical: 8,
     paddingHorizontal: 6,
     alignItems: 'center',
     justifyContent: 'space-evenly',
@@ -124,16 +127,15 @@ const styles = StyleSheet.create({
     height: 4,
   },
   emojiBubble: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 4,
   },
   emoji: {
-    fontSize: 35,
-    lineHeight: 40,
+    fontSize: 38,
+    lineHeight: 44,
   },
   word: {
     fontSize: 13,
@@ -143,15 +145,15 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   categoryBadge: {
-    paddingVertical: 2,
+    paddingVertical: 1,
     paddingHorizontal: 6,
     borderRadius: 8,
     borderWidth: 1,
     maxWidth: '100%',
-    marginBottom: 4,
   },
   category: {
     fontSize: 8,
+    lineHeight: 11,
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: 0.4,
@@ -159,7 +161,7 @@ const styles = StyleSheet.create({
   },
   speakPill: {
     minWidth: 40,
-    paddingVertical: 4,
+    paddingVertical: 3,
     paddingHorizontal: 10,
     borderRadius: Radius.sm,
     alignItems: 'center',
@@ -167,13 +169,13 @@ const styles = StyleSheet.create({
   },
   speakGlyph: {
     fontSize: 12,
-    lineHeight: 16,
+    lineHeight: 14,
     textAlign: 'center',
   },
   waveRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 16,
+    height: 14,
   },
   waveBar: {
     width: 3,

@@ -62,6 +62,12 @@ let audioModeReady = false;       // setAudioModeAsync() run once, lazily
 //     per-phrase via opts.clipRate (e.g. single letters/words are played even
 //     slower ~0.7 so a child can copy the pronunciation).
 //   • TTS_RATE: matching calm-but-clear speed for the device-TTS fallback.
+//   • opts.minClipRate: a FLOOR on the stretch for very short clips. Slowing a
+//     word works because there are several syllables to spread out; slowing a
+//     single letter does not — "A" is ~0.45s of one diphthong, and pitch-
+//     corrected stretching that far warbles it into "aaiii" instead of a clean
+//     teacher's "ay". Those clips are baked already-enunciated (generateAudio.mjs
+//     LETTER_RATE) and pass a floor so no global speed setting can mangle them.
 const CLIP_PLAYBACK_RATE = 0.9;
 const TTS_RATE = 0.9;
 
@@ -261,7 +267,8 @@ export const SpeechEngine = {
           try {
             // Per-call tuning × the user's global speed, clamped so an extreme
             // setting can't distort the voice into a chipmunk/drone.
-            const clipRate = clampRate((opts.clipRate ?? CLIP_PLAYBACK_RATE) * globalSpeed, 0.4, 3.0);
+            const floor = Number.isFinite(opts.minClipRate) ? opts.minClipRate : 0.4;
+            const clipRate = clampRate((opts.clipRate ?? CLIP_PLAYBACK_RATE) * globalSpeed, floor, 3.0);
             player.shouldCorrectPitch = true;
             player.setPlaybackRate(clipRate, 'high');
           } catch { /* older expo-audio native — play at 1x */ }

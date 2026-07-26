@@ -46,7 +46,7 @@ const BrandSplash = () => {
 
       <Animated.View style={[styles.footer, { opacity: footerFade }]}>
         <Text style={styles.footerText}>
-          Made With <Text style={styles.heart}>❤️</Text> By <Text style={styles.author}>Basit</Text>
+          MADE BY <Text style={styles.author}>BASIT DEV</Text>
         </Text>
       </Animated.View>
     </LinearGradient>
@@ -83,9 +83,8 @@ const styles = StyleSheet.create({
   },
 
   footer: { position: 'absolute', bottom: 42, alignItems: 'center' },
-  footerText: { ...textStyles.bodyStrong, color: '#C7D2FE', letterSpacing: 0.4 },
-  heart: { fontSize: 14 },
-  author: { color: C.accent, fontFamily: 'Baloo2_800ExtraBold' },
+  footerText: { ...textStyles.bodyStrong, color: '#C7D2FE', letterSpacing: 0.8 },
+  author: { color: C.onBrand, fontFamily: 'Baloo2_800ExtraBold' },
 });
 
 export default BrandSplash;

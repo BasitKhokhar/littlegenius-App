@@ -12,7 +12,6 @@ import * as Haptics from 'expo-haptics';
 import { Header } from '../../Components/UI';
 import { useTheme } from '../../Context/ThemeContext';
 import { getGameTheme } from '../../Theme/gameThemes';
-import { useTabBarClearance } from '../../Hooks';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
@@ -35,6 +34,16 @@ const ATTEMPTS = 4;
 const CELL = Math.floor((SCREEN_W - 16 * 2 - 12) / 2); // 2-column grid
 const CELL_PAD = Math.round(CELL * 0.12);
 const GUIDE_OPACITY = [0.9, 0.55, 0.35, 0.18]; // progressive fading
+
+// Glyph keypad under the tabs: every glyph of the active set laid out in
+// full-width wrapping rows (A B C D E F G / H I J …) instead of a cramped
+// horizontal strip, so a child can see and reach the whole alphabet.
+const GLYPH_COLS = 7;
+const GLYPH_GAP = 6;
+const PANEL_PAD = 8;
+const GLYPH_SIZE = Math.floor(
+  (SCREEN_W - 16 * 2 - PANEL_PAD * 2 - GLYPH_GAP * (GLYPH_COLS - 1)) / GLYPH_COLS
+);
 
 const TRACE_URDU = urduData.map((h) => h.letter);
 
@@ -64,7 +73,6 @@ const emptyCells = () => Array.from({ length: ATTEMPTS }, () => null); // null |
 const TracingWorksheetScreen = ({ navigation }) => {
   const { colors, isDark } = useTheme();
   const gt = getGameTheme(7, isDark); // violet stage
-  const bottomPad = useTabBarClearance();
   const { addStars } = useAuth();
   const styles = makeStyles(colors);
 
@@ -247,43 +255,49 @@ const TracingWorksheetScreen = ({ navigation }) => {
     <GameStage theme={gt}>
       <Header title="Tracing Worksheet ✍️" showBack variant="transparent" onBackPress={() => navigation.goBack()} />
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* The picture belongs to the glyph on the sheet, so it changes with
             every letter/number/haroof instead of being one fixed mascot. */}
-            <View style={{marginVertical: 6}}>
-  <Mascot key={`${setKey}-${glyph}`} emoji={picture} size={58} glow={gt.deco} style={styles.mascot} />
-            </View>
-      
-        {/* Set picker + glyph strip */}
-        <View style={styles.pickerRow}>
-          {SETS.map((s) => (
-            <TouchableOpacity
-              key={s.key}
-              style={[styles.setChip, setKey === s.key && { backgroundColor: accent, borderColor: accent }]}
-              onPress={() => resetRow(0, s.key)}
-              activeOpacity={0.85}
-            >
-              <Text
-                style={[
-                  styles.setChipText,
-                  s.urdu && styles.urduChipText,
-                  setKey === s.key && { color: '#FFF' },
-                ]}
+        <View style={styles.mascotWrap}>
+          <Mascot key={`${setKey}-${glyph}`} emoji={picture} size={58} glow={gt.deco} style={styles.mascot} />
+        </View>
+
+        {/* Set tabs — the three sets share one row, equal width */}
+        <View style={styles.setTabs}>
+          {SETS.map((s) => {
+            const active = setKey === s.key;
+            return (
+              <TouchableOpacity
+                key={s.key}
+                style={[styles.setTab, active && { backgroundColor: accent, borderColor: accent }]}
+                onPress={() => resetRow(0, s.key)}
+                activeOpacity={0.85}
               >
-                {s.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-          <ScrollView
-            horizontal
-            style={styles.glyphStripScroll}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.glyphStrip}
-          >
-            {set.glyphs.map((g, i) => (
+                <Text
+                  style={[
+                    styles.setTabText,
+                    s.urdu && styles.urduTabText,
+                    active && styles.setTabTextActive,
+                  ]}
+                >
+                  {s.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Every glyph of the tapped tab, wrapped across full rows */}
+        <View style={styles.glyphPanel}>
+          {set.glyphs.map((g, i) => {
+            const active = i === glyphIdx;
+            return (
               <TouchableOpacity
                 key={g}
-                style={[styles.glyphChip, i === glyphIdx && { backgroundColor: accent + '22', borderColor: accent }]}
+                style={[
+                  styles.glyphChip,
+                  active && { backgroundColor: accent, borderColor: accent },
+                ]}
                 onPress={() => resetRow(i)}
                 activeOpacity={0.85}
               >
@@ -291,14 +305,14 @@ const TracingWorksheetScreen = ({ navigation }) => {
                   style={[
                     styles.glyphChipText,
                     isUrdu && styles.urduChipText,
-                    i === glyphIdx && { color: accent },
+                    active && styles.glyphChipTextActive,
                   ]}
                 >
                   {g}
                 </Text>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
+            );
+          })}
         </View>
 
         <Text style={styles.hint}>
@@ -403,34 +417,52 @@ const TracingWorksheetScreen = ({ navigation }) => {
 };
 
 const makeStyles = (colors) => StyleSheet.create({
-  content: { paddingHorizontal: 16, paddingTop: 12 },
+  // Footer buttons sit 10px off the bottom — no tab-bar clearance is needed
+  // here because the bar is hidden on this pushed game screen.
+  content: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10 },
+  mascotWrap: { marginVertical: 6 },
   mascot: { alignSelf: 'center', marginBottom: 6 },
 
-  pickerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  setChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  setChipText: { fontSize: 13, fontWeight: '900', color: colors.textSecondary },
-  glyphStripScroll: { flex: 1 },
-  glyphStrip: { gap: 6, alignItems: 'center', paddingRight: 8 },
-  glyphChip: {
-    minWidth: 38,
-    height: 42,
-    paddingHorizontal: 6,
-    borderRadius: 10,
+  setTabs: { flexDirection: 'row', gap: 8, marginBottom: 10 },
+  setTab: {
+    flex: 1,
+    height: 44,
+    borderRadius: 14,
     borderWidth: 1.5,
     borderColor: colors.border,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 1,
+  },
+  setTabText: { fontSize: 14, fontWeight: '900', color: colors.textSecondary },
+  setTabTextActive: { color: '#FFF' },
+  // Nastaliq needs a taller line box or the glyph clips.
+  urduTabText: { fontFamily: Fonts.urduBold, fontSize: 17, lineHeight: 30 },
+
+  glyphPanel: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: GLYPH_GAP,
+    padding: PANEL_PAD,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    marginBottom: 12,
+  },
+  glyphChip: {
+    width: GLYPH_SIZE,
+    height: GLYPH_SIZE,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   glyphChipText: { fontSize: 15, fontWeight: '900', color: colors.textSecondary },
-  // Nastaliq needs a taller line box or the glyph clips.
+  glyphChipTextActive: { color: '#FFF' },
   urduChipText: { fontFamily: Fonts.urduBold, fontSize: 16, lineHeight: 30 },
 
   hint: {

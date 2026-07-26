@@ -2,7 +2,7 @@
 export const duasData = [
   {
     title: 'Before Eating (کھانے سے پہلے)',
-    arabic: 'بِسْمِ اللَّهِ وَعَلَى بَرَكَةِ اللَّهِ',
+    arabic: 'بِسْمِ اللَّهِ وَعَلَى بَرَكَةِ اللَّهِ',
     transliteration: 'Bismillahi wa ala barakatillah',
     urdu: 'اللہ کے نام سے شروع اور اللہ کی برکت سے',
     english: 'In the name of Allah and with the blessings of Allah',
@@ -12,7 +12,7 @@ export const duasData = [
   },
   {
     title: 'After Eating (کھانے کے بعد)',
-    arabic: 'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا',
+    arabic: 'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا',
     transliteration: 'Alhamdulillahil lazi at amana wa saqana',
     urdu: 'سب تعریف اللہ کے لیے جس نے ہمیں کھلایا پلایا',
     english: 'All praise to Allah who gave us food and drink',
@@ -22,17 +22,17 @@ export const duasData = [
   },
   {
     title: 'Before Sleeping (سونے سے پہلے)',
-    arabic: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا',
-    transliteration: 'Bismika Allahumma amutu wa ahya',
+    arabic: 'اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا',
+    transliteration: 'Allahumma bismika amutu wa ahya',
     urdu: 'اے اللہ تیرے نام پر مرتا اور جیتا ہوں',
     english: 'In Your name O Allah I live and die',
     emoji: '😴',
     color: '#1565C0',
-    speak: 'Bismika Allahumma amutu wa ahya.',
+    speak: 'Allahumma bismika amutu wa ahya.',
   },
   {
     title: 'After Waking Up (جاگنے کے بعد)',
-    arabic: 'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا',
+    arabic: 'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا',
     transliteration: 'Alhamdu lillahil lazi ahyana baada ma amatana',
     urdu: 'اللہ کا شکر جس نے مارنے کے بعد ہمیں جلایا',
     english: 'Praise be to Allah who gave us life after death',
@@ -42,17 +42,17 @@ export const duasData = [
   },
   {
     title: 'For Knowledge (علم میں اضافے کی دعا)',
-    arabic: 'رَبِّ زِدْنِي عِلْمًا',
-    transliteration: 'Rabbi Zidni Ilma',
+    arabic: 'رَبِّ زِدْنِي عِلْمًا',
+    transliteration: 'Rabbi zidni ilma',
     urdu: 'اے میرے رب! میرے علم میں اضافہ فرما۔',
     english: 'O my Lord! Increase me in knowledge.',
     emoji: '📚',
     color: '#6A1B9A',
-    speak: 'Rabbi Zidni Ilma.',
+    speak: 'Rabbi zidni ilma.',
   },
   {
     title: 'For Parents (والدین کے لیے دعا)',
-    arabic: 'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',
+    arabic: 'رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',
     transliteration: 'Rabbir hamhuma kama rabbayani sagheera',
     urdu: 'اے میرے رب! ان دونوں پر رحم فرما جیسا کہ انہوں نے بچپن میں میری پرورش کی',
     english: 'O my Lord! Have mercy on them even as they nourished me in childhood.',
@@ -62,8 +62,8 @@ export const duasData = [
   },
   {
     title: 'Entering Home (گھر میں داخل ہونے کی دعا)',
-    arabic: 'بِسْمِ اللهِ وَلَجْنَا، وَبِسْمِ اللهِ خَرَجْنَا',
-    transliteration: 'Bismillahi walajna, wa bismillahi kharajna',
+    arabic: 'بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا',
+    transliteration: 'Bismillahi walajna wa bismillahi kharajna',
     urdu: 'اللہ کے نام سے ہم داخل ہوئے اور اللہ کے نام سے ہم نکلے',
     english: 'In the name of Allah we enter, and in the name of Allah we leave',
     emoji: '🏠',
@@ -72,7 +72,7 @@ export const duasData = [
   },
   {
     title: 'Dua for Traveling (سفر کی دعا)',
-    arabic: 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ',
+    arabic: 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ',
     transliteration: 'Subhanal lazi sakhara lana haza wa ma kunna lahu muqrineen',
     urdu: 'پاک ہے وہ ذات جس نے اس سواری کو ہمارے تابع کیا',
     english: 'Glory to Him who has brought this vehicle under our control',
@@ -82,7 +82,7 @@ export const duasData = [
   },
   {
     title: 'Before Entering Toilet (بیت الخلا میں داخل ہونے کی دعا)',
-    arabic: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ',
+    arabic: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ',
     transliteration: 'Allahumma inni auzu bika minal khubsi wal khabais',
     urdu: 'اے اللہ! میں ناپاک جنوں کی برائی سے تیری پناہ مانگتا ہوں',
     english: 'O Allah, I seek refuge in You from evil and impure beings',
@@ -102,27 +102,27 @@ export const duasData = [
   },
   {
     title: 'Before Studying (پڑھائی سے پہلے)',
-    arabic: 'رَبِّ زِدْنِي عِلْمًا نَافِعًا',
-    transliteration: 'Rabbi zidni ilman nafian',
+    arabic: 'رَبِّ زِدْنِي عِلْمًا نَافِعًا',
+    transliteration: 'Rabbi zidni ilman naafia',
     urdu: 'اے میرے رب! میرے علم میں نفع بخش اضافہ فرما',
     english: 'O my Lord! Increase me in beneficial knowledge',
     emoji: '✏️',
     color: '#5C6BC0',
-    speak: 'Rabbi zidni ilman nafian.',
+    speak: 'Rabbi zidni ilman naafia.',
   },
   {
     title: 'When It Rains (بارش کی دعا)',
-    arabic: 'اللَّهُمَّ صَيِّبًا نَافِعًا',
-    transliteration: 'Allahumma sayyiban nafian',
+    arabic: 'اللَّهُمَّ صَيِّبًا نَافِعًا',
+    transliteration: 'Allahumma sayyiban naafia',
     urdu: 'اے اللہ! یہ مفید بارش بنادے',
     english: 'O Allah, make it a beneficial rain',
     emoji: '🌧️',
     color: '#0288D1',
-    speak: 'Allahumma sayyiban nafian.',
+    speak: 'Allahumma sayyiban naafia.',
   },
   {
     title: 'When Sneezing (چھینک آنے پر)',
-    arabic: 'الْحَمْدُ لِلَّهِ',
+    arabic: 'الْحَمْدُ لِلَّهِ',
     transliteration: 'Alhamdulillah',
     urdu: 'تمام تعریفیں اللہ کے لیے ہیں',
     english: 'All praise is for Allah',
@@ -132,7 +132,11 @@ export const duasData = [
   },
   {
     title: 'Reply to Sneezing (چھینک کی جواب)',
-    arabic: 'يَرْحَمُكَ اللَّهُ',
+    arabic: 'يَرْحَمُكَ اللَّهُ',
+    // Spoken form: ٱ (alef wasla) tells the voice to elide across the
+    // word break — "yarhamukallah", not "yarhamuka Allah". Display keeps the
+    // plain alif, which is easier for a child to read.
+    arabicSpeak: 'يَرْحَمُكَ ٱللَّهُ',
     transliteration: 'Yarhamukallah',
     urdu: 'اللہ تم پر رحم فرمائے',
     english: 'May Allah have mercy on you',
@@ -142,7 +146,7 @@ export const duasData = [
   },
   {
     title: 'Entering Masjid (مسجد میں داخل ہونے کی دعا)',
-    arabic: 'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
+    arabic: 'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
     transliteration: 'Allahummaftah li abwaba rahmatik',
     urdu: 'اے اللہ! میرے لیے اپنی رحمت کے دروازے کھول دے',
     english: 'O Allah, open for me the doors of Your mercy',
@@ -152,7 +156,7 @@ export const duasData = [
   },
   {
     title: 'Leaving Masjid (مسجد سے نکلنے کی دعا)',
-    arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ',
+    arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ',
     transliteration: 'Allahumma inni asaluka min fadlik',
     urdu: 'اے اللہ! میں تیرے فضل کا سوال کرتا ہوں',
     english: 'O Allah, I ask You from Your bounty',
@@ -162,7 +166,7 @@ export const duasData = [
   },
   {
     title: 'When Looking in Mirror (آئینے میں دیکھنے کی دعا)',
-    arabic: 'اللَّهُمَّ كَمَا حَسَّنْتَ خَلْقِي فَحَسِّنْ خُلُقِي',
+    arabic: 'اللَّهُمَّ كَمَا حَسَّنْتَ خَلْقِي فَحَسِّنْ خُلُقِي',
     transliteration: 'Allahumma kama hassanta khalqi fahassin khuluqi',
     urdu: 'اے اللہ! جیسے تو نے میری صورت اچھی بنائی، میرے اخلاق بھی اچھے بنا دے',
     english: 'O Allah, as You made my appearance beautiful, make my character beautiful too',
@@ -172,7 +176,7 @@ export const duasData = [
   },
   {
     title: 'Protection from Evil Eye (نظر بد سے بچاؤ)',
-    arabic: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
+    arabic: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
     transliteration: 'Auzu bi kalimatillahit tammati min sharri ma khalaq',
     urdu: 'میں اللہ کے کامل کلمات کی پناہ مانگتا ہوں ہر مخلوق کے شر سے',
     english: 'I seek refuge in the perfect words of Allah from the evil of what He created',
@@ -182,7 +186,11 @@ export const duasData = [
   },
   {
     title: 'When Feeling Scared (ڈر لگنے پر)',
-    arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ',
+    arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ',
+    // Spoken form: ٱ (alef wasla) tells the voice to elide across the
+    // word break — "yarhamukallah", not "yarhamuka Allah". Display keeps the
+    // plain alif, which is easier for a child to read.
+    arabicSpeak: 'لَا إِلَٰهَ إِلَّا ٱللَّهُ',
     transliteration: 'La ilaha illallah',
     urdu: 'اللہ کے سوا کوئی معبود نہیں',
     english: 'There is no God but Allah',
@@ -192,7 +200,7 @@ export const duasData = [
   },
   {
     title: 'Before Drinking Milk (دودھ پینے سے پہلے)',
-    arabic: 'اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ',
+    arabic: 'اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ',
     transliteration: 'Allahumma barik lana fihi wa zidna minhu',
     urdu: 'اے اللہ! ہمارے لیے اس میں برکت دے اور ہمیں اور زیادہ عطا فرما',
     english: 'O Allah, bless it for us and give us more of it',
@@ -202,7 +210,7 @@ export const duasData = [
   },
   {
     title: 'Wearing New Clothes (نئے کپڑے پہننے کی دعا)',
-    arabic: 'الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي هَذَا',
+    arabic: 'الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي هَذَا',
     transliteration: 'Alhamdu lillahil lazi kasani haza',
     urdu: 'سب تعریف اللہ کے لیے جس نے مجھے یہ پہنایا',
     english: 'All praise to Allah who clothed me with this',
@@ -212,7 +220,7 @@ export const duasData = [
   },
   {
     title: 'Riding a Vehicle (سواری پر بیٹھنے کی دعا)',
-    arabic: 'بِسْمِ اللَّهِ وَالْحَمْدُ لِلَّهِ',
+    arabic: 'بِسْمِ اللَّهِ وَالْحَمْدُ لِلَّهِ',
     transliteration: 'Bismillahi walhamdulillah',
     urdu: 'اللہ کے نام سے اور سب تعریف اللہ کے لیے',
     english: 'In the name of Allah and all praise to Allah',
@@ -222,7 +230,11 @@ export const duasData = [
   },
   {
     title: 'For Good Manners (اچھے اخلاق کی دعا)',
-    arabic: 'اللَّهُمَّ اهْدِنِي لِأَحْسَنِ الْأَخْلَاقِ',
+    arabic: 'اللَّهُمَّ اهْدِنِي لِأَحْسَنِ الْأَخْلَاقِ',
+    // Spoken form: ٱ (alef wasla) tells the voice to elide across the
+    // word break — "yarhamukallah", not "yarhamuka Allah". Display keeps the
+    // plain alif, which is easier for a child to read.
+    arabicSpeak: 'اللَّهُمَّ ٱهْدِنِي لِأَحْسَنِ ٱلْأَخْلَاقِ',
     transliteration: 'Allahummahdini li ahsanil akhlaq',
     urdu: 'اے اللہ! مجھے بہترین اخلاق کی ہدایت دے',
     english: 'O Allah, guide me to the best of manners',
@@ -232,17 +244,17 @@ export const duasData = [
   },
   {
     title: 'When Starting Anything (کوئی کام شروع کرنے پر)',
-    arabic: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-    transliteration: 'Bismillahir Rahmanir Raheem',
+    arabic: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+    transliteration: 'Bismillahir Rahmaanir Raheem',
     urdu: 'اللہ کے نام سے جو بہت مہربان اور رحم والا ہے',
     english: 'In the name of Allah, the Most Gracious, the Most Merciful',
     emoji: '🤍',
     color: '#1B5E20',
-    speak: 'Bismillahir Rahmanir Raheem.',
+    speak: 'Bismillahir Rahmaanir Raheem.',
   },
   {
     title: 'For Health (صحت کی دعا)',
-    arabic: 'اللَّهُمَّ عَافِنِي فِي بَدَنِي',
+    arabic: 'اللَّهُمَّ عَافِنِي فِي بَدَنِي',
     transliteration: 'Allahumma afini fi badani',
     urdu: 'اے اللہ! میرے جسم کو صحت دے',
     english: 'O Allah, grant my body good health',
@@ -252,7 +264,7 @@ export const duasData = [
   },
   {
     title: 'Forgiveness Dua (معافی کی دعا)',
-    arabic: 'رَبَّنَا ظَلَمْنَا أَنْفُسَنَا',
+    arabic: 'رَبَّنَا ظَلَمْنَا أَنْفُسَنَا',
     transliteration: 'Rabbana zalamna anfusana',
     urdu: 'اے ہمارے رب! ہم نے اپنی جانوں پر ظلم کیا',
     english: 'Our Lord, we have wronged ourselves',
@@ -262,7 +274,7 @@ export const duasData = [
   },
   {
     title: 'For Goodness in Both Worlds (دونوں جہاں کی بھلائی)',
-    arabic: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً',
+    arabic: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً',
     transliteration: 'Rabbana atina fid dunya hasanatan wa fil akhirati hasanah',
     urdu: 'اے ہمارے رب! ہمیں دنیا میں بھی بھلائی دے اور آخرت میں بھی بھلائی دے',
     english: 'Our Lord, give us good in this world and good in the Hereafter',
@@ -272,7 +284,7 @@ export const duasData = [
   },
   {
     title: 'When Hearing Adhan Ends (اذان کے بعد کی دعا)',
-    arabic: 'اللَّهُمَّ رَبَّ هَٰذِهِ الدَّعْوَةِ التَّامَّةِ',
+    arabic: 'اللَّهُمَّ رَبَّ هَٰذِهِ الدَّعْوَةِ التَّامَّةِ',
     transliteration: 'Allahumma Rabba hazihid dawatit tammah',
     urdu: 'اے اللہ! اس کامل دعوت کے رب',
     english: 'O Allah, Lord of this perfect call',
@@ -282,7 +294,7 @@ export const duasData = [
   },
   {
     title: 'For Patience (صبر کی دعا)',
-    arabic: 'رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا',
+    arabic: 'رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا',
     transliteration: 'Rabbana afrigh alayna sabra',
     urdu: 'اے ہمارے رب! ہم پر صبر انڈیل دے',
     english: 'Our Lord, pour upon us patience',

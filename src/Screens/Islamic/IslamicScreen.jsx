@@ -146,7 +146,10 @@ const IslamicScreen = ({ navigation, route }) => {
                 meaningUr={dua.urdu}
                 meaningEn={dua.english}
                 speakArabic={{
-                  text: dua.arabic,
+                  // arabicSpeak, when present, is the same dua spelled with a
+                  // wasla so the voice elides across the word break. The card
+                  // still SHOWS dua.arabic.
+                  text: dua.arabicSpeak || dua.arabic,
                   language: 'ar-SA',
                   fallback: dua.speak || dua.transliteration,
                 }}

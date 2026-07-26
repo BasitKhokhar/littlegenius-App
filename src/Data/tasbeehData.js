@@ -32,7 +32,7 @@ const tasbeehData = [
   },
   {
     id: 'lailahaillallah',
-    arabic: 'لَا إِلٰهَ إِلَّا اللهُ',
+    arabic: 'لَا إِلٰهَ إِلَّا اللهُ',
     transliteration: 'La ilaha illallah',
     urdu: 'اللہ کے سوا کوئی معبود نہیں',
     english: 'There is no god but Allah',
@@ -50,7 +50,7 @@ const tasbeehData = [
   },
   {
     id: 'durood',
-    arabic: 'اَللّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ',
+    arabic: 'اَللّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ',
     transliteration: 'Allahumma Salli Ala Muhammad',
     urdu: 'اے اللہ! محمد ﷺ پر رحمت بھیج',
     english: 'O Allah, send blessings upon Muhammad ﷺ',

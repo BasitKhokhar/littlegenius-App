@@ -90,27 +90,61 @@ const xmlEscape = (s) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
-// A lone English letter must be READ AS A LETTER NAME, not as a word. Left bare,
-// Azure speaks "A" as the indefinite article (a flat schwa, "uh") and "I" as the
-// pronoun — so those two clips sounded nothing like the other 24 letter names.
-// <say-as interpret-as="characters"> forces the alphabet name ("ay", "eye").
-// Applies to any single A–Z clip (alphabet letters, single-letter quiz answers).
+// ── Single English letters ─────────────────────────────────────────────────
+// A lone letter is the hardest thing in the corpus to get right and the most
+// important — it is the first thing a child taps on the Alphabet screen.
+//
+// It must be read as the letter NAME ("ay"), not as a word: left bare, Azure can
+// speak "A" as the indefinite article (a flat schwa, "uh") and "I" as the
+// pronoun. <say-as interpret-as="characters"> was tried for this and measured to
+// be a NO-OP on these voices — bare and say-as renders came back the same length
+// for A/E/G/I/Z. So the letter name is stated outright in IPA instead, which
+// leaves Azure nothing to guess.
+//
+// The rate is baked in at -25% too. A letter is ~0.45s of a single diphthong, and
+// slowing THAT for a young learner has to happen at synthesis (the neural voice
+// really articulates the glide) — doing it at playback time-stretches half a
+// second of vowel into a warble. The app plays these at ~1x; see speechEngine.js.
+const LETTER_RATE = '-25%';
+
+// General American letter names.
+const LETTER_IPA = {
+  A: 'eɪ',  B: 'biː', C: 'siː', D: 'diː', E: 'iː',  F: 'ɛf',
+  G: 'dʒiː', H: 'eɪtʃ', I: 'aɪ', J: 'dʒeɪ', K: 'keɪ', L: 'ɛl',
+  M: 'ɛm',  N: 'ɛn',  O: 'oʊ',  P: 'piː', Q: 'kjuː', R: 'ɑɹ',
+  S: 'ɛs',  T: 'tiː', U: 'juː', V: 'viː', W: 'ˈdʌbəljuː',
+  X: 'ɛks', Y: 'waɪ', Z: 'ziː',
+};
+
 const isSingleEnglishLetter = (text, voice) =>
   voice.locale.startsWith('en') && /^[A-Za-z]$/.test(text.trim());
 
-const sayAs = (text, voice) =>
-  isSingleEnglishLetter(text, voice)
-    ? `<say-as interpret-as="characters">${xmlEscape(text.trim())}</say-as>`
-    : xmlEscape(text);
+// Azure occasionally returns a single-letter clip with ~0.9s of trailing silence
+// stapled on — the SAME request rendered 1.78s, 1.78s, then 0.98s on three
+// consecutive tries. A padded clip leaves dead air after the sound and delays the
+// button's finished state, so a letter render that busts this ceiling is retried
+// and the tightest take wins. CBR mp3 ⇒ bytes are proportional to duration, so
+// this needs no decoder. The longest legitimate letter is "double-you" (~1.1s).
+const LETTER_MAX_SECONDS = 1.3;
+const LETTER_TAKES = 5;
+const clipSeconds = (buf) => (buf.length * 8) / 48000;
 
 // Explicit neutral prosody on every clip. Azure's default already is rate/pitch
 // 0%, but stating it means a future voice swap can't quietly change the pace of
 // SOME clips and not others — every phrase in the app is spoken identically.
-const ssml = (text, voice) =>
-  `<speak version='1.0' xml:lang='${voice.locale}'>` +
-  `<voice name='${voice.name}'>` +
-  `<prosody rate="0%" pitch="0%">${sayAs(text, voice)}</prosody>` +
-  `</voice></speak>`;
+const ssml = (text, voice) => {
+  const letter = isSingleEnglishLetter(text, voice);
+  const ipa = letter ? LETTER_IPA[text.trim().toUpperCase()] : null;
+  const inner = ipa
+    ? `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(text.trim())}</phoneme>`
+    : xmlEscape(text);
+  return (
+    `<speak version='1.0' xml:lang='${voice.locale}'>` +
+    `<voice name='${voice.name}'>` +
+    `<prosody rate="${letter ? LETTER_RATE : '0%'}" pitch="0%">${inner}</prosody>` +
+    `</voice></speak>`
+  );
+};
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -136,7 +170,32 @@ async function loadPairs() {
 // 429 repeatedly, so retry with exponential backoff, honouring Retry-After when
 // Azure sends it. 5xx is retried too (transient); 4xx other than 429 is a real
 // error (bad SSML / bad voice name) and fails fast.
+//
+// Single letters get an extra pass on top: see LETTER_MAX_SECONDS — Azure pads
+// these tiny renders with trailing silence at random, so a busted clip is
+// re-requested and the shortest take is kept (padding only ever ADDS).
 async function synthesize(text, voice, key, region, attempt = 0) {
+  if (isSingleEnglishLetter(text, voice) && attempt === 0) {
+    let best = null;
+    for (let take = 0; take < LETTER_TAKES; take++) {
+      const buf = await synthesizeOnce(text, voice, key, region, 0);
+      if (!best || buf.length < best.length) best = buf;
+      if (clipSeconds(best) <= LETTER_MAX_SECONDS) break;
+      await sleep(600);
+    }
+    if (clipSeconds(best) > LETTER_MAX_SECONDS) {
+      // Say so rather than shipping dead air nobody notices until a child taps it.
+      process.stdout.write(
+        `\n  ⚠ letter "${text}" still ${clipSeconds(best).toFixed(2)}s after ` +
+        `${LETTER_TAKES} takes (padded) — re-run to re-roll it`
+      );
+    }
+    return best;
+  }
+  return synthesizeOnce(text, voice, key, region, attempt);
+}
+
+async function synthesizeOnce(text, voice, key, region, attempt = 0) {
   const MAX_ATTEMPTS = 6;
   let res;
   try {
@@ -154,7 +213,7 @@ async function synthesize(text, voice, key, region, attempt = 0) {
     // Network blip — treat like a 5xx.
     if (attempt >= MAX_ATTEMPTS) throw e;
     await sleep(2 ** attempt * 1000);
-    return synthesize(text, voice, key, region, attempt + 1);
+    return synthesizeOnce(text, voice, key, region, attempt + 1);
   }
 
   if (res.ok) return Buffer.from(await res.arrayBuffer());
@@ -165,7 +224,7 @@ async function synthesize(text, voice, key, region, attempt = 0) {
     const waitMs = Number.isFinite(hinted) ? hinted * 1000 : 2 ** attempt * 1000;
     if (res.status === 429) process.stdout.write(`\n  ⏳ rate-limited, waiting ${Math.round(waitMs / 1000)}s…`);
     await sleep(waitMs);
-    return synthesize(text, voice, key, region, attempt + 1);
+    return synthesizeOnce(text, voice, key, region, attempt + 1);
   }
 
   // NOTE: never include `key` in this message.

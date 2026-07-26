@@ -93,14 +93,19 @@ const AlphabetScreen = ({ navigation, route }) => {
 
             <View style={styles.heroActions}>
               <View style={styles.heroAction}>
+                {/* The letter clip is baked already slowed and enunciated
+                    (generateAudio.mjs LETTER_RATE), so it plays essentially as
+                    recorded — stretching half a second of "ay" any further
+                    distorts it. The floor keeps that true at any global speed. */}
                 <SpeakButton
                   text={upper}
                   language="en-US"
                   color="rgba(0,0,0,0.22)"
                   label={`🔊 Hear "${upper}"`}
                   size="sm"
-                  clipRate={0.8}
-                  rate={0.8}
+                  clipRate={1}
+                  minClipRate={0.85}
+                  rate={0.85}
                 />
               </View>
               <TouchableOpacity
@@ -229,7 +234,7 @@ const makeStyles = (colors, s) => StyleSheet.create({
     paddingVertical: 16,
     // rowGap only — horizontal spacing lives in columnWrapper because
     // AlphabetCard's CARD_SIZE is derived from it.
-    rowGap: 6,
+    rowGap: 12,
   },
   // No justifyContent: the cards + COLUMN_GAP fill the row exactly, so any
   // distribution rule would only add phantom spacing.
@@ -365,7 +370,7 @@ const makeStyles = (colors, s) => StyleSheet.create({
   // stretching them into columns; spare height becomes row spacing.
   wordsRow: {
     flex: 1,
-    maxHeight: 150,
+    maxHeight: 180,
     flexDirection: 'row',
     gap: 10,
   },

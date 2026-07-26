@@ -22,8 +22,12 @@ const SpeakButton = ({
   // Slow the delivery for single letters / vocabulary words so young learners
   // can copy the pronunciation. clipRate applies to the pre-baked teacher clip;
   // rate slows the device-TTS fallback to match. Omit for normal speed.
+  // minClipRate floors how far the clip may be slowed once the grown-up's global
+  // speed is applied — set it for very short clips (a single letter) whose one
+  // diphthong distorts when time-stretched. See speechEngine.js.
   clipRate = null,
   rate = null,
+  minClipRate = null,
   color = Colors.primary,
   size = 'md',
   label = '🔊 Listen',
@@ -107,6 +111,7 @@ const SpeakButton = ({
           fallbackLang: step.fallbackLang ?? fallbackLang,
           clipRate: step.clipRate ?? clipRate,
           rate: step.rate ?? rate,
+          minClipRate: step.minClipRate ?? minClipRate,
           onDone: () => speakAt(i + 1),
           onError: () => speakAt(i + 1),
         });
@@ -125,6 +130,7 @@ const SpeakButton = ({
       fallbackLang,
       clipRate,
       rate,
+      minClipRate,
       onDone: finish,
       onError: finish,
     });

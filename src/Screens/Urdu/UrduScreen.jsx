@@ -148,7 +148,7 @@ const UrduScreen = ({ navigation, route }) => {
         </View>
 
         {/* Move between letters without going back to the grid */}
-        <View style={[styles.navBar, { paddingBottom: bottomPad }]}>
+        <View style={[styles.navBar, { paddingBottom: 10 }]}>
           <TouchableOpacity
             style={styles.navBtn}
             onPress={() => goToLetter(prevIdx)}
@@ -425,18 +425,19 @@ const makeStyles = (colors, s) => StyleSheet.create({
   // stretching them into columns; spare height becomes row spacing.
   wordsRow: {
     flex: 1,
-    maxHeight: 150,
+    maxHeight: 175,
     flexDirection: 'row',
     gap: 10,
   },
   wordTile: {
     flex: 1,
   },
-  // Nastaliq inside the tile: bigger than the Latin word style and with the
-  // headroom the script needs, or the descenders get cut off.
+  // Nastaliq inside the tile: bigger than the Latin word style and with ~1.6x
+  // headroom the script needs, or the descenders get cut off. Kept lean so the
+  // tile's speak pill still fits above the card's bottom padding.
   tileWord: {
-    fontSize: 16,
-    lineHeight: 28,
+    fontSize: 15,
+    lineHeight: 24,
     fontFamily: Fonts.urduBold,
   },
 

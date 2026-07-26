@@ -65,8 +65,11 @@ export function collectPairs() {
 
   // Duas / Kalmas — IslamicCard now carries TWO speakers per card: the Arabic
   // panel (ar) and the Urdu translation block (ur). IslamicScreen.jsx duas/kalmas tabs.
+  // A few duas carry `arabicSpeak`: the same text spelled with a wasla (ٱ) so
+  // the voice elides across the word break ("yarhamukallah", not "yarhamuka
+  // Allah"). The card displays `arabic` but speaks this — mirror that here.
   for (const d of pick(duasMod, 'duasData') || []) {
-    add('ar-SA', d.arabic, 'duas');
+    add('ar-SA', d.arabicSpeak || d.arabic, 'duas');
     add('ur-PK', d.urdu, 'duas');
   }
   for (const k of pick(kalmasMod, 'kalmasData') || []) {
