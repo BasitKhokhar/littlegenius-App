@@ -27,6 +27,12 @@ const SpeakButton = ({
   color = Colors.primary,
   size = 'md',
   label = '🔊 Listen',
+  // 'solid' → the full-width labelled pill. 'icon' → a compact round speaker
+  // button meant to sit INSIDE a block (next to the Arabic panel or the Urdu
+  // translation) so each script gets its own play control instead of one
+  // button at the bottom of the card.
+  variant = 'solid',
+  accessibilityLabel = null,
   onSpeakStart = null,
   onSpeakEnd = null,
 }) => {
@@ -132,6 +138,41 @@ const SpeakButton = ({
 
   const config = sizeConfig[size] || sizeConfig.md;
 
+  // Compact round speaker — big enough for a 4-year-old's fingertip even at
+  // 'sm', because these sit inline beside a block of text.
+  if (variant === 'icon') {
+    const diameter = { sm: 38, md: 44, lg: 52 }[size] || 44;
+    return (
+      <TouchableOpacity
+        onPress={handleSpeak}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel || 'Play audio'}
+        style={[
+          styles.iconButton,
+          coloredShadow(color, 'sm'),
+          {
+            backgroundColor: color,
+            width: diameter,
+            height: diameter,
+            borderRadius: diameter / 2,
+            opacity: isSpeaking ? 0.85 : 1,
+          },
+        ]}
+        activeOpacity={0.8}
+      >
+        {isSpeaking ? (
+          <View style={styles.speakingContainer}>
+            <View style={styles.waveBar} />
+            <View style={styles.waveBar} />
+            <View style={styles.waveBar} />
+          </View>
+        ) : (
+          <Text style={[styles.iconGlyph, { fontSize: diameter * 0.42 }]}>🔊</Text>
+        )}
+      </TouchableOpacity>
+    );
+  }
+
   return (
     <TouchableOpacity
       onPress={handleSpeak}
@@ -178,6 +219,12 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     textAlign: 'center',
   },
+  iconButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // lineHeight must be a number — a string clips the emoji on Fabric.
+  iconGlyph: { lineHeight: 26, textAlign: 'center' },
   speakingContainer: {
     flexDirection: 'row',
     alignItems: 'center',

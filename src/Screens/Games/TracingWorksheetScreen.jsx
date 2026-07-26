@@ -7,17 +7,21 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Path, Circle, Text as SvgText } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { Header } from '../../Components/UI';
-import { useThemeColors } from '../../Context/ThemeContext';
+import { useTheme } from '../../Context/ThemeContext';
+import { getGameTheme } from '../../Theme/gameThemes';
 import { useTabBarClearance } from '../../Hooks';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
-import { DrawCanvas, MarksBadge } from '../../Components/Games';
+import { DrawCanvas, MarksBadge, GameStage, Mascot } from '../../Components/Games';
 import traceSkeletons, { TRACE_LETTERS, TRACE_NUMBERS } from '../../Data/traceSkeletons';
-import { densifySkeleton, skeletonToPath, scoreTrace } from '../../Utils/traceScoring';
+import { densifySkeleton, skeletonToPath, scoreTrace, scoreFreeform } from '../../Utils/traceScoring';
+import { alphabetData } from '../../Data/alphabetData';
+import { urduData } from '../../Data/urduData';
+import { Fonts } from '../../Theme/fonts';
 
 // ──────────────────────────────────────────────────────────────
 // TracingWorksheetScreen — school-copybook writing practice.
@@ -32,17 +36,34 @@ const CELL = Math.floor((SCREEN_W - 16 * 2 - 12) / 2); // 2-column grid
 const CELL_PAD = Math.round(CELL * 0.12);
 const GUIDE_OPACITY = [0.9, 0.55, 0.35, 0.18]; // progressive fading
 
+const TRACE_URDU = urduData.map((h) => h.letter);
+
 const SETS = [
   { key: 'abc', label: 'ABC', glyphs: TRACE_LETTERS },
   { key: '123', label: '123', glyphs: TRACE_NUMBERS },
+  // Urdu haroof have no hand-authored skeleton — they trace over a Nastaliq
+  // ghost glyph and are graded with the freeform (placement/effort) scorer.
+  { key: 'urdu', label: 'اردو', glyphs: TRACE_URDU, urdu: true },
 ];
 
 const ACCENTS = ['#6366F1', '#0EA5E9', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6'];
 
+// A picture that actually belongs to the glyph being written — A → 🍎,
+// 7 → 🌈, ا → 🍎 (انار) — instead of one fixed mascot for every letter.
+const NUMBER_EMOJI = ['🥚', '☝️', '✌️', '🌳', '🍀', '🖐️', '🎲', '🌈', '🐙', '🎈'];
+
+const glyphEmoji = (setKey, glyph) => {
+  if (setKey === '123') return NUMBER_EMOJI[Number(glyph)] || '🔢';
+  const source = setKey === 'urdu' ? urduData : alphabetData;
+  const entry = source.find((e) => e.letter === glyph);
+  return entry?.vocabulary?.[0]?.emoji || '✏️';
+};
+
 const emptyCells = () => Array.from({ length: ATTEMPTS }, () => null); // null | { marks, paths }
 
 const TracingWorksheetScreen = ({ navigation }) => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useTheme();
+  const gt = getGameTheme(7, isDark); // violet stage
   const bottomPad = useTabBarClearance();
   const { addStars } = useAuth();
   const styles = makeStyles(colors);
@@ -60,6 +81,10 @@ const TracingWorksheetScreen = ({ navigation }) => {
   const glyph = set.glyphs[glyphIdx];
   const accent = ACCENTS[glyphIdx % ACCENTS.length];
   const skeleton = traceSkeletons[glyph] || [];
+  const hasSkeleton = skeleton.length > 0;
+  const isUrdu = !!set.urdu;
+  const glyphFont = isUrdu ? Fonts.urduBold : undefined;
+  const picture = glyphEmoji(set.key, glyph);
 
   const guidePts = useMemo(() => densifySkeleton(skeleton, CELL, CELL_PAD), [skeleton]);
   const guidePaths = useMemo(() => skeleton.map((line) => skeletonToPath(line, CELL, CELL_PAD)), [skeleton]);
@@ -83,7 +108,9 @@ const TracingWorksheetScreen = ({ navigation }) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
       return;
     }
-    const { marks } = scoreTrace(guidePts, strokes, CELL);
+    const { marks } = hasSkeleton
+      ? scoreTrace(guidePts, strokes, CELL)
+      : scoreFreeform(strokes, CELL);
     Haptics.notificationAsync(
       marks >= 5 ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
     ).catch(() => {});
@@ -154,7 +181,38 @@ const TracingWorksheetScreen = ({ navigation }) => {
 
   const nextGlyph = () => resetRow((glyphIdx + 1) % set.glyphs.length);
 
-  const renderGuide = (opacity) => (
+  const renderGuide = (opacity) => {
+    // Urdu haroof: a faint Nastaliq ghost + dotted outline of the same glyph,
+    // matching the guide the Sketch practice sheet uses.
+    if (!hasSkeleton) {
+      const common = {
+        x: CELL / 2,
+        y: CELL * 0.74,
+        fontSize: CELL * 0.58,
+        fontWeight: '900',
+        fontFamily: glyphFont,
+        textAnchor: 'middle',
+      };
+      return (
+        <>
+          <SvgText {...common} fill={accent} opacity={opacity * 0.18}>
+            {glyph}
+          </SvgText>
+          <SvgText
+            {...common}
+            fill="none"
+            stroke={accent}
+            strokeWidth={3}
+            strokeLinecap="round"
+            strokeDasharray="1,12"
+            opacity={opacity}
+          >
+            {glyph}
+          </SvgText>
+        </>
+      );
+    }
+    return (
     <>
       {guidePaths.map((d, i) => (
         <Path
@@ -180,15 +238,22 @@ const TracingWorksheetScreen = ({ navigation }) => {
         />
       ) : null}
     </>
-  );
+    );
+  };
 
   const retryPending = cells[activeIdx]?.pendingRetry && !rowDone;
 
   return (
-    <View style={styles.container}>
-      <Header title="Tracing Worksheet ✍️" showBack onBackPress={() => navigation.goBack()} />
+    <GameStage theme={gt}>
+      <Header title="Tracing Worksheet ✍️" showBack variant="transparent" onBackPress={() => navigation.goBack()} />
 
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
+        {/* The picture belongs to the glyph on the sheet, so it changes with
+            every letter/number/haroof instead of being one fixed mascot. */}
+            <View style={{marginVertical: 6}}>
+  <Mascot key={`${setKey}-${glyph}`} emoji={picture} size={58} glow={gt.deco} style={styles.mascot} />
+            </View>
+      
         {/* Set picker + glyph strip */}
         <View style={styles.pickerRow}>
           {SETS.map((s) => (
@@ -198,10 +263,23 @@ const TracingWorksheetScreen = ({ navigation }) => {
               onPress={() => resetRow(0, s.key)}
               activeOpacity={0.85}
             >
-              <Text style={[styles.setChipText, setKey === s.key && { color: '#FFF' }]}>{s.label}</Text>
+              <Text
+                style={[
+                  styles.setChipText,
+                  s.urdu && styles.urduChipText,
+                  setKey === s.key && { color: '#FFF' },
+                ]}
+              >
+                {s.label}
+              </Text>
             </TouchableOpacity>
           ))}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.glyphStrip}>
+          <ScrollView
+            horizontal
+            style={styles.glyphStripScroll}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.glyphStrip}
+          >
             {set.glyphs.map((g, i) => (
               <TouchableOpacity
                 key={g}
@@ -209,14 +287,23 @@ const TracingWorksheetScreen = ({ navigation }) => {
                 onPress={() => resetRow(i)}
                 activeOpacity={0.85}
               >
-                <Text style={[styles.glyphChipText, i === glyphIdx && { color: accent }]}>{g}</Text>
+                <Text
+                  style={[
+                    styles.glyphChipText,
+                    isUrdu && styles.urduChipText,
+                    i === glyphIdx && { color: accent },
+                  ]}
+                >
+                  {g}
+                </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
         <Text style={styles.hint}>
-          Write “{glyph}” in every box — follow the dots! Each box is marked out of 10. 📝
+          Write “<Text style={glyphFont && { fontFamily: glyphFont }}>{glyph}</Text>” in every box — follow the
+          {hasSkeleton ? ' dots' : ' shape'}! Each box is marked out of 10. 📝
         </Text>
 
         {/* Copybook grid */}
@@ -278,7 +365,9 @@ const TracingWorksheetScreen = ({ navigation }) => {
             <Text style={styles.resultStars}>+{starsAwarded} ⭐ earned!</Text>
             <View style={styles.resultBtns}>
               <TouchableOpacity style={styles.secondaryBtn} onPress={() => resetRow()} activeOpacity={0.85}>
-                <Text style={styles.secondaryBtnText}>Practice “{glyph}” again 🔁</Text>
+                <Text style={styles.secondaryBtnText}>
+                  Practice “<Text style={glyphFont && { fontFamily: glyphFont }}>{glyph}</Text>” again 🔁
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: accent }]} onPress={nextGlyph} activeOpacity={0.85}>
                 <Text style={styles.primaryBtnText}>Next letter →</Text>
@@ -309,13 +398,13 @@ const TracingWorksheetScreen = ({ navigation }) => {
           </View>
         )}
       </ScrollView>
-    </View>
+    </GameStage>
   );
 };
 
 const makeStyles = (colors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg },
   content: { paddingHorizontal: 16, paddingTop: 12 },
+  mascot: { alignSelf: 'center', marginBottom: 6 },
 
   pickerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
   setChip: {
@@ -327,10 +416,12 @@ const makeStyles = (colors) => StyleSheet.create({
     backgroundColor: colors.surface,
   },
   setChipText: { fontSize: 13, fontWeight: '900', color: colors.textSecondary },
+  glyphStripScroll: { flex: 1 },
   glyphStrip: { gap: 6, alignItems: 'center', paddingRight: 8 },
   glyphChip: {
-    width: 34,
-    height: 34,
+    minWidth: 38,
+    height: 42,
+    paddingHorizontal: 6,
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: colors.border,
@@ -339,8 +430,19 @@ const makeStyles = (colors) => StyleSheet.create({
     justifyContent: 'center',
   },
   glyphChipText: { fontSize: 15, fontWeight: '900', color: colors.textSecondary },
+  // Nastaliq needs a taller line box or the glyph clips.
+  urduChipText: { fontFamily: Fonts.urduBold, fontSize: 16, lineHeight: 30 },
 
-  hint: { fontSize: 12, fontWeight: '700', color: colors.textSecondary, marginBottom: 12, lineHeight: 17 },
+  hint: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 12,
+    lineHeight: 17,
+    textShadowColor: 'rgba(0,0,0,0.18)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
 
   grid: {
     flexDirection: 'row',

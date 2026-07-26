@@ -54,6 +54,24 @@ const Button = ({
     gradient: { bg: 'transparent', fg: '#FFFFFF', border: 'transparent' },
   }[variant] || { bg: colors.primary, fg: colors.onPrimary, border: 'transparent' };
 
+  // The animated wrapper — not the Pressable — is the real child of the
+  // caller's layout, so layout props from `style` (flex, alignSelf, width,
+  // margins) have to be hoisted onto it or they are silently ignored.
+  const {
+    flex, flexGrow, flexShrink, flexBasis, alignSelf,
+    width, minWidth, maxWidth,
+    margin, marginTop, marginBottom, marginLeft, marginRight,
+    marginHorizontal, marginVertical,
+    ...innerStyle
+  } = StyleSheet.flatten(style) || {};
+
+  const outerStyle = {
+    flex, flexGrow, flexShrink, flexBasis, alignSelf,
+    width, minWidth, maxWidth,
+    margin, marginTop, marginBottom, marginLeft, marginRight,
+    marginHorizontal, marginVertical,
+  };
+
   const containerStyle = [
     styles.base,
     {
@@ -68,7 +86,9 @@ const Button = ({
     fullWidth && styles.fullWidth,
     (variant === 'primary' || variant === 'danger') && coloredShadow(v.bg, 'sm'),
     isDisabled && styles.disabled,
-    style,
+    innerStyle,
+    // A flexed button must still fill the wrapper it was stretched to.
+    flex !== undefined && styles.fullWidth,
   ];
 
   const label = (
@@ -81,7 +101,7 @@ const Button = ({
   const content = loading ? <ActivityIndicator color={v.fg} size="small" /> : label;
 
   return (
-    <Animated.View style={[fullWidth && styles.fullWidth, { transform: [{ scale }] }]}>
+    <Animated.View style={[fullWidth && styles.fullWidth, outerStyle, { transform: [{ scale }] }]}>
       <Pressable
         onPress={onPress}
         onPressIn={pressIn}
@@ -90,7 +110,7 @@ const Button = ({
         accessibilityRole="button"
         accessibilityState={{ disabled: isDisabled, busy: loading }}
         hitSlop={Layout.hitSlop}
-        style={variant === 'gradient' ? (fullWidth && styles.fullWidth) : containerStyle}
+        style={variant === 'gradient' ? [(fullWidth || flex !== undefined) && styles.fullWidth] : containerStyle}
         {...rest}
       >
         {variant === 'gradient' ? (

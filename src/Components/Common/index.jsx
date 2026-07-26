@@ -8,6 +8,7 @@ export { default as BrandSplash } from './BrandSplash';
 // Design-system primitives
 export { default as Screen } from './Screen';
 export { default as Card, GradientCard } from './Card';
+export { default as TopicCard } from './TopicCard';
 export { default as SectionHeader } from './SectionHeader';
 export { default as Badge } from './Badge';
 export { default as IconButton } from './IconButton';

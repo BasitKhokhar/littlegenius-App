@@ -17,6 +17,9 @@ import * as namesAllahMod from '../src/Data/namesOfAllahData.js';
 import * as namesMuhammadMod from '../src/Data/namesOfMuhammadData.js';
 import * as prophetsMod from '../src/Data/prophetsData.js';
 import * as mannersMod from '../src/Data/mannersData.js';
+import * as pillarsMod from '../src/Data/pillarsData.js';
+import * as wuduSalahMod from '../src/Data/wuduSalahData.js';
+import * as tasbeehMod from '../src/Data/tasbeehData.js';
 import * as namazMod from '../src/Data/namazGuideData.js';
 import * as juzAmmaMod from '../src/Data/juzAmmaData.js';
 import * as pakistanMod from '../src/Data/pakistanData.js';
@@ -60,18 +63,60 @@ export function collectPairs() {
   // (romanized name is only the no-voice-pack fallbackText.) UrduScreen.jsx.
   for (const l of pick(urduMod, 'urduData') || []) add('ur-PK', l.letter, 'urduLetters');
 
-  // Duas / Kalmas — IslamicScreen speaks the Arabic. IslamicScreen.jsx:61,112
-  for (const d of pick(duasMod, 'duasData') || []) add('ar-SA', d.arabic, 'duas');
-  for (const k of pick(kalmasMod, 'kalmasData') || []) add('ar-SA', k.arabic, 'kalmas');
+  // Duas / Kalmas — IslamicCard now carries TWO speakers per card: the Arabic
+  // panel (ar) and the Urdu translation block (ur). IslamicScreen.jsx duas/kalmas tabs.
+  for (const d of pick(duasMod, 'duasData') || []) {
+    add('ar-SA', d.arabic, 'duas');
+    add('ur-PK', d.urdu, 'duas');
+  }
+  for (const k of pick(kalmasMod, 'kalmasData') || []) {
+    add('ar-SA', k.arabic, 'kalmas');
+    add('ur-PK', k.urdu, 'kalmas');
+  }
 
-  // 99 Names / Names of Muhammad — spoken as the Arabic name (ar), so the child
-  // hears correct Arabic pronunciation. IslamicScreen.jsx:148,165
-  for (const n of pick(namesAllahMod, 'namesOfAllahData') || []) add('ar-SA', n.arabic, 'namesAllah');
-  for (const n of pick(namesMuhammadMod, 'namesOfMuhammadData') || []) add('ar-SA', n.arabic, 'namesMuhammad');
+  // 99 Names / Names of Muhammad — Arabic name (ar) on the scripture panel,
+  // Urdu meaning (ur) on the translation block. IslamicScreen.jsx names tabs.
+  for (const n of pick(namesAllahMod, 'namesOfAllahData') || []) {
+    add('ar-SA', n.arabic, 'namesAllah');
+    add('ur-PK', n.urdu, 'namesAllah');
+  }
+  for (const n of pick(namesMuhammadMod, 'namesOfMuhammadData') || []) {
+    add('ar-SA', n.arabic, 'namesMuhammad');
+    add('ur-PK', n.urdu, 'namesMuhammad');
+  }
 
-  // Prophets / Manners — spoken via `speak` (en). IslamicScreen.jsx:183,199
-  for (const p of pick(prophetsMod, 'prophetsData') || []) add('en-US', p.speak, 'prophets');
-  for (const m of pick(mannersMod, 'mannersData') || []) add('en-US', m.speak, 'manners');
+  // Five Pillars — English detail on the foot pill, Urdu detail on the Urdu
+  // block. IslamicScreen.jsx pillars tab.
+  for (const p of pick(pillarsMod, 'pillarsData') || []) {
+    add('en-US', p.detailedDesc, 'pillars');
+    add('ur-PK', p.urduDetail, 'pillars');
+  }
+
+  // Prophets / Manners — English `speak` on the foot pill, Urdu story/tip on
+  // the Urdu block. IslamicScreen.jsx prophets/manners tabs.
+  for (const p of pick(prophetsMod, 'prophetsData') || []) {
+    add('en-US', p.speak, 'prophets');
+    add('ur-PK', p.urduStory, 'prophets');
+  }
+  for (const m of pick(mannersMod, 'mannersData') || []) {
+    add('en-US', m.speak, 'manners');
+    add('ur-PK', m.urduTip, 'manners');
+  }
+
+  // Tasbeeh dhikr — the counter card speaks the Arabic dhikr (ar) and its Urdu
+  // meaning (ur). TasbeehScreen.jsx dhikr card.
+  for (const d of pick(tasbeehMod, 'tasbeehData') || []) {
+    add('ar-SA', d.arabic, 'tasbeeh');
+    add('ur-PK', d.urdu, 'tasbeeh');
+  }
+
+  // Wudu & Salah steps — the card speaks step.detail (en) and step.urduDetail
+  // (ur). IslamicScreen.jsx salah tab.
+  for (const list of ['wuduSteps', 'salahSteps'])
+    for (const s of wuduSalahMod[list] || []) {
+      add('en-US', s.detail, 'wuduSalah');
+      add('ur-PK', s.urduDetail, 'wuduSalah');
+    }
 
   // Namaz guide — Arabic recitation (ar) + Urdu instruction (ur). NamazGuideScreen.jsx:82,91
   for (const s of pick(namazMod, 'namazGuideData') || []) {

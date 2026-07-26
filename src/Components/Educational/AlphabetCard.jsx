@@ -4,7 +4,10 @@ import { Colors } from '../../Data/colorsTheme';
 import { Radius, Spacing, textStyles, coloredShadow, Motion } from '../../Theme';
 
 const { width } = Dimensions.get('window');
-const CARD_SIZE = (width - 12 * 3 - 32) / 2;
+// Single source of truth for the 2-up grid: the screen imports COLUMN_GAP so
+// the card width and the row gap can't drift apart. 32 = screen padding (16×2).
+export const COLUMN_GAP = 8;
+const CARD_SIZE = (width - 32 - COLUMN_GAP) / 2;
 
 const AlphabetCard = ({
   letter = 'A',
@@ -92,7 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   emoji: {
-    fontSize: 50,
+    fontSize: 60,
     marginVertical: 4,
     alignSelf: 'center',
   },

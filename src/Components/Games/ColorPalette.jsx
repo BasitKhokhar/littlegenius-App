@@ -13,6 +13,7 @@ import { View, TouchableOpacity, Text, StyleSheet, ScrollView } from 'react-nati
 //   widths        optional array of stroke widths to pick from
 //   width         current stroke width
 //   onWidthChange(w)
+//   size          explicit swatch diameter, overrides large/compact
 // ──────────────────────────────────────────────────────────────
 
 export const ERASER = '__eraser__';
@@ -31,9 +32,10 @@ const ColorPalette = ({
   // `compact` shrinks the circles so a fuller palette still fits neatly.
   wrap = false,
   compact = false,
+  size,
 }) => {
   // Bigger swatches on the coloring book — easier for little fingers to hit.
-  const dim = compact ? 34 : large ? 48 : 36;
+  const dim = size || (compact ? 34 : large ? 48 : 36);
   const sizeStyle = { width: dim, height: dim, borderRadius: dim / 2 };
 
   const items = (
@@ -45,7 +47,9 @@ const ColorPalette = ({
           onPress={() => onChange(c)}
           activeOpacity={0.85}
         >
-          {value === c ? <Text style={[styles.check, large && styles.checkLarge]}>✓</Text> : null}
+          {value === c ? (
+            <Text style={[styles.check, large && styles.checkLarge, dim <= 30 && styles.checkSmall]}>✓</Text>
+          ) : null}
         </TouchableOpacity>
       ))}
       {eraser ? (
@@ -54,7 +58,7 @@ const ColorPalette = ({
           onPress={() => onChange(ERASER)}
           activeOpacity={0.85}
         >
-          <Text style={[styles.eraserIcon, large && { fontSize: 22 }]}>🧽</Text>
+          <Text style={[styles.eraserIcon, large && { fontSize: 22 }, dim <= 30 && { fontSize: 13 }]}>🧽</Text>
         </TouchableOpacity>
       ) : null}
     </>
@@ -65,7 +69,11 @@ const ColorPalette = ({
     {wrap ? (
       <View style={styles.wrapRow}>{items}</View>
     ) : (
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.row, large && styles.rowLarge]}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[styles.row, large && styles.rowLarge, dim <= 30 && styles.rowTight]}
+      >
         {items}
       </ScrollView>
     )}
@@ -99,6 +107,7 @@ const styles = StyleSheet.create({
   container: { width: '100%' },
   row: { gap: 10, paddingVertical: 8, paddingHorizontal: 4, alignItems: 'center' },
   rowLarge: { gap: 14, paddingVertical: 6 },
+  rowTight: { gap: 8, paddingVertical: 4, paddingHorizontal: 6 },
   wrapRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -118,6 +127,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   checkLarge: { fontSize: 20 },
+  checkSmall: { fontSize: 12 },
   swatch: {
     width: 36,
     height: 36,

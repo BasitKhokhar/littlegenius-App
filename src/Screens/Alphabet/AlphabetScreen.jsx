@@ -1,91 +1,174 @@
-﻿import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
-  ScrollView,
   FlatList,
   TouchableOpacity,
   Text,
   StyleSheet,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { alphabetData } from '../../Data/alphabetData';
 import { Header } from '../../Components/UI';
-import AlphabetCard from '../../Components/Educational/AlphabetCard';
-import VocabularyCard from '../../Components/Educational/VocabularyCard';
-import { SketchButton, SketchCanvas } from '../../Components/Educational';
+import AlphabetCard, { COLUMN_GAP } from '../../Components/Educational/AlphabetCard';
+import { VocabularyTile, SketchCanvas } from '../../Components/Educational';
 import SpeakButton from '../../Components/Common/SpeakButton';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
-
-const { width } = Dimensions.get('window');
+import SpeechEngine from '../../Utils/speechEngine';
+import { useTabBarClearance } from '../../Hooks';
 
 const AlphabetScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
-  const styles = makeStyles(colors);
+  // Tight clearance so the Prev/Next bar hugs the bottom edge. This route is
+  // pushed inside HomeStack (tab bar hidden), so the hook returns just the
+  // safe-area inset plus this extra.
+  const bottomPad = useTabBarClearance(6);
+  const { height: winHeight } = useWindowDimensions();
+  // Everything in the detail view is laid out with flex so it always fits the
+  // viewport; this factor only keeps the type/emoji proportional on very short
+  // or very tall devices.
+  const scale = Math.min(1.1, Math.max(0.8, winHeight / 800));
+  const styles = makeStyles(colors, scale);
   const [selectedLetter, setSelectedLetter] = useState(null);
   const [sketchOpen, setSketchOpen] = useState(false);
   const letter = selectedLetter !== null ? alphabetData[selectedLetter] : null;
 
+  // Silence any clip when moving to another letter or leaving the detail view.
+  useEffect(() => {
+    return () => {
+      SpeechEngine.stop();
+    };
+  }, [selectedLetter]);
+
   // ─── Detail view ──────────────────────────────────────────
   if (selectedLetter !== null && letter) {
+    const total = alphabetData.length;
+    const upper = letter.letter;
+    const lower = letter.letter.toLowerCase();
+    const hero = letter.vocabulary[0];
+    // 3 tiles per row — 6 words fill two rows exactly.
+    const wordRows = [letter.vocabulary.slice(0, 3), letter.vocabulary.slice(3, 6)];
+    // Wrap around at both ends so no button is ever dead: Z → A, A → Z.
+    const prevIdx = (selectedLetter - 1 + total) % total;
+    const nextIdx = (selectedLetter + 1) % total;
+
+    const goToLetter = (idx) => {
+      SpeechEngine.stop();
+      setSelectedLetter(idx);
+    };
+
     return (
       <View style={styles.container}>
         <Header
-          title={`Letter ${letter.letter}`}
+          title={`Letter ${upper}`}
           showBack={true}
           onBackPress={() => setSelectedLetter(null)}
         />
-        <ScrollView
-          contentContainerStyle={styles.detailContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Hero letter card */}
-          <View style={[styles.letterHeroCard, { backgroundColor: letter.color }]}>
-            <View style={styles.letterHeroDecor} />
-            <Text style={styles.letterHeroBig}>{letter.letter}</Text>
-            <Text style={styles.letterHeroSmall}>{letter.letter.toLowerCase()}</Text>
-            <View style={styles.letterHeroSpeak}>
-              <SpeakButton
-                text={letter.letter}
-                language="en-US"
-                color="rgba(0,0,0,0.25)"
-                label={`🔊 Hear "${letter.letter}"`}
-                size="sm"
-                clipRate={0.7}
-                rate={0.75}
-              />
+
+        <View style={styles.stage}>
+          {/* Hero — emoji beside the letter pair, with both actions inside it
+              so the card stays short and the word grid gets the height. */}
+          <View
+            style={[
+              styles.hero,
+              { backgroundColor: letter.color, borderBottomColor: letter.borderColor },
+            ]}
+          >
+            <View style={styles.heroDecor} />
+
+            <View style={styles.heroTop}>
+              <View style={styles.heroEmojiBubble}>
+                <Text style={styles.heroEmoji}>{hero.emoji}</Text>
+              </View>
+              <View style={styles.heroTextCol}>
+                <View style={styles.letterPair}>
+                  <Text style={styles.heroBig}>{upper}</Text>
+                  <Text style={styles.heroSmall}>{lower}</Text>
+                </View>
+                <Text style={styles.heroWord} numberOfLines={1}>
+                  {hero.word}
+                </Text>
+              </View>
             </View>
-            <View style={styles.letterHeroBadge}>
-              <Text style={styles.letterHeroBadgeText}>Tap the letter or the word cards to hear them 🔊</Text>
+
+            <View style={styles.heroActions}>
+              <View style={styles.heroAction}>
+                <SpeakButton
+                  text={upper}
+                  language="en-US"
+                  color="rgba(0,0,0,0.22)"
+                  label={`🔊 Hear "${upper}"`}
+                  size="sm"
+                  clipRate={0.8}
+                  rate={0.8}
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.sketchPill}
+                onPress={() => setSketchOpen(true)}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={`Practice writing letter ${upper}`}
+              >
+                <Text style={styles.sketchPillText}>✏️ Write {upper}{lower}</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
-          {/* Sketch / handwriting practice */}
-          <View style={styles.sketchSection}>
-            <SketchButton
-              color={letter.color}
-              label={`Write letter ${letter.letter}`}
-              onPress={() => setSketchOpen(true)}
-            />
-          </View>
-
-          {/* Vocabulary section */}
-          <View style={styles.vocabSection}>
-            <Text style={styles.vocabSectionTitle}>
-              📚 Vocabulary for <Text style={{ color: letter.color }}>"{letter.letter}"</Text>
+          {/* Six words — 3 per row, 2 rows, sized to fill the leftover height */}
+          <View style={styles.wordsSection}>
+            <Text style={styles.wordsTitle}>
+              📚 Words with <Text style={{ color: letter.color }}>"{upper}"</Text>
             </Text>
-            {letter.vocabulary.map((vocab, idx) => (
-              <VocabularyCard
-                key={idx}
-                emoji={vocab.emoji}
-                word={vocab.word}
-                category={vocab.category}
-                categoryColor={letter.color}
-              />
-            ))}
+            <View style={styles.wordsGrid}>
+              {wordRows.map((row, rowIdx) => (
+                <View key={`row-${rowIdx}`} style={styles.wordsRow}>
+                  {row.map((vocab, idx) => (
+                    <VocabularyTile
+                      key={`${vocab.word}-${idx}`}
+                      style={styles.wordTile}
+                      emoji={vocab.emoji}
+                      word={vocab.word}
+                      category={vocab.category}
+                      categoryColor={letter.color}
+                    />
+                  ))}
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+
+        {/* Move between letters without going back to the grid */}
+        <View style={[styles.navBar, { paddingBottom: 12 }]}>
+          <TouchableOpacity
+            style={styles.navBtn}
+            onPress={() => goToLetter(prevIdx)}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={`Previous letter ${alphabetData[prevIdx].letter}`}
+          >
+            <Text style={styles.navBtnText}>← {alphabetData[prevIdx].letter}</Text>
+          </TouchableOpacity>
+
+          <View style={styles.navCounter}>
+            <Text style={[styles.navCounterText, { color: letter.color }]}>
+              {selectedLetter + 1} / {total}
+            </Text>
           </View>
 
-        </ScrollView>
+          <TouchableOpacity
+            style={[styles.navBtn, styles.navBtnPrimary, { backgroundColor: letter.color }]}
+            onPress={() => goToLetter(nextIdx)}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={`Next letter ${alphabetData[nextIdx].letter}`}
+          >
+            <Text style={[styles.navBtnText, styles.navBtnTextPrimary]}>
+              {alphabetData[nextIdx].letter} →
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <SketchCanvas
           visible={sketchOpen}
@@ -111,7 +194,7 @@ const AlphabetScreen = ({ navigation, route }) => {
         data={alphabetData}
         keyExtractor={(item) => item.letter}
         numColumns={2}
-        contentContainerStyle={styles.gridContent}
+        contentContainerStyle={[styles.gridContent, { paddingBottom: bottomPad }]}
         columnWrapperStyle={styles.columnWrapper}
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
@@ -134,7 +217,7 @@ const AlphabetScreen = ({ navigation, route }) => {
   );
 };
 
-const makeStyles = (colors) => StyleSheet.create({
+const makeStyles = (colors, s) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -144,34 +227,43 @@ const makeStyles = (colors) => StyleSheet.create({
   gridContent: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    paddingBottom: 130,
-    gap: 12,
+    // rowGap only — horizontal spacing lives in columnWrapper because
+    // AlphabetCard's CARD_SIZE is derived from it.
+    rowGap: 6,
   },
+  // No justifyContent: the cards + COLUMN_GAP fill the row exactly, so any
+  // distribution rule would only add phantom spacing.
   columnWrapper: {
-    gap: 12,
-    justifyContent: 'space-between',
+    gap: COLUMN_GAP,
   },
 
-  // Detail view
-  detailContent: {
+  // Detail view — one screen, no scrolling
+  stage: {
+    flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 130,
+    paddingTop: 10,
+    gap: 10,
   },
-  letterHeroCard: {
-    borderRadius: 28,
-    paddingVertical: 36,
-    paddingHorizontal: 24,
-    marginBottom: 24,
-    alignItems: 'center',
+  // Short hero: it may grow into spare height but never past maxHeight, so
+  // the word grid always keeps the bigger share of the screen.
+  hero: {
+    flex: 1,
+    minHeight: 146,
+    maxHeight: 190,
+    borderRadius: 26,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    gap: 10,
     overflow: 'hidden',
+    borderBottomWidth: 4,
     elevation: 8,
     shadowColor: '#1E1B4B',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.18,
-    shadowRadius: 24,
+    shadowRadius: 20,
   },
-  letterHeroDecor: {
+  heroDecor: {
     position: 'absolute',
     top: -40,
     right: -40,
@@ -180,48 +272,142 @@ const makeStyles = (colors) => StyleSheet.create({
     borderRadius: 70,
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
-  letterHeroBig: {
-    fontSize: 100,
+  heroTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 14,
+  },
+  heroEmojiBubble: {
+    width: 90 * s,
+    height: 90 * s,
+    borderRadius: 45 * s,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroEmoji: {
+    fontSize: 55 * s,
+    lineHeight: 65 * s,
+    textAlign: 'center',
+  },
+  heroTextCol: {
+    flex: 1,
+  },
+  letterPair: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 6,
+  },
+  heroBig: {
+    fontSize: 46 * s,
     fontWeight: '900',
     color: '#FFFFFF',
-    lineHeight: 110,
+    lineHeight: 52 * s,
     textShadowColor: 'rgba(0,0,0,0.2)',
     textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 6,
   },
-  letterHeroSmall: {
-    fontSize: 48,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.7)',
-    marginTop: -8,
-    marginBottom: 16,
+  heroSmall: {
+    fontSize: 32 * s,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.75)',
+    lineHeight: 38 * s,
   },
-  letterHeroSpeak: {
-    marginBottom: 14,
-  },
-  letterHeroBadge: {
-    backgroundColor: 'rgba(255,255,255,0.22)',
-    borderRadius: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-  },
-  letterHeroBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
+  heroWord: {
+    fontSize: 15 * s,
+    fontWeight: '900',
     color: '#FFFFFF',
+    letterSpacing: 0.2,
   },
-  sketchSection: {
-    marginBottom: 24,
+  heroActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  vocabSection: {
-    marginBottom: 20,
+  heroAction: {
+    flex: 1,
   },
-  vocabSectionTitle: {
-    fontSize: 15,
+  // Mirrors SpeakButton size="sm" so both hero pills read as a pair.
+  sketchPill: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.22)',
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sketchPillText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+
+  wordsSection: {
+    flex: 2,
+  },
+  wordsTitle: {
+    fontSize: 14,
+    fontWeight: '900',
+    marginTop: 4,
+    marginBottom: 12,
+    color: colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  wordsGrid: {
+    flex: 1,
+    gap: 10,
+    // justifyContent: 'space-evenly',
+  },
+  // maxHeight keeps the tiles near-square on tall devices instead of
+  // stretching them into columns; spare height becomes row spacing.
+  wordsRow: {
+    flex: 1,
+    maxHeight: 150,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  wordTile: {
+    flex: 1,
+  },
+
+  // Prev / Next bar — stays in normal flow so it never overlaps content
+  navBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+  },
+  navBtn: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    borderRadius: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  navBtnPrimary: {
+    borderWidth: 0,
+  },
+  navCounter: {
+    minWidth: 56,
+    alignItems: 'center',
+  },
+  navCounterText: {
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  navBtnText: {
+    fontSize: 16,
     fontWeight: '900',
     color: colors.textPrimary,
-    marginBottom: 12,
-    letterSpacing: -0.3,
+  },
+  navBtnTextPrimary: {
+    color: '#FFFFFF',
   },
 });
 

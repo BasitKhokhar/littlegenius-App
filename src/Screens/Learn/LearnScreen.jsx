@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, ScrollView, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Fonts } from '../../Theme/fonts';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
-import { Spacing, Radius, textStyles, Elevation, coloredShadow } from '../../Theme';
+import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
 import learnModules from '../../Data/learnModulesData';
 import { Header } from '../../Components/UI';
-import SpeakButton from '../../Components/Common/SpeakButton';
+import TopicCard from '../../Components/Common/TopicCard';
 
 // Generic, data-driven general-knowledge screen. The module to show is
 // chosen by route.params.moduleKey (see learnModulesData.js).
@@ -21,7 +21,22 @@ const LearnScreen = ({ navigation, route }) => {
   const defaultTab = tabs.some((t) => t.key === initialTab) ? initialTab : tabs[0]?.key;
   const [activeTab, setActiveTab] = useState(defaultTab);
 
-  const s = makeStyles(colors);
+  const renderItem = useCallback(
+    ({ item, index }) => (
+      <TopicCard
+        index={index}
+        emoji={item.emoji}
+        color={item.color}
+        title={item.en}
+        titleUrdu={item.ur}
+        subtitle={item.fact}
+        subtitleUrdu={item.urFact}
+        speakText={item.speak || `${item.en}. ${item.fact}`}
+        speakLanguage="en-US"
+      />
+    ),
+    []
+  );
 
   if (!data) {
     return (
@@ -38,6 +53,7 @@ const LearnScreen = ({ navigation, route }) => {
 
   const accent = data.color || colors.primary;
   const current = tabs.find((t) => t.key === activeTab) || tabs[0];
+  const count = current?.items?.length || 0;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
@@ -74,38 +90,25 @@ const LearnScreen = ({ navigation, route }) => {
         </ScrollView>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
-        {current?.items.map((item) => (
-          <View key={item.en} style={[s.card, { borderLeftWidth: 4, borderLeftColor: item.color }]}>
-            <View style={styles.row}>
-              <Text style={styles.emoji}>{item.emoji}</Text>
-              <View style={styles.flex}>
-                <Text style={[styles.value, { color: colors.textPrimary }]}>{item.en}</Text>
-                <Text style={[styles.urduValue, { color: colors.textPrimary }]}>{item.ur}</Text>
-              </View>
+      <FlatList
+        data={current?.items || []}
+        keyExtractor={(item) => item.en}
+        renderItem={renderItem}
+        contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          /* Section intro — premium little header above the cards */
+          <View style={styles.sectionHead}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{current?.label}</Text>
+            <View style={[styles.countPill, { backgroundColor: accent + '1A', borderColor: accent + '33' }]}>
+              <Text style={[styles.countText, { color: accent }]}>{count} to explore</Text>
             </View>
-            <Text style={[styles.fact, { color: colors.textSecondary }]}>{item.fact}</Text>
-            <Text style={[styles.urduFact, { color: colors.textSecondary }]}>{item.urFact}</Text>
-            <SpeakButton text={item.speak || `${item.en}. ${item.fact}`} language="en-US" label="🔊 Hear" color={item.color} />
           </View>
-        ))}
-      </ScrollView>
+        }
+      />
     </View>
   );
 };
-
-const makeStyles = (colors) =>
-  StyleSheet.create({
-    card: {
-      backgroundColor: colors.surface,
-      borderRadius: Radius.md,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
-      padding: Spacing.lg,
-      marginBottom: Spacing.md,
-      ...Elevation.sm,
-    },
-  });
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
@@ -127,14 +130,25 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     textAlignVertical: 'center',
   },
-  content: { paddingHorizontal: Spacing.lg },
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, marginBottom: Spacing.sm },
-  flex: { flex: 1 },
-  emoji: { fontSize: 34 },
-  value: { fontSize: 17, fontFamily: Fonts.extraBold },
-  urduValue: { fontSize: 16, fontFamily: Fonts.urdu, textAlign: 'right', lineHeight: 30 },
-  fact: { fontSize: 13, fontFamily: Fonts.medium, marginBottom: 4, lineHeight: 18 },
-  urduFact: { fontSize: 14, fontFamily: Fonts.urdu, textAlign: 'right', lineHeight: 28, marginBottom: 6 },
+  content: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.xs },
+
+  // Section intro
+  sectionHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
+    paddingHorizontal: Spacing.xs,
+  },
+  sectionTitle: { fontFamily: Fonts.extraBold, fontSize: 20, letterSpacing: -0.3 },
+  countPill: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 6,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+  },
+  countText: { fontFamily: Fonts.bold, fontSize: 12, letterSpacing: 0.2 },
+
   errorWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
 });
 

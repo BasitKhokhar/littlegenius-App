@@ -20,7 +20,7 @@ import {
 } from '@expo-google-fonts/noto-naskh-arabic';
 
 // Context Providers
-import { AuthProvider, DialogProvider, ThemeProvider, NotificationProvider } from './src/Context';
+import { AuthProvider, DialogProvider, ThemeProvider, NotificationProvider, SpeechProvider, TabBarProvider } from './src/Context';
 import { RootNavigator } from './src/Navigation';
 
 // Global App Container (StatusBar + SafeArea + background)
@@ -64,13 +64,17 @@ export default function App() {
         <ThemeProvider>
           <AuthProvider>
             <NotificationProvider>
-              <DialogProvider>
-                <AppContainer>
-                  <NavigationContainer>
-                    <RootNavigator fontsReady={fontsLoaded} />
-                  </NavigationContainer>
-                </AppContainer>
-              </DialogProvider>
+              <SpeechProvider>
+                <DialogProvider>
+                  <TabBarProvider>
+                    <AppContainer>
+                      <NavigationContainer>
+                        <RootNavigator fontsReady={fontsLoaded} />
+                      </NavigationContainer>
+                    </AppContainer>
+                  </TabBarProvider>
+                </DialogProvider>
+              </SpeechProvider>
             </NotificationProvider>
           </AuthProvider>
         </ThemeProvider>

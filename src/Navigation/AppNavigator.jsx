@@ -1,4 +1,5 @@
 import React from 'react';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { PremiumTabBar } from '../Components/UI';
@@ -98,6 +99,21 @@ const IslamicStackNavigator = () => (
   </Stack.Navigator>
 );
 
+// ── Tab bar visibility ────────────────────────────────────────
+// The floating pill belongs ONLY on the landing screen of each tab. As soon
+// as the user drills into a detail screen (a letter set, a game, a surah…)
+// the bar just eats vertical space and covers content, so we hide it for
+// every pushed route. `getFocusedRouteNameFromRoute` is undefined until the
+// nested stack has navigated once — that means "still on the root screen".
+const tabStackOptions = (label, rootRoute) => ({ route }) => {
+  const focused = getFocusedRouteNameFromRoute(route) ?? rootRoute;
+  return {
+    tabBarLabel: label,
+    // PremiumTabBar reads this and renders nothing when display is 'none'.
+    tabBarStyle: focused === rootRoute ? { position: 'absolute' } : { display: 'none' },
+  };
+};
+
 // ── Root App Navigator (Bottom Tabs) ──────────────────────────
 // The bar itself lives in PremiumTabBar; the navigator just supplies
 // routes + labels. Order puts Islamic dead-centre for prominence.
@@ -106,10 +122,27 @@ const AppNavigator = () => (
     screenOptions={{ headerShown: false, tabBarStyle: { position: 'absolute' } }}
     tabBar={(props) => <PremiumTabBar {...props} />}
   >
-    <Tab.Screen name="Home" component={HomeStackNavigator} options={{ tabBarLabel: 'Home' }} />
-    <Tab.Screen name="Stories" component={StoriesStackNavigator} options={{ tabBarLabel: 'Stories' }} />
-    <Tab.Screen name="Islamic" component={IslamicStackNavigator} options={{ tabBarLabel: 'Islamic' }} />
-    <Tab.Screen name="Games" component={GamesStackNavigator} options={{ tabBarLabel: 'Games' }} />
+    <Tab.Screen
+      name="Home"
+      component={HomeStackNavigator}
+      options={tabStackOptions('Home', 'HomeScreen')}
+    />
+    <Tab.Screen
+      name="Stories"
+      component={StoriesStackNavigator}
+      options={tabStackOptions('Stories', 'StoriesMain')}
+    />
+    <Tab.Screen
+      name="Islamic"
+      component={IslamicStackNavigator}
+      options={tabStackOptions('Islamic', 'IslamicMain')}
+    />
+    <Tab.Screen
+      name="Games"
+      component={GamesStackNavigator}
+      options={tabStackOptions('Games', 'GamesMain')}
+    />
+    {/* Settings is a single screen — nothing to drill into, bar always shows. */}
     <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Settings' }} />
   </Tab.Navigator>
 );

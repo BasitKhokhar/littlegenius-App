@@ -128,13 +128,16 @@ const SketchCanvas = ({
         : Haptics.NotificationFeedbackType.Error
     ).catch(() => {});
 
+    // Kid-paced praise: a touch slower than normal so a young child clearly
+    // hears the encouragement. Still scales with the grown-up's global speed.
     SpeechEngine.speak(
       marks >= 8
         ? SPEECH_PHRASES.TRACE_AMAZING
         : marks >= PASS
         ? SPEECH_PHRASES.TRACE_GOOD
         : SPEECH_PHRASES.TRACE_WRONG,
-      'en-US'
+      'en-US',
+      { clipRate: 0.8, rate: 0.8 }
     );
 
     setLastMarks(marks);
@@ -156,7 +159,7 @@ const SketchCanvas = ({
         addStars(reward);
         // Fixed praise phrase (pre-baked teacher voice); the score/stars are
         // shown on the summary screen rather than read as dynamic numbers.
-        SpeechEngine.speak(SPEECH_PHRASES.SKETCH_COMPLETE, 'en-US');
+        SpeechEngine.speak(SPEECH_PHRASES.SKETCH_COMPLETE, 'en-US', { clipRate: 0.8, rate: 0.8 });
       }
       return next;
     });

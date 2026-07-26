@@ -35,7 +35,7 @@ const DrawingBoardScreen = ({ navigation }) => {
   const canvasRef = useRef(null);
 
   const canvasW = SCREEN_W - 24;
-  const canvasH = Math.max(420, SCREEN_H - bottomPad - 330);
+  const canvasH = Math.max(450, SCREEN_H - bottomPad - 330);
 
   const isEraser = color === ERASER;
 
@@ -54,7 +54,17 @@ const DrawingBoardScreen = ({ navigation }) => {
       <Header title="Neon Drawing ✨" showBack onBackPress={() => navigation.goBack()} />
 
       <View style={styles.body}>
-        <Text style={styles.hint}>Draw anything you like — your lines glow! 🌟</Text>
+        <View style={styles.actions}>
+            <TouchableOpacity style={styles.actionBtn} onPress={() => canvasRef.current?.undo()} activeOpacity={0.85}>
+            <Text style={styles.actionText}>↩️</Text>
+          </TouchableOpacity>
+          <Text style={styles.hint}>Draw anything you like — your lines glow! 🌟</Text>
+        
+          <TouchableOpacity style={styles.actionBtn} onPress={handleClear} activeOpacity={0.85}>
+            <Text style={styles.actionText}>🗑️</Text>
+          </TouchableOpacity>
+        </View>
+
 
         <DrawCanvas
           ref={canvasRef}
@@ -76,15 +86,6 @@ const DrawingBoardScreen = ({ navigation }) => {
           width={width}
           onWidthChange={setWidth}
         />
-
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => canvasRef.current?.undo()} activeOpacity={0.85}>
-            <Text style={styles.actionText}>↩️ Undo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={handleClear} activeOpacity={0.85}>
-            <Text style={styles.actionText}>🗑️ Clear</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </View>
   );
@@ -99,14 +100,14 @@ const makeStyles = (colors) => StyleSheet.create({
     borderWidth: 2,
     borderColor: '#2A2647',
   },
-  actions: { flexDirection: 'row', gap: 12, marginTop: 4 },
+  actions: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 12, marginVertical: 5 },
   actionBtn: {
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: colors.textMuted + '22',
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 22,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
   },
   actionText: { fontSize: 13, fontWeight: '900', color: colors.textPrimary },
 });

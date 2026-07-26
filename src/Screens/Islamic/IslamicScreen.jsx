@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   ScrollView,
@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { Fonts } from '../../Theme/fonts';
+import { Spacing, Radius, Elevation, coloredShadow } from '../../Theme';
 import {
   duasData,
   kalmasData,
@@ -20,23 +21,50 @@ import {
   salahSteps,
 } from '../../Data';
 import { Header } from '../../Components/UI';
-import SpeakButton from '../../Components/Common/SpeakButton';
+import { useTabBarClearance } from '../../Hooks';
+import IslamicCard from '../../Components/Islamic/IslamicCard';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 
+// ──────────────────────────────────────────────────────────────
+// IslamicScreen — every study section (Duas, Kalmas, Pillars, 99
+// Names, Names of the Prophet ﷺ, Prophets, Manners, Wudu & Salah)
+// rendered through the shared <IslamicCard>, so the whole section
+// reads as one premium design: oversized emoji medallion, framed
+// Arabic panel, labelled Urdu/English meaning blocks.
+// ──────────────────────────────────────────────────────────────
+
 const TABS = [
-  { key: 'duas', label: 'Duas' },
-  { key: 'kalmas', label: 'Kalmas' },
-  { key: 'pillars', label: 'Pillars' },
-  { key: 'names', label: '99 Names of Allah' },
-  { key: 'namesMuhammad', label: 'Names of Prophet ﷺ' },
-  { key: 'prophets', label: 'Prophets' },
-  { key: 'manners', label: 'Manners' },
-  { key: 'salah', label: 'Wudu & Salah' },
+  { key: 'duas', emoji: '🤲', label: 'Duas' },
+  { key: 'kalmas', emoji: '☪️', label: 'Kalmas' },
+  { key: 'pillars', emoji: '🕋', label: 'Pillars' },
+  { key: 'names', emoji: '💜', label: '99 Names of Allah' },
+  { key: 'namesMuhammad', emoji: '💚', label: 'Names of Prophet ﷺ' },
+  { key: 'prophets', emoji: '⭐', label: 'Prophets' },
+  { key: 'manners', emoji: '😊', label: 'Manners' },
+  { key: 'salah', emoji: '🚿', label: 'Wudu & Salah' },
 ];
+
+// The 6 Kalmas carry no emoji in the data — one picture each, so a
+// child can find "the shield one" before they can read "Rad-de-Kufr".
+const KALMA_EMOJI = ['☪️', '🤝', '✨', '☝️', '🤲', '🛡️'];
+
+// Titles in the data pack the Urdu inside brackets — e.g.
+// "Before Eating (کھانے سے پہلے)". Split it so each script gets its
+// own line and its own font instead of colliding on one row.
+const splitTitle = (raw = '') => {
+  const m = raw.match(/^(.*?)\s*[(（]([^)）]*)[)）]\s*$/);
+  return m
+    ? { title: m[1].trim(), urdu: m[2].trim() }
+    : { title: raw.trim(), urdu: '' };
+};
+
+// "First Kalma: Tayyab" → "Tayyab" (the eyebrow already says "Kalma 1").
+const kalmaName = (title) => title.replace(/^\w+\s+Kalma:\s*/i, '');
 
 const IslamicScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
-  const styles = makeStyles(colors);
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const bottomPad = useTabBarClearance();
   const initialTab = TABS.some((t) => t.key === route?.params?.tab) ? route.params.tab : 'duas';
   const [activeTab, setActiveTab] = useState(initialTab);
 
@@ -47,18 +75,13 @@ const IslamicScreen = ({ navigation, route }) => {
     if (t && TABS.some((x) => x.key === t)) setActiveTab(t);
   }, [route?.params?.tab]);
 
-  const renderDuaCard = (dua) => (
-    <View key={dua.title} style={styles.islamicCard}>
-      <View style={styles.duaHeader}>
-        <Text style={styles.duaEmoji}>{dua.emoji}</Text>
-        <Text style={styles.duaTitle}>{dua.title}</Text>
+  const renderSectionHeading = (emoji, text, urdu) => (
+    <View style={styles.sectionHead}>
+      <Text style={styles.sectionEmoji}>{emoji}</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.sectionTitle}>{text}</Text>
+        {!!urdu && <Text style={styles.sectionUrdu}>{urdu}</Text>}
       </View>
-      <Text style={styles.arabic}>{dua.arabic}</Text>
-      <Text style={styles.transliteration}>{dua.transliteration}</Text>
-      <View style={styles.divider} />
-      <Text style={styles.urdu}>{dua.urdu}</Text>
-      <Text style={styles.english}>{dua.english}</Text>
-      <SpeakButton text={dua.arabic} language="ar-SA" fallbackText={dua.speak || dua.transliteration} label="🔊 Hear" color={dua.color} />
     </View>
   );
 
@@ -78,159 +101,222 @@ const IslamicScreen = ({ navigation, route }) => {
         style={styles.tabScroll}
         contentContainerStyle={styles.tabContainer}
       >
-        {TABS.map((tab) => (
-          <TouchableOpacity
-            key={tab.key}
-            style={[
-              styles.tab,
-              activeTab === tab.key ? styles.tabActive : styles.tabInactive,
-            ]}
-            onPress={() => setActiveTab(tab.key)}
-          >
-            <Text
-              numberOfLines={1}
-              style={[styles.tabText, { color: activeTab === tab.key ? '#FFF' : colors.textSecondary }]}
+        {TABS.map((tab) => {
+          const active = activeTab === tab.key;
+          return (
+            <TouchableOpacity
+              key={tab.key}
+              style={[
+                styles.tab,
+                active ? [styles.tabActive, coloredShadow(colors.primary, 'sm')] : styles.tabInactive,
+              ]}
+              onPress={() => setActiveTab(tab.key)}
+              activeOpacity={0.85}
             >
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text style={styles.tabEmoji}>{tab.emoji}</Text>
+              <Text
+                numberOfLines={1}
+                style={[styles.tabText, { color: active ? '#FFFFFF' : colors.textSecondary }]}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {activeTab === 'duas' && duasData.map(renderDuaCard)}
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {activeTab === 'duas' &&
+          duasData.map((dua, i) => {
+            const { title, urdu } = splitTitle(dua.title);
+            return (
+              <IslamicCard
+                key={dua.title}
+                index={i}
+                accent={dua.color}
+                emoji={dua.emoji}
+                eyebrow="Daily Dua"
+                title={title}
+                titleUrdu={urdu}
+                arabic={dua.arabic}
+                transliteration={dua.transliteration}
+                meaningUr={dua.urdu}
+                meaningEn={dua.english}
+                speakArabic={{
+                  text: dua.arabic,
+                  language: 'ar-SA',
+                  fallback: dua.speak || dua.transliteration,
+                }}
+                speakUrdu={{ text: dua.urdu, language: 'ur-PK', fallback: dua.english }}
+              />
+            );
+          })}
+
         {activeTab === 'kalmas' &&
-          kalmasData.map((kalma) => (
-            <View key={kalma.number} style={[styles.islamicCard, { borderLeftWidth: 4, borderLeftColor: kalma.color }]}>
-              <Text style={styles.kalmaNumber}>Kalma {kalma.number}</Text>
-              <Text style={styles.kalmaTitle}>{kalma.title}</Text>
-              <Text style={styles.arabic}>{kalma.arabic}</Text>
-              <Text style={styles.transliteration}>{kalma.transliteration}</Text>
-              <View style={styles.divider} />
-              <Text style={styles.urdu}>{kalma.urdu}</Text>
-              <Text style={styles.english}>{kalma.english}</Text>
-              <SpeakButton text={kalma.arabic} language="ar-SA" fallbackText={kalma.speak || kalma.transliteration} label="🔊 Hear" color={kalma.color} />
-            </View>
-          ))}
+          kalmasData.map((kalma, i) => {
+            const { title, urdu } = splitTitle(kalma.title);
+            return (
+              <IslamicCard
+                key={kalma.number}
+                index={i}
+                accent={kalma.color}
+                emoji={KALMA_EMOJI[(kalma.number - 1) % KALMA_EMOJI.length]}
+                number={kalma.number}
+                eyebrow={`Kalma ${kalma.number}`}
+                title={kalmaName(title)}
+                titleUrdu={urdu}
+                arabic={kalma.arabic}
+                transliteration={kalma.transliteration}
+                meaningUr={kalma.urdu}
+                meaningEn={kalma.english}
+                speakArabic={{
+                  text: kalma.arabic,
+                  language: 'ar-SA',
+                  fallback: kalma.speak || kalma.transliteration,
+                }}
+                speakUrdu={{ text: kalma.urdu, language: 'ur-PK', fallback: kalma.english }}
+              />
+            );
+          })}
+
         {activeTab === 'pillars' &&
-          pillarsData.map((pillar) => (
-            <View key={pillar.number} style={styles.islamicCard}>
-              <Text style={styles.pillarEmoji}>{pillar.emoji}</Text>
-              <Text style={styles.pillarTitle}>{pillar.title}</Text>
-              <Text style={styles.pillarUrdu}>{pillar.urdu}</Text>
-              <Text style={styles.pillarDesc}>{pillar.desc}</Text>
-              <Text style={styles.pillarDetail}>{pillar.detailedDesc}</Text>
-              {pillar.whenToSay ? (
-                <View style={styles.pillarWhenBox}>
-                  <Text style={styles.pillarWhenLabel}>📅 When:</Text>
-                  <Text style={styles.pillarWhenText}>{pillar.whenToSay}</Text>
-                </View>
-              ) : null}
-              {pillar.urduDetail ? (
-                <Text style={styles.pillarUrduDetail}>{pillar.urduDetail}</Text>
-              ) : null}
-            </View>
+          pillarsData.map((pillar, i) => (
+            <IslamicCard
+              key={pillar.number}
+              index={i}
+              accent={pillar.color}
+              emoji={pillar.emoji}
+              number={pillar.number}
+              eyebrow={`Pillar ${pillar.number} of 5`}
+              title={pillar.title}
+              titleUrdu={pillar.urdu}
+              meaningEn={pillar.desc}
+              detail={pillar.detailedDesc}
+              detailUr={pillar.urduDetail}
+              note={pillar.whenToSay ? { label: '📅 When', text: pillar.whenToSay } : null}
+              speakUrdu={{ text: pillar.urduDetail, language: 'ur-PK', fallback: pillar.desc }}
+              speak={{ text: pillar.detailedDesc, language: 'en-US' }}
+            />
           ))}
 
         {activeTab === 'names' &&
-          namesOfAllahData.map((name) => (
-            <View key={name.number} style={[styles.islamicCard, { borderLeftWidth: 4, borderLeftColor: name.color }]}>
-              <View style={styles.duaHeader}>
-                <View style={[styles.nameBadge, { backgroundColor: name.color }]}>
-                  <Text style={styles.nameBadgeText}>{name.number}</Text>
-                </View>
-                <Text style={styles.duaTitle}>{name.transliteration}</Text>
-              </View>
-              <Text style={styles.arabic}>{name.arabic}</Text>
-              <View style={styles.divider} />
-              <Text style={styles.english}>{name.english}</Text>
-              <Text style={styles.urdu}>{name.urdu}</Text>
-              <SpeakButton text={name.arabic} language="ar-SA" fallbackText={name.transliteration} label="🔊 Hear" color={name.color} />
-            </View>
+          namesOfAllahData.map((name, i) => (
+            <IslamicCard
+              key={name.number}
+              index={i}
+              accent={name.color}
+              emoji="💜"
+              number={name.number}
+              eyebrow={`Name ${name.number} of 99`}
+              title={name.transliteration}
+              arabic={name.arabic}
+              meaningUr={name.urdu}
+              meaningEn={name.english}
+              speakArabic={{
+                text: name.arabic,
+                language: 'ar-SA',
+                fallback: name.speak || name.transliteration,
+              }}
+              speakUrdu={{ text: name.urdu, language: 'ur-PK', fallback: name.english }}
+            />
           ))}
 
         {activeTab === 'namesMuhammad' &&
-          namesOfMuhammadData.map((name) => (
-            <View key={name.number} style={[styles.islamicCard, { borderLeftWidth: 4, borderLeftColor: name.color }]}>
-              <View style={styles.duaHeader}>
-                <View style={[styles.nameBadge, { backgroundColor: name.color }]}>
-                  <Text style={styles.nameBadgeText}>{name.number}</Text>
-                </View>
-                <Text style={styles.duaTitle}>{name.transliteration}</Text>
-              </View>
-              <Text style={styles.arabic}>{name.arabic}</Text>
-              <View style={styles.divider} />
-              <Text style={styles.english}>{name.english}</Text>
-              <Text style={styles.urdu}>{name.urdu}</Text>
-              <SpeakButton text={name.arabic} language="ar-SA" fallbackText={name.transliteration} label="🔊 Hear" color={name.color} />
-            </View>
+          namesOfMuhammadData.map((name, i) => (
+            <IslamicCard
+              key={name.number}
+              index={i}
+              accent={name.color}
+              emoji="💚"
+              number={name.number}
+              eyebrow={`Name ${name.number} · Prophet ﷺ`}
+              title={name.transliteration}
+              arabic={name.arabic}
+              meaningUr={name.urdu}
+              meaningEn={name.english}
+              speakArabic={{
+                text: name.arabic,
+                language: 'ar-SA',
+                fallback: name.speak || name.transliteration,
+              }}
+              speakUrdu={{ text: name.urdu, language: 'ur-PK', fallback: name.english }}
+            />
           ))}
 
         {activeTab === 'prophets' &&
-          prophetsData.map((p) => (
-            <View key={p.id} style={[styles.islamicCard, { borderLeftWidth: 4, borderLeftColor: p.color }]}>
-              <View style={styles.duaHeader}>
-                <Text style={styles.pillarEmoji}>{p.emoji}</Text>
-                <Text style={styles.pillarTitle}>{p.name}</Text>
-              </View>
-              <Text style={styles.pillarUrdu}>{p.arabicName}</Text>
-              <Text style={styles.pillarDetail}>{p.story}</Text>
-              <Text style={styles.pillarUrduDetail}>{p.urduStory}</Text>
-              <View style={styles.pillarWhenBox}>
-                <Text style={styles.pillarWhenLabel}>⭐ Lesson:</Text>
-                <Text style={styles.pillarWhenText}>{p.lesson}</Text>
-              </View>
-              <SpeakButton text={p.speak} language="en-US" label="🔊 Hear" color={p.color} />
-            </View>
+          prophetsData.map((p, i) => (
+            <IslamicCard
+              key={p.id}
+              index={i}
+              accent={p.color}
+              emoji={p.emoji}
+              eyebrow="Prophet Story"
+              title={p.name}
+              titleUrdu={p.arabicName}
+              detail={p.story}
+              detailUr={p.urduStory}
+              note={{ label: '⭐ Lesson', text: p.lesson }}
+              speakUrdu={{ text: p.urduStory, language: 'ur-PK', fallback: p.speak }}
+              speak={{ text: p.speak, language: 'en-US' }}
+            />
           ))}
 
         {activeTab === 'manners' &&
-          mannersData.map((m) => (
-            <View key={m.id} style={[styles.islamicCard, { borderLeftWidth: 4, borderLeftColor: m.color }]}>
-              <View style={styles.duaHeader}>
-                <Text style={styles.pillarEmoji}>{m.emoji}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.pillarTitle}>{m.title}</Text>
-                  <Text style={styles.pillarUrdu}>{m.urduTitle}</Text>
-                </View>
-              </View>
-              <Text style={styles.pillarDetail}>{m.tip}</Text>
-              <Text style={styles.pillarUrduDetail}>{m.urduTip}</Text>
-              <SpeakButton text={m.speak} language="en-US" label="🔊 Hear" color={m.color} />
-            </View>
+          mannersData.map((m, i) => (
+            <IslamicCard
+              key={m.id}
+              index={i}
+              accent={m.color}
+              emoji={m.emoji}
+              eyebrow="Good Manners"
+              title={m.title}
+              titleUrdu={m.urduTitle}
+              detail={m.tip}
+              detailUr={m.urduTip}
+              speakUrdu={{ text: m.urduTip, language: 'ur-PK', fallback: m.speak }}
+              speak={{ text: m.speak, language: 'en-US' }}
+            />
           ))}
 
         {activeTab === 'salah' && (
           <>
-            <Text style={styles.sectionHeading}>🚿 Wudu (Ablution) Steps</Text>
-            {wuduSteps.map((s) => (
-              <View key={`w${s.step}`} style={[styles.islamicCard, styles.stepCard]}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={styles.stepNumberText}>{s.step}</Text>
-                </View>
-                <View style={styles.stepBody}>
-                  <Text style={styles.stepEmoji}>{s.emoji}</Text>
-                  <Text style={styles.pillarTitle}>{s.title}</Text>
-                  <Text style={styles.pillarUrdu}>{s.urduTitle}</Text>
-                  <Text style={styles.pillarDetail}>{s.detail}</Text>
-                  <Text style={styles.pillarUrduDetail}>{s.urduDetail}</Text>
-                </View>
-              </View>
+            {renderSectionHeading('🚿', 'Wudu (Ablution) Steps', 'وضو کے مراحل')}
+            {wuduSteps.map((s, i) => (
+              <IslamicCard
+                key={`w${s.step}`}
+                index={i}
+                accent={colors.primary}
+                emoji={s.emoji}
+                number={s.step}
+                eyebrow={`Step ${s.step} of ${wuduSteps.length}`}
+                title={s.title}
+                titleUrdu={s.urduTitle}
+                detail={s.detail}
+                detailUr={s.urduDetail}
+                speakUrdu={{ text: s.urduDetail, language: 'ur-PK', fallback: s.detail }}
+                speak={{ text: s.detail, language: 'en-US', label: '🔊 Hear Step' }}
+              />
             ))}
-            <Text style={styles.sectionHeading}>🕌 Salah (Prayer) Steps</Text>
-            {salahSteps.map((s) => (
-              <View key={`s${s.step}`} style={[styles.islamicCard, styles.stepCard]}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.secondary }]}>
-                  <Text style={styles.stepNumberText}>{s.step}</Text>
-                </View>
-                <View style={styles.stepBody}>
-                  <Text style={styles.stepEmoji}>{s.emoji}</Text>
-                  <Text style={styles.pillarTitle}>{s.title}</Text>
-                  <Text style={styles.pillarUrdu}>{s.urduTitle}</Text>
-                  <Text style={styles.pillarDetail}>{s.detail}</Text>
-                  <Text style={styles.pillarUrduDetail}>{s.urduDetail}</Text>
-                </View>
-              </View>
+
+            {renderSectionHeading('🕌', 'Salah (Prayer) Steps', 'نماز کے مراحل')}
+            {salahSteps.map((s, i) => (
+              <IslamicCard
+                key={`s${s.step}`}
+                index={i}
+                accent={colors.secondary}
+                emoji={s.emoji}
+                number={s.step}
+                eyebrow={`Step ${s.step} of ${salahSteps.length}`}
+                title={s.title}
+                titleUrdu={s.urduTitle}
+                detail={s.detail}
+                detailUr={s.urduDetail}
+                speakUrdu={{ text: s.urduDetail, language: 'ur-PK', fallback: s.detail }}
+                speak={{ text: s.detail, language: 'en-US', label: '🔊 Hear Step' }}
+              />
             ))}
           </>
         )}
@@ -255,17 +341,18 @@ const makeStyles = (colors) => StyleSheet.create({
   },
   tabContainer: {
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
   tab: {
-    paddingVertical: 9,
-    paddingHorizontal: 18,
-    borderRadius: 12,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    marginRight: 8,
+    gap: 6,
+    paddingVertical: 9,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    marginRight: Spacing.sm,
     flexShrink: 0,
   },
   tabActive: {
@@ -274,195 +361,49 @@ const makeStyles = (colors) => StyleSheet.create({
   },
   tabInactive: {
     backgroundColor: colors.surface,
-    borderColor: colors.borderStrong,
+    borderColor: colors.border,
+    ...Elevation.sm,
   },
+  tabEmoji: { fontSize: 15, lineHeight: 20 },
   tabText: {
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     fontSize: 13,
+    lineHeight: 18,
   },
-  sectionHeading: {
-    fontSize: 15,
-    fontWeight: '900',
-    color: colors.textDark,
-    marginTop: 8,
-    marginBottom: 12,
-  },
-  nameBadge: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  nameBadgeText: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: '#FFFFFF',
-  },
-  stepCard: {
+
+  sectionHead: {
     flexDirection: 'row',
-    gap: 12,
-  },
-  stepNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: Spacing.md,
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: Radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    marginTop: Spacing.xs,
+    marginBottom: Spacing.md,
   },
-  stepNumberText: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: '#FFFFFF',
+  sectionEmoji: { fontSize: 26, lineHeight: 34 },
+  sectionTitle: {
+    fontFamily: Fonts.extraBold,
+    fontSize: 15,
+    lineHeight: 20,
+    letterSpacing: -0.2,
+    color: colors.textPrimary,
   },
-  stepBody: {
-    flex: 1,
+  sectionUrdu: {
+    fontFamily: Fonts.urdu,
+    fontSize: 13,
+    lineHeight: 26,
+    color: colors.textSecondary,
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
-  stepEmoji: {
-    fontSize: 26,
-    marginBottom: 4,
-  },
+
   content: {
-    paddingHorizontal: 16,
-    paddingBottom: 130,
-  },
-  islamicCard: {
-    backgroundColor: colors.bgCard,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.borderLight,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-  },
-  duaHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 10,
-  },
-  duaEmoji: {
-    fontSize: 28,
-  },
-  duaTitle: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: colors.textDark,
-    flex: 1,
-  },
-  arabic: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.textDark,
-    lineHeight: 40,
-    textAlign: 'right',
-    marginVertical: 8,
-    fontFamily: Fonts.arabicBold, // Noto Naskh Arabic
-  },
-  transliteration: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textLight,
-    marginBottom: 8,
-    fontStyle: 'italic',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.borderLight,
-    marginVertical: 10,
-  },
-  urdu: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textDark,
-    lineHeight: 30,
-    marginBottom: 8,
-    textAlign: 'right',
-    fontFamily: Fonts.urdu, // Nastaliq Urdu
-  },
-  english: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textLight,
-    lineHeight: 18,
-    marginBottom: 12,
-  },
-  kalmaNumber: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: colors.primary,
-    textTransform: 'uppercase',
-    marginBottom: 6,
-  },
-  kalmaTitle: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: colors.textDark,
-    marginBottom: 8,
-  },
-  pillarEmoji: {
-    fontSize: 40,
-    marginBottom: 8,
-  },
-  pillarTitle: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: colors.textDark,
-    marginBottom: 6,
-  },
-  pillarUrdu: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textDark,
-    lineHeight: 30,
-    marginBottom: 6,
-    fontFamily: Fonts.urdu, // Nastaliq Urdu
-  },
-  pillarDesc: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textLight,
-    marginBottom: 10,
-  },
-  pillarDetail: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textDark,
-    lineHeight: 18,
-    marginBottom: 10,
-  },
-  pillarWhenBox: {
-    backgroundColor: '#F0FDF4',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
-  },
-  pillarWhenLabel: {
-    fontSize: 11,
-    fontWeight: '900',
-    color: '#15803D',
-    marginBottom: 4,
-  },
-  pillarWhenText: {
-    fontSize: 12,
-    fontWeight: '600',
-    // Box bg is a fixed light green in both themes — keep text dark so it stays readable.
-    color: '#1E1B4B',
-    lineHeight: 18,
-  },
-  pillarUrduDetail: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textDark,
-    lineHeight: 32,
-    textAlign: 'right',
-    fontFamily: Fonts.urdu, // Nastaliq Urdu
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xs,
   },
 });
 

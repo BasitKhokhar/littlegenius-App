@@ -1,23 +1,97 @@
-import React, { useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useState, useMemo, useCallback } from 'react';
+import { View, ScrollView, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useThemeColors } from '../../Context/ThemeContext';
-import { Fonts } from '../../Theme/fonts';
+import { useTabBarClearance } from '../../Hooks';
 import { nationalSymbols, provinces, heroes, famousPlaces } from '../../Data';
 import { Header } from '../../Components/UI';
-import SpeakButton from '../../Components/Common/SpeakButton';
+import TopicCard from '../../Components/Common/TopicCard';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 
 const TABS = [
-  { key: 'symbols', label: 'Symbols' },
-  { key: 'provinces', label: 'Provinces' },
-  { key: 'heroes', label: 'Heroes' },
-  { key: 'places', label: 'Places' },
+  { key: 'symbols', label: 'Symbols', emoji: '🏅' },
+  { key: 'provinces', label: 'Provinces', emoji: '🗺️' },
+  { key: 'heroes', label: 'Heroes', emoji: '🦸' },
+  { key: 'places', label: 'Places', emoji: '📍' },
 ];
+
+// Normalise each dataset into one shared card shape so a single premium
+// card renders across every tab. `sentence` is the full spoken line the
+// voice reads — it is not drawn on the card, since it just restates the
+// primary/secondary lines above it.
+const getItems = (tab) => {
+  switch (tab) {
+    case 'provinces':
+      return provinces.map((p) => ({
+        key: p.name,
+        emoji: p.emoji,
+        color: p.color,
+        primary: p.name,
+        primaryUrdu: p.urduName,
+        secondary: `Capital: ${p.capital}`,
+        secondaryUrdu: p.urduCapital,
+        sentence: p.speak,
+      }));
+    case 'heroes':
+      return heroes.map((h) => ({
+        key: h.name,
+        emoji: h.emoji,
+        color: h.color,
+        primary: h.name,
+        primaryUrdu: h.urduName,
+        secondary: h.role,
+        secondaryUrdu: h.urduRole,
+        sentence: h.speak,
+      }));
+    case 'places':
+      return famousPlaces.map((item) => ({
+        key: item.title,
+        emoji: item.emoji,
+        color: item.color,
+        primary: item.title,
+        primaryUrdu: item.urduTitle,
+        secondary: item.value,
+        secondaryUrdu: item.urduValue,
+        sentence: item.speak,
+      }));
+    case 'symbols':
+    default:
+      return nationalSymbols.map((item) => ({
+        key: item.title,
+        emoji: item.emoji,
+        color: item.color,
+        primary: item.title,
+        primaryUrdu: item.urduTitle,
+        secondary: item.value,
+        secondaryUrdu: item.urduValue,
+        sentence: item.speak,
+      }));
+  }
+};
 
 const PakistanScreen = ({ navigation }) => {
   const colors = useThemeColors();
-  const styles = makeStyles(colors);
+  const bottomPad = useTabBarClearance();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [activeTab, setActiveTab] = useState('symbols');
+
+  const items = useMemo(() => getItems(activeTab), [activeTab]);
+
+  const renderItem = useCallback(
+    ({ item, index }) => (
+      <TopicCard
+        index={index}
+        emoji={item.emoji}
+        color={item.color}
+        title={item.primary}
+        titleUrdu={item.primaryUrdu}
+        subtitle={item.secondary}
+        subtitleUrdu={item.secondaryUrdu}
+        speakText={item.sentence}
+        speakLanguage="en-US"
+      />
+    ),
+    []
+  );
 
   return (
     <View style={styles.container}>
@@ -38,12 +112,16 @@ const PakistanScreen = ({ navigation }) => {
           return (
             <TouchableOpacity
               key={tab.key}
+              activeOpacity={0.85}
               style={[
                 styles.tab,
-                { backgroundColor: isActive ? colors.primary : colors.surface, borderColor: isActive ? colors.primary : colors.border },
+                isActive
+                  ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                  : { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
               ]}
               onPress={() => setActiveTab(tab.key)}
             >
+              <Text style={styles.tabEmoji}>{tab.emoji}</Text>
               <Text
                 numberOfLines={1}
                 style={[styles.tabText, { color: isActive ? '#FFF' : colors.textSecondary }]}
@@ -55,119 +133,54 @@ const PakistanScreen = ({ navigation }) => {
         })}
       </ScrollView>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {activeTab === 'symbols' &&
-          nationalSymbols.map((item) => (
-            <View key={item.title} style={[styles.card, { borderLeftWidth: 4, borderLeftColor: item.color }]}>
-              <View style={styles.row}>
-                <Text style={styles.emoji}>{item.emoji}</Text>
-                <View style={styles.flex}>
-                  <Text style={styles.label}>{item.title}</Text>
-                  <Text style={styles.urduLabel}>{item.urduTitle}</Text>
-                </View>
-              </View>
-              <Text style={styles.value}>{item.value}</Text>
-              <Text style={styles.urduValue}>{item.urduValue}</Text>
-              <SpeakButton text={item.speak} language="en-US" label="🔊 Hear" color={item.color} />
-            </View>
-          ))}
-
-        {activeTab === 'provinces' &&
-          provinces.map((p) => (
-            <View key={p.name} style={[styles.card, { borderLeftWidth: 4, borderLeftColor: p.color }]}>
-              <View style={styles.row}>
-                <Text style={styles.emoji}>{p.emoji}</Text>
-                <View style={styles.flex}>
-                  <Text style={styles.value}>{p.name}</Text>
-                  <Text style={styles.urduValue}>{p.urduName}</Text>
-                </View>
-              </View>
-              <Text style={styles.label}>Capital: {p.capital} ({p.urduCapital})</Text>
-              <SpeakButton text={p.speak} language="en-US" label="🔊 Hear" color={p.color} />
-            </View>
-          ))}
-
-        {activeTab === 'heroes' &&
-          heroes.map((h) => (
-            <View key={h.name} style={[styles.card, { borderLeftWidth: 4, borderLeftColor: h.color }]}>
-              <View style={styles.row}>
-                <Text style={styles.emoji}>{h.emoji}</Text>
-                <View style={styles.flex}>
-                  <Text style={styles.value}>{h.name}</Text>
-                  <Text style={styles.urduValue}>{h.urduName}</Text>
-                </View>
-              </View>
-              <Text style={styles.label}>{h.role}</Text>
-              <Text style={styles.urduLabel}>{h.urduRole}</Text>
-              <SpeakButton text={h.speak} language="en-US" label="🔊 Hear" color={h.color} />
-            </View>
-          ))}
-
-        {activeTab === 'places' &&
-          famousPlaces.map((item) => (
-            <View key={item.title} style={[styles.card, { borderLeftWidth: 4, borderLeftColor: item.color }]}>
-              <View style={styles.row}>
-                <Text style={styles.emoji}>{item.emoji}</Text>
-                <View style={styles.flex}>
-                  <Text style={styles.label}>{item.title}</Text>
-                  <Text style={styles.urduLabel}>{item.urduTitle}</Text>
-                </View>
-              </View>
-              <Text style={styles.value}>{item.value}</Text>
-              <Text style={styles.urduValue}>{item.urduValue}</Text>
-              <SpeakButton text={item.speak} language="en-US" label="🔊 Hear" color={item.color} />
-            </View>
-          ))}
-        <QuizEntryBar
-          color="#059669"
-          onPress={() => navigation.navigate('QuizList', { module: 'pakistan' })}
-        />
-      </ScrollView>
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item.key}
+        renderItem={renderItem}
+        contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
+        showsVerticalScrollIndicator={false}
+        ListFooterComponent={
+          <QuizEntryBar
+            color="#059669"
+            onPress={() => navigation.navigate('QuizList', { module: 'pakistan' })}
+          />
+        }
+      />
     </View>
   );
 };
 
-const makeStyles = (colors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg },
-  tabScroll: { flexGrow: 0 },
-  tabContainer: { flexDirection: 'row', paddingHorizontal: 16, gap: 8, paddingVertical: 12 },
-  tab: {
-    minHeight: 40,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tabText: {
-    fontWeight: '700',
-    fontSize: 11,
-    textTransform: 'uppercase',
-    includeFontPadding: false,
-    textAlignVertical: 'center',
-  },
-  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 130 },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.border,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-  },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8 },
-  flex: { flex: 1 },
-  emoji: { fontSize: 34 },
-  label: { fontSize: 12, fontWeight: '700', color: colors.textMuted, marginBottom: 2 },
-  urduLabel: { fontSize: 13, fontWeight: '700', color: colors.textMuted, textAlign: 'right', lineHeight: 26, fontFamily: Fonts.urdu },
-  value: { fontSize: 17, fontWeight: '900', color: colors.textPrimary },
-  urduValue: { fontSize: 16, fontWeight: '700', color: colors.textPrimary, textAlign: 'right', lineHeight: 30, marginBottom: 6, fontFamily: Fonts.urdu },
-});
+const makeStyles = (colors) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bg },
+
+    tabScroll: { flexGrow: 0 },
+    tabContainer: { flexDirection: 'row', paddingHorizontal: 16, gap: 8, paddingVertical: 12 },
+    tab: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      minHeight: 42,
+      paddingVertical: 9,
+      paddingHorizontal: 16,
+      borderRadius: 999,
+      borderWidth: 1,
+      justifyContent: 'center',
+      // No elevation/shadow here: Android draws the elevation shadow from a
+      // rectangular outline behind the pill, which looked like a grey box.
+      overflow: 'hidden',
+    },
+    tabEmoji: { fontSize: 15 },
+    tabText: {
+      fontWeight: '800',
+      fontSize: 12,
+      textTransform: 'uppercase',
+      letterSpacing: 0.3,
+      includeFontPadding: false,
+      textAlignVertical: 'center',
+    },
+
+    content: { paddingHorizontal: 16, paddingTop: 14 },
+  });
 
 export default PakistanScreen;

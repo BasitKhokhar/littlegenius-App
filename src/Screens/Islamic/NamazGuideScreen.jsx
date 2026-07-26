@@ -111,7 +111,7 @@ const NamazGuideScreen = ({ navigation }) => {
       </ScrollView>
 
       {/* Prev / Next bar — kept in normal flow so it never overlaps content */}
-      <View style={styles.navBar}>
+      <View style={[styles.navBar, { paddingBottom: 12 }]}>
         <TouchableOpacity
           style={[styles.navBtn, isFirst && styles.navBtnDisabled]}
           disabled={isFirst}
@@ -218,7 +218,6 @@ const makeStyles = (colors) => StyleSheet.create({
     gap: 12,
     paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom: 90,
   },
   navBtn: {
     flex: 1,

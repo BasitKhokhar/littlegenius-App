@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Header } from '../../Components/UI';
-import { SectionHeader, Badge } from '../../Components/Common';
+import { SectionHeader, Badge, TopicCard } from '../../Components/Common';
 import { useAuth } from '../../Context';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
@@ -18,8 +18,6 @@ import {
   Spacing,
   Radius,
   textStyles,
-  Typography,
-  Elevation,
   coloredShadow,
   Motion,
   moduleColors,
@@ -46,6 +44,18 @@ const WORLD_CATEGORIES = [
   { key: 'body', name: 'My Body', icon: '🧠', count: 20, color: '#EC4899' },
   { key: 'colors', name: 'Colors', icon: '🎨', count: 20, color: '#8B5CF6' },
 ];
+
+// Explore My World is always 3 up. Rows are built explicitly instead of
+// letting flexWrap decide: a computed 1/3 width is fractional, and on some
+// densities each card rounds up just enough that the third one wraps and
+// leaves a dead column on the right.
+const CAT_COLUMNS = 3;
+
+const chunk = (arr, size) => {
+  const rows = [];
+  for (let i = 0; i < arr.length; i += size) rows.push(arr.slice(i, i + size));
+  return rows;
+};
 
 const QUICK_ACTIONS = [
   { name: 'Stories', icon: '📚', mod: 'stories', screen: 'Stories' },
@@ -159,21 +169,26 @@ const HomeScreen = ({ navigation }) => {
         {/* Explore My World */}
         <SectionHeader emoji="🌍" title="Explore My World" />
         <View style={styles.catGrid}>
-          {WORLD_CATEGORIES.map((cat) => (
-            <TouchableOpacity
-              key={cat.key}
-              style={[s.catCard, Elevation.sm]}
-              onPress={() => navigation.navigate('Learn', { moduleKey: 'world', initialTab: cat.key })}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.catIconCircle, { backgroundColor: cat.color + '22' }]}>
-                <Text style={styles.catIcon}>{cat.icon}</Text>
-              </View>
-              <Text style={s.catName} numberOfLines={1}>{cat.name}</Text>
-              <View style={[styles.catCountPill, { backgroundColor: cat.color }]}>
-                <Text style={styles.catCountText}>{cat.count}</Text>
-              </View>
-            </TouchableOpacity>
+          {chunk(WORLD_CATEGORIES, CAT_COLUMNS).map((row, rowIndex) => (
+            <View key={`cat-row-${rowIndex}`} style={styles.catRow}>
+              {row.map((cat, i) => (
+                <TopicCard
+                  key={cat.key}
+                  variant="tile"
+                  index={rowIndex * CAT_COLUMNS + i}
+                  style={styles.catCell}
+                  emoji={cat.icon}
+                  color={cat.color}
+                  title={cat.name}
+                  badge={cat.count}
+                  onPress={() => navigation.navigate('Learn', { moduleKey: 'world', initialTab: cat.key })}
+                />
+              ))}
+              {/* Keep a short last row left-aligned at the same column width */}
+              {Array.from({ length: CAT_COLUMNS - row.length }, (_, i) => (
+                <View key={`cat-spacer-${i}`} style={styles.catCell} />
+              ))}
+            </View>
           ))}
         </View>
 
@@ -206,15 +221,6 @@ const HomeScreen = ({ navigation }) => {
 const makeStyles = (colors) =>
   StyleSheet.create({
     heroGreeting: { ...textStyles.overline, color: colors.onBrandMuted, marginBottom: Spacing.xs },
-    catCard: {
-      width: (width - 32 - Spacing.sm * 2) / 3,
-      backgroundColor: colors.surface,
-      borderRadius: Radius.lg,
-      paddingVertical: Spacing.md,
-      paddingHorizontal: Spacing.sm,
-      alignItems: 'center',
-    },
-    catName: { ...textStyles.caption, fontFamily: Typography.font.bold, color: colors.textPrimary, marginBottom: Spacing.sm, textAlign: 'center' },
   });
 
 // Static styles
@@ -279,15 +285,16 @@ const styles = StyleSheet.create({
   },
   moduleArrowText: { fontSize: 15, color: '#FFFFFF', fontFamily: 'Baloo2_800ExtraBold' },
 
-  // Category grid
-  catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.xxl },
-  catIconCircle: { width: 52, height: 52, borderRadius: Radius.full, alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.sm },
-  catIcon: { fontSize: 28 },
-  catCountPill: { borderRadius: Radius.full, paddingVertical: 2, paddingHorizontal: Spacing.md },
-  catCountText: { fontSize: 11, color: '#FFFFFF', fontFamily: 'Baloo2_800ExtraBold' },
+  // Category grid — 3 up on every screen size. TopicCard owns the tile's
+  // look; the screen only owns the columns. Cells flex instead of carrying a
+  // computed pixel width so the row always divides the available space
+  // exactly, whatever the device width or orientation.
+  catGrid: { gap: Spacing.sm, marginBottom: Spacing.xxl },
+  catRow: { flexDirection: 'row', gap: Spacing.sm },
+  catCell: { flex: 1 },
 
   // Quick play
-  quickActions: { flexDirection: 'row', gap: 12, marginBottom: Spacing.lg },
+  quickActions: { flexDirection: 'row', gap: 12 },
   quickWrap: { flex: 1, borderRadius: Radius.lg },
   quickCard: { borderRadius: Radius.lg, paddingVertical: Spacing.xl, alignItems: 'center', overflow: 'hidden' },
   quickIcon: { fontSize: 28, marginBottom: Spacing.sm },

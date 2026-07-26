@@ -9,7 +9,9 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Header } from '../../Components/UI';
-import { useThemeColors } from '../../Context/ThemeContext';
+import { GameStage, Mascot, CelebrationOverlay } from '../../Components/Games';
+import { useTheme } from '../../Context/ThemeContext';
+import { getGameTheme } from '../../Theme/gameThemes';
 import { useTabBarClearance } from '../../Hooks';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
@@ -18,19 +20,21 @@ import { calculateStarReward } from '../../Utils/dataHelpers';
 import { buildPuzzleRounds } from '../../Data/letterPuzzleData';
 
 // ──────────────────────────────────────────────────────────────
-// LetterPuzzleScreen — "find the missing letter" word game.
-// A word with one letter missing (F _ S H) + its emoji; the child
-// taps the right letter from 4 options. Correct → the letter pops
-// into the slot; wrong → the row shakes and they try again.
+// LetterPuzzleScreen — "find the missing letter" word game, now on a
+// bright cartoon "ocean" stage (light & dark aware). A word with one
+// letter missing (F _ S H) + its bouncing picture; the child taps the
+// right letter from 4 candy buttons. Correct → the letter pops into the
+// slot; wrong → the row shakes and they try again.
 // ──────────────────────────────────────────────────────────────
 
 const ROUNDS = 10;
 
 const LetterPuzzleScreen = ({ navigation }) => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useTheme();
+  const gt = getGameTheme(10, isDark); // ocean / fish
   const bottomPad = useTabBarClearance();
   const { addStars } = useAuth();
-  const styles = makeStyles(colors);
+  const styles = makeStyles(colors, gt);
 
   const [session, setSession] = useState(0);
   const rounds = useMemo(() => buildPuzzleRounds(ROUNDS), [session]);
@@ -45,6 +49,14 @@ const LetterPuzzleScreen = ({ navigation }) => {
   const shake = useRef(new Animated.Value(0)).current;
   const slotPop = useRef(new Animated.Value(1)).current;
   const pulse = useRef(new Animated.Value(1)).current;
+  const picPop = useRef(new Animated.Value(1)).current;
+
+  // Each new word's picture springs in, so the big emoji reads as the star of
+  // the round rather than a static image.
+  React.useEffect(() => {
+    picPop.setValue(0.55);
+    Animated.spring(picPop, { toValue: 1, friction: 5, tension: 90, useNativeDriver: true }).start();
+  }, [roundIdx, session, picPop]);
 
   React.useEffect(() => {
     // gentle pulse on the empty slot
@@ -73,7 +85,7 @@ const LetterPuzzleScreen = ({ navigation }) => {
   const handleOption = (letter) => {
     if (solved || finished) return;
     if (letter === round.answer) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => { });
       if (firstTry) {
         correctRef.current += 1;
         setCorrectCount((c) => c + 1);
@@ -87,7 +99,7 @@ const LetterPuzzleScreen = ({ navigation }) => {
       SpeechEngine.speak(round.word, 'en-US');
       setTimeout(nextRound, 1200);
     } else {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => { });
       setFirstTry(false);
       runShake();
       SpeechEngine.speak(SPEECH_PHRASES.TRY_AGAIN, 'en-US');
@@ -123,190 +135,199 @@ const LetterPuzzleScreen = ({ navigation }) => {
   const shakeX = shake.interpolate({ inputRange: [-1, 1], outputRange: [-10, 10] });
 
   return (
-    <View style={styles.container}>
-      <Header title="Letter Puzzle 🧩" showBack onBackPress={() => navigation.goBack()} />
+    <GameStage theme={gt} wave>
+      <Header title="Letter Puzzle 🧩" showBack variant="transparent" onBackPress={() => navigation.goBack()} />
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
-        {finished ? (
-          <View style={styles.resultCard}>
-            <Text style={styles.resultEmoji}>🏆</Text>
-            <Text style={styles.resultTitle}>Puzzle Complete!</Text>
-            <Text style={styles.resultScore}>First-try score: {correctCount} / {ROUNDS}</Text>
-            <Text style={styles.resultReward}>+{calculateStarReward(correctCount, ROUNDS, 3)} ⭐ earned!</Text>
-            <View style={styles.resultBtns}>
-              <TouchableOpacity style={styles.primaryBtn} onPress={restart} activeOpacity={0.85}>
-                <Text style={styles.primaryBtnText}>Play Again 🔁</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.goBack()} activeOpacity={0.85}>
-                <Text style={styles.secondaryBtnText}>Back to Games ➔</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ) : (
-          <>
+      {finished ? (
+        <CelebrationOverlay
+          title="Puzzle Complete!"
+          scoreLabel={`First-try score: ${correctCount} / ${ROUNDS}`}
+          reward={calculateStarReward(correctCount, ROUNDS, 3)}
+          accent={gt.accent}
+          onReplay={restart}
+          onExit={() => navigation.goBack()}
+        />
+      ) : (
+        <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
+          {/* Round counter + prompt sit right under the header — no dead
+              space above them — and the picture takes the room that frees up. */}
+          <View style={styles.progPill}>
             <Text style={styles.progText}>Word {roundIdx + 1} of {ROUNDS}</Text>
-            <Text style={styles.title}>Find the missing letter!</Text>
-
-            {/* Illustration */}
-            <View style={styles.emojiCard}>
-              <Text style={styles.bigEmoji}>{round.emoji}</Text>
-            </View>
-
-            {/* Word tiles */}
-            <Animated.View style={[styles.wordRow, { transform: [{ translateX: shakeX }] }]}>
-              {round.word.split('').map((letter, i) => {
-                const isBlank = i === round.blankIdx;
-                if (isBlank) {
-                  return (
-                    <Animated.View
-                      key={i}
-                      style={[
-                        styles.tile,
-                        styles.blankTile,
-                        solved && styles.solvedTile,
-                        { transform: [{ scale: solved ? slotPop : pulse }] },
-                      ]}
-                    >
-                      <Text style={[styles.tileText, solved ? styles.solvedTileText : styles.blankTileText]}>
-                        {solved ? round.answer : '?'}
-                      </Text>
-                    </Animated.View>
-                  );
-                }
-                return (
-                  <View key={i} style={styles.tile}>
-                    <Text style={styles.tileText}>{letter}</Text>
-                  </View>
-                );
-              })}
-            </Animated.View>
-
-            {/* Options */}
-            <View style={styles.optionsRow}>
-              {round.options.map((letter, i) => (
-                <TouchableOpacity
-                  key={`${roundIdx}-${i}`}
-                  style={styles.optionTile}
-                  onPress={() => handleOption(letter)}
-                  activeOpacity={0.8}
-                  disabled={solved}
-                >
-                  <Text style={styles.optionText}>{letter}</Text>
-                </TouchableOpacity>
+            <View style={styles.progDots}>
+              {Array.from({ length: ROUNDS }, (_, i) => (
+                <View key={i} style={[styles.progDot, i <= roundIdx && styles.progDotOn]} />
               ))}
             </View>
+          </View>
+          <Text style={styles.title}>Find the missing letter!</Text>
 
-            {solved && <Text style={styles.praise}>🎉 {round.word}!</Text>}
-          </>
-        )}
-      </ScrollView>
-    </View>
+          {/* Bouncing word picture */}
+          <View style={{ alignItems: 'center', marginBottom: 30,marginTop: 24 }}>
+            <Animated.View style={{ transform: [{ scale: picPop }] }}>
+              <Mascot emoji={round.emoji} size={132} glow={gt.deco} style={styles.mascot} />
+            </Animated.View>
+          </View>
+
+
+
+          {/* Word tiles */}
+          <Animated.View style={[styles.wordRow, { transform: [{ translateX: shakeX }] }]}>
+            {round.word.split('').map((letter, i) => {
+              const isBlank = i === round.blankIdx;
+              if (isBlank) {
+                return (
+                  <Animated.View
+                    key={i}
+                    style={[
+                      styles.tile,
+                      styles.blankTile,
+                      solved && styles.solvedTile,
+                      { transform: [{ scale: solved ? slotPop : pulse }] },
+                    ]}
+                  >
+                    <Text style={[styles.tileText, solved ? styles.solvedTileText : styles.blankTileText]}>
+                      {solved ? round.answer : '?'}
+                    </Text>
+                  </Animated.View>
+                );
+              }
+              return (
+                <View key={i} style={styles.tile}>
+                  <Text style={styles.tileText}>{letter}</Text>
+                </View>
+              );
+            })}
+          </Animated.View>
+
+          {/* Options */}
+          <View style={styles.optionsRow}>
+            {round.options.map((letter, i) => (
+              <TouchableOpacity
+                key={`${roundIdx}-${i}`}
+                style={styles.optionTile}
+                onPress={() => handleOption(letter)}
+                activeOpacity={0.8}
+                disabled={solved}
+              >
+                <Text style={styles.optionText}>{letter}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {solved && (
+            <View style={styles.praisePill}>
+              <Text style={styles.praise}>🎉 {round.word}!</Text>
+            </View>
+          )}
+        </ScrollView>
+      )}
+    </GameStage>
   );
 };
 
-const TILE = 52;
+const TILE = 54;
 
-const makeStyles = (colors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg },
-  content: { paddingHorizontal: 16, paddingTop: 20, alignItems: 'center', flexGrow: 1, justifyContent: 'center' },
+const makeStyles = (colors, gt) => StyleSheet.create({
+  // Top-aligned (not centred) so the round counter sits straight under the
+  // header instead of floating in the middle with dead space above it.
+  content: { paddingHorizontal: 16, paddingTop: 4, alignItems: 'center' },
 
+  progPill: {
+    alignItems: 'center',
+    gap: 7,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
   progText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: colors.textSecondary,
+    fontWeight: '900',
+    color: '#FFFFFF',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 6,
+    letterSpacing: 0.6,
   },
-  title: { fontSize: 20, fontWeight: '900', color: colors.textPrimary, marginBottom: 20 },
-
-  emojiCard: {
-    width: 120,
-    height: 120,
-    borderRadius: 28,
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-    elevation: 3,
+  progDots: { flexDirection: 'row', gap: 5 },
+  progDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.35)',
   },
-  bigEmoji: { fontSize: 64 },
+  progDotOn: { backgroundColor: '#FFFFFF' },
+  title: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.18)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  mascot: { marginBottom: 26, marginTop: 14 },
 
   wordRow: { flexDirection: 'row', gap: 8, marginBottom: 30 },
   tile: {
     width: TILE,
     height: TILE,
-    borderRadius: 14,
+    borderRadius: 16,
     backgroundColor: colors.surface,
     borderWidth: 2,
     borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 2,
-    borderBottomWidth: 4,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    borderBottomWidth: 5,
+    borderBottomColor: colors.borderStrong,
   },
-  tileText: { fontSize: 24, fontWeight: '900', color: colors.textPrimary },
+  tileText: { fontSize: 26, fontWeight: '900', color: colors.textPrimary },
   blankTile: {
-    borderColor: colors.primary,
+    borderColor: gt.accent,
     borderStyle: 'dashed',
+    borderBottomColor: gt.accent,
     backgroundColor: colors.surfaceAlt,
   },
-  blankTileText: { color: colors.primary },
+  blankTileText: { color: gt.accent },
   solvedTile: {
-    borderColor: colors.secondary,
+    borderColor: colors.successDeep,
     borderStyle: 'solid',
-    backgroundColor: colors.secondary,
+    borderBottomColor: colors.successDeep,
+    backgroundColor: colors.success,
   },
   solvedTileText: { color: '#FFFFFF' },
 
   optionsRow: { flexDirection: 'row', gap: 12 },
   optionTile: {
-    width: 60,
-    height: 60,
-    borderRadius: 16,
-    backgroundColor: colors.primary,
+    width: 64,
+    height: 64,
+    borderRadius: 18,
+    backgroundColor: gt.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 3,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.2)',
+    elevation: 5,
+    shadowColor: gt.accent,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    borderBottomWidth: 5,
+    borderBottomColor: 'rgba(0,0,0,0.22)',
   },
-  optionText: { fontSize: 26, fontWeight: '900', color: '#FFFFFF' },
+  optionText: { fontSize: 28, fontWeight: '900', color: '#FFFFFF' },
 
-  praise: { fontSize: 18, fontWeight: '900', color: colors.secondary, marginTop: 20 },
-
-  resultCard: {
-    width: '100%',
-    backgroundColor: colors.surface,
-    borderRadius: 28,
-    borderWidth: 2,
-    borderColor: colors.border,
-    padding: 28,
-    alignItems: 'center',
+  praisePill: {
+    marginTop: 22,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 999,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
   },
-  resultEmoji: { fontSize: 64, marginBottom: 12 },
-  resultTitle: { fontSize: 24, fontWeight: '900', color: colors.textPrimary, marginBottom: 6 },
-  resultScore: { fontSize: 16, fontWeight: '800', color: colors.primary, marginBottom: 4 },
-  resultReward: { fontSize: 14, fontWeight: '700', color: colors.textSecondary, marginBottom: 22 },
-  resultBtns: { width: '100%', gap: 10 },
-  primaryBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  primaryBtnText: { color: '#FFF', fontWeight: '900', fontSize: 14 },
-  secondaryBtn: {
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 16,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  secondaryBtnText: { color: colors.textPrimary, fontWeight: '900', fontSize: 14 },
+  praise: { fontSize: 18, fontWeight: '900', color: colors.successDeep },
 });
 
 export default LetterPuzzleScreen;

@@ -49,18 +49,22 @@ const VOICE_DIR = 'teacher';
 const VOICES = {
   en: { name: 'en-US-AndrewNeural', locale: 'en-US' },
   ur: { name: 'ur-PK-AsadNeural', locale: 'ur-PK' },
-  // Islamic Arabic recitation is out of scope and skipped unless --include-arabic.
-  // Those clips are already baked and must not be silently overwritten.
+  // Arabic recitation is skipped by default (see ARABIC gate below) but uses
+  // the same one male teacher when it IS baked.
   ar: { name: 'ar-SA-HamedNeural', locale: 'ar-SA' },
 };
 
-// Islamic sources — excluded from generation. Their Arabic clips already exist
-// (baked separately) and the Qari recitation in assets/audio/quran/ is real
-// human recitation that must never be replaced by TTS.
-const ISLAMIC_SOURCES = new Set([
-  'duas', 'kalmas', 'namesAllah', 'namesMuhammad', 'prophets',
-  'manners', 'namaz', 'juzAmma', 'islamicStories',
-]);
+// ARABIC clips are held back unless --include-arabic (or an explicit --only).
+// They are already baked, and the Qari recitation in assets/audio/quran/ is
+// real human recitation that must never be replaced by TTS.
+//
+// NOTE: the gate is on the LANGUAGE, not on the source. It used to list whole
+// Islamic sources ('prophets', 'manners', …) — which meant their ENGLISH and
+// URDU narration was never generated either, so those cards silently fell back
+// to the device (female) TTS voice. Every non-Arabic string in the Islamic
+// section now bakes in the normal run, in the same male teacher voice as the
+// rest of the app.
+const isArabic = (prefix) => prefix === 'ar';
 
 // Azure output: small mono MP3 is plenty for short narration and plays on both
 // platforms via expo-audio.
@@ -86,13 +90,26 @@ const xmlEscape = (s) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
+// A lone English letter must be READ AS A LETTER NAME, not as a word. Left bare,
+// Azure speaks "A" as the indefinite article (a flat schwa, "uh") and "I" as the
+// pronoun — so those two clips sounded nothing like the other 24 letter names.
+// <say-as interpret-as="characters"> forces the alphabet name ("ay", "eye").
+// Applies to any single A–Z clip (alphabet letters, single-letter quiz answers).
+const isSingleEnglishLetter = (text, voice) =>
+  voice.locale.startsWith('en') && /^[A-Za-z]$/.test(text.trim());
+
+const sayAs = (text, voice) =>
+  isSingleEnglishLetter(text, voice)
+    ? `<say-as interpret-as="characters">${xmlEscape(text.trim())}</say-as>`
+    : xmlEscape(text);
+
 // Explicit neutral prosody on every clip. Azure's default already is rate/pitch
 // 0%, but stating it means a future voice swap can't quietly change the pace of
 // SOME clips and not others — every phrase in the app is spoken identically.
 const ssml = (text, voice) =>
   `<speak version='1.0' xml:lang='${voice.locale}'>` +
   `<voice name='${voice.name}'>` +
-  `<prosody rate="0%" pitch="0%">${xmlEscape(text)}</prosody>` +
+  `<prosody rate="0%" pitch="0%">${sayAs(text, voice)}</prosody>` +
   `</voice></speak>`;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -229,15 +246,16 @@ async function main() {
   // Dedupe by speechKey; keep first text seen per key.
   const byKey = new Map();
   for (const p of raw) {
-    // --only names sources explicitly, so honour it even for Islamic ones;
-    // otherwise Islamic content is left alone unless --include-arabic.
+    const prefix = langPrefix(p.language);
+    // --only names sources explicitly, so honour it even for Arabic ones;
+    // otherwise Arabic recitation is left alone unless --include-arabic.
     if (ONLY) {
       if (!ONLY.has(p.source)) continue;
-    } else if (!INCLUDE_ARABIC && ISLAMIC_SOURCES.has(p.source)) {
+    } else if (!INCLUDE_ARABIC && isArabic(prefix)) {
       continue;
     }
     const key = speechKey(p.language, p.text);
-    if (!byKey.has(key)) byKey.set(key, { ...p, key, prefix: langPrefix(p.language) });
+    if (!byKey.has(key)) byKey.set(key, { ...p, key, prefix });
   }
   const items = [...byKey.values()];
 
@@ -258,7 +276,7 @@ async function main() {
   }
   console.log(`  ${''.padEnd(16)} ${'TOTAL'.padEnd(18)} ${String(totalChars).padStart(6)} chars ` +
     `(${((totalChars / 500000) * 100).toFixed(1)}% of the 500K free F0 tier)`);
-  if (!INCLUDE_ARABIC) console.log('  (Islamic/Arabic sources excluded — pass --include-arabic to bake them)');
+  if (!INCLUDE_ARABIC && !ONLY) console.log('  (Arabic clips excluded — pass --include-arabic to bake them)');
 
   if (EMIT_PHRASES) writePhrases(items);
   if (REPORT || EMIT_PHRASES) {

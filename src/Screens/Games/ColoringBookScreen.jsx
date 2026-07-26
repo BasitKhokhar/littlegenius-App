@@ -28,7 +28,10 @@ import coloringData from '../../Data/coloringData';
 // ──────────────────────────────────────────────────────────────
 // ColoringBookScreen — premium tap-to-fill coloring pages.
 //
-// • Big full-height editing canvas that fills the screen.
+// • Big full-height editing canvas that fills the screen. Everything else
+//   (scene strip, status, palette) is kept slim so the art gets the room.
+// • Each path carries its own stroke width, so heavy silhouettes and
+//   hairline texture lines render the way the art was drawn.
 // • Pinch to zoom + drag to pan, so tiny parts of detailed art can be
 //   reached (double-tap resets). Fills still work by tapping.
 // • Top-right button reveals the finished "original" (same paths, filled
@@ -45,13 +48,23 @@ const clampW = (v, min, max) => {
   return Math.min(Math.max(v, min), max);
 };
 
-// Two rows of bright + soft colours, like a real coloring app's palette.
+// One long scrolling row of bright + soft colours, like a real coloring
+// app's palette. Small swatches so plenty of them fit in a single row.
 const PALETTE = [
-  '#EF4444', '#F97316', '#F59E0B', '#FBBF24', '#84CC16', '#22C55E',
-  '#10B981', '#14B8A6', '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6',
-  '#A855F7', '#EC4899', '#F472B6', '#FBCFE8', '#8B4513', '#9CA3AF',
-  '#FFFFFF', '#111827',
+  '#EF4444', '#DC2626', '#F97316', '#F59E0B', '#FBBF24', '#FDE68A',
+  '#84CC16', '#22C55E', '#15803D', '#10B981', '#14B8A6', '#06B6D4',
+  '#0EA5E9', '#3B82F6', '#1D4ED8', '#6366F1', '#8B5CF6', '#A855F7',
+  '#EC4899', '#F472B6', '#FBCFE8', '#FDE2C8', '#A16207', '#8B4513',
+  '#78350F', '#9CA3AF', '#4B5563', '#FFFFFF', '#111827',
 ];
+
+const SWATCH_SIZE = 28;
+
+// The page itself always stays a real coloring-book sheet — white paper,
+// dark ink — in both themes, so the line art reads the way it was drawn
+// and the child's colours land on the tones they picked.
+const PAPER = '#FFFFFF';
+const INK = '#1F2937';
 
 const ColoringBookScreen = ({ navigation }) => {
   const colors = useThemeColors();
@@ -212,7 +225,7 @@ const ColoringBookScreen = ({ navigation }) => {
 
   const onCanvasLayout = (e) => {
     const { width, height } = e.nativeEvent.layout;
-    const size = Math.max(0, Math.floor(Math.min(width, height)) - 16);
+    const size = Math.max(0, Math.floor(Math.min(width, height)) - 8);
     if (size !== canvasSize) setCanvasSize(size);
   };
 
@@ -241,17 +254,6 @@ const ColoringBookScreen = ({ navigation }) => {
           })}
         </ScrollView>
 
-        {/* Slim status bar: selected colour + progress */}
-        <View style={styles.statusRow}>
-          <View style={[styles.colorChip, { backgroundColor: selectedColor === ERASER ? '#E5E7EB' : selectedColor }]}>
-            {selectedColor === ERASER ? <Text style={styles.colorChipIcon}>🧽</Text> : null}
-          </View>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${(filledCount / totalRegions) * 100}%` }]} />
-          </View>
-          <Text style={styles.progressText}>{filledCount}/{totalRegions} ⭐</Text>
-        </View>
-
         {/* Large editing canvas */}
         <View style={styles.canvasWrap} onLayout={onCanvasLayout}>
           {canvasSize > 0 && (
@@ -264,11 +266,11 @@ const ColoringBookScreen = ({ navigation }) => {
                       d={r.d}
                       fill={
                         showReference
-                          ? (scene.preview?.[r.id] || colors.surface)
-                          : (sceneFills[r.id] || colors.surface)
+                          ? (scene.preview?.[r.id] || PAPER)
+                          : (sceneFills[r.id] || PAPER)
                       }
-                      stroke={colors.textPrimary}
-                      strokeWidth={3.2}
+                      stroke={INK}
+                      strokeWidth={r.w ?? 2.8}
                       strokeLinejoin="round"
                       strokeLinecap="round"
                       onPress={showReference ? undefined : () => handleRegionPress(r.id)}
@@ -278,9 +280,9 @@ const ColoringBookScreen = ({ navigation }) => {
                     <Path
                       key={`o${i}`}
                       d={o.d}
-                      fill={o.fill ? colors.textPrimary : 'none'}
-                      stroke={colors.textPrimary}
-                      strokeWidth={2.6}
+                      fill={o.fill ? INK : 'none'}
+                      stroke={INK}
+                      strokeWidth={o.w ?? 1.6}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       pointerEvents="none"
@@ -340,19 +342,28 @@ const ColoringBookScreen = ({ navigation }) => {
           )}
         </View>
 
-        {/* Palette + reset */}
+        {/* Slim status strip + one scrolling row of small swatches */}
         <View style={styles.bottomBar}>
+          <View style={styles.statusRow}>
+            <View style={[styles.colorChip, { backgroundColor: selectedColor === ERASER ? '#E5E7EB' : selectedColor }]}>
+              {selectedColor === ERASER ? <Text style={styles.colorChipIcon}>🧽</Text> : null}
+            </View>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${(filledCount / totalRegions) * 100}%` }]} />
+            </View>
+            <Text style={styles.progressText}>{filledCount}/{totalRegions}</Text>
+            <TouchableOpacity style={styles.resetBtn} onPress={handleReset} activeOpacity={0.85}>
+              <Text style={styles.resetBtnText}>↺</Text>
+            </TouchableOpacity>
+          </View>
+
           <ColorPalette
             colors={PALETTE}
             value={selectedColor}
             onChange={setSelectedColor}
             eraser
-            wrap
-            compact
+            size={SWATCH_SIZE}
           />
-          <TouchableOpacity style={styles.resetBtn} onPress={handleReset} activeOpacity={0.85}>
-            <Text style={styles.resetBtnText}>↺ Start this picture over</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -361,38 +372,37 @@ const ColoringBookScreen = ({ navigation }) => {
 
 const makeStyles = (colors) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  body: { flex: 1, paddingHorizontal: 12, paddingTop: 8 },
+  body: { flex: 1, paddingHorizontal: 10, paddingTop: 4 },
 
   sceneStripWrap: { flexGrow: 0 },
-  sceneStrip: { gap: 8, paddingVertical: 4, paddingHorizontal: 2 },
+  sceneStrip: { gap: 6, paddingVertical: 2, paddingHorizontal: 2 },
   sceneChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
     backgroundColor: colors.surface,
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1.5,
     borderColor: colors.border,
-    paddingVertical: 7,
-    paddingHorizontal: 11,
+    paddingVertical: 5,
+    paddingHorizontal: 9,
   },
   sceneChipActive: { borderColor: colors.primary, backgroundColor: colors.surfaceAlt },
-  sceneEmoji: { fontSize: 17 },
-  sceneName: { fontSize: 12, fontWeight: '900', color: colors.textSecondary },
-  sceneDone: { fontSize: 12 },
+  sceneEmoji: { fontSize: 15 },
+  sceneName: { fontSize: 11, fontWeight: '900', color: colors.textSecondary },
+  sceneDone: { fontSize: 11 },
 
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginTop: 8,
-    marginBottom: 8,
+    gap: 8,
     paddingHorizontal: 2,
+    paddingBottom: 2,
   },
   colorChip: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     borderWidth: 2,
     borderColor: '#FFFFFF',
     alignItems: 'center',
@@ -403,30 +413,31 @@ const makeStyles = (colors) => StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 2,
   },
-  colorChipIcon: { fontSize: 12 },
+  colorChipIcon: { fontSize: 11 },
   progressTrack: {
     flex: 1,
-    height: 12,
-    borderRadius: 6,
+    height: 9,
+    borderRadius: 5,
     backgroundColor: colors.surfaceAlt,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.border,
   },
-  progressFill: { height: '100%', borderRadius: 6, backgroundColor: colors.primary },
-  progressText: { fontSize: 13, fontWeight: '900', color: colors.textPrimary, minWidth: 46, textAlign: 'right' },
+  progressFill: { height: '100%', borderRadius: 5, backgroundColor: colors.primary },
+  progressText: { fontSize: 12, fontWeight: '900', color: colors.textPrimary, minWidth: 38, textAlign: 'right' },
 
-  // Big flexible editing area
+  // Big flexible editing area — everything else is kept slim so this grows.
   canvasWrap: {
     flex: 1,
-    borderRadius: 24,
+    borderRadius: 22,
     borderWidth: 2,
     borderColor: colors.border,
-    backgroundColor: colors.surface,
+    backgroundColor: PAPER,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginTop: 6,
+    marginBottom: 4,
   },
   canvasInner: { alignItems: 'center', justifyContent: 'center' },
 
@@ -526,18 +537,26 @@ const makeStyles = (colors) => StyleSheet.create({
   celebrateBtn: { backgroundColor: colors.primary, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 18 },
   celebrateBtnText: { color: '#FFF', fontWeight: '900', fontSize: 13 },
 
-  bottomBar: { paddingTop: 2 },
+  bottomBar: {
+    paddingTop: 4,
+    paddingBottom: 2,
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    paddingHorizontal: 6,
+  },
   resetBtn: {
-    marginTop: 6,
-    alignSelf: 'center',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.surfaceAlt,
     borderWidth: 1.5,
     borderColor: colors.border,
-    borderRadius: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
   },
-  resetBtnText: { fontSize: 13, fontWeight: '900', color: colors.textPrimary },
+  resetBtnText: { fontSize: 15, fontWeight: '900', color: colors.textPrimary },
 });
 
 export default ColoringBookScreen;

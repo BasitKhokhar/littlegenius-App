@@ -64,7 +64,7 @@ const CustomDialog = ({
                 variant="tonal"
                 size="md"
                 fullWidth={!isConfirm}
-                style={isConfirm && styles.flexBtn}
+                style={isConfirm ? styles.flexBtn : undefined}
                 onPress={() => {
                   onSecondaryPress();
                   onDismiss();
@@ -76,7 +76,7 @@ const CustomDialog = ({
               variant={variant === 'error' ? 'danger' : 'primary'}
               size="md"
               fullWidth={!isConfirm}
-              style={[isConfirm && styles.flexBtn, variant === 'success' && { backgroundColor: colors.success }]}
+              style={[isConfirm && styles.flexBtn, variant === 'success' && { backgroundColor: colors.success }].filter(Boolean)}
               onPress={() => {
                 onPrimaryPress();
                 onDismiss();
@@ -94,13 +94,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: Spacing.xxl,
+    paddingHorizontal: Spacing.xxxl,
   },
   modalView: {
     width: '100%',
     maxWidth: 340,
     borderRadius: Radius.xl,
-    paddingVertical: Spacing.xxl,
+    paddingTop: Spacing.xxl,
+    paddingBottom: Spacing.xl,
     paddingHorizontal: Spacing.xl,
     alignItems: 'center',
   },
@@ -116,8 +117,8 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 38 },
   title: { textAlign: 'center', marginBottom: Spacing.sm },
   description: { textAlign: 'center', marginBottom: Spacing.xl },
-  buttonContainer: { width: '100%', gap: Spacing.sm },
-  buttonRow: { flexDirection: 'row' },
+  buttonContainer: { width: '100%', gap: Spacing.sm, alignSelf: 'stretch' },
+  buttonRow: { flexDirection: 'row', gap: Spacing.md },
   flexBtn: { flex: 1 },
 });
 

@@ -12,7 +12,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Header, ParentalGate } from '../../Components/UI';
 import { Card, Button, Badge } from '../../Components/Common';
-import { useAuth, useDialog, useNotifications } from '../../Context';
+import { useAuth, useDialog, useNotifications, useSpeech } from '../../Context';
 import { useTheme } from '../../Context/ThemeContext';
 import { LEGAL_URLS, SUPPORT_EMAIL } from '../../Constants';
 import SpeechEngine from '../../Utils/speechEngine';
@@ -38,8 +38,16 @@ const SettingsScreen = ({ navigation }) => {
   const { showConfirm } = useDialog();
   const { colors, isDark, toggle } = useTheme();
   const { enabled: remindersOn, hour, minute, setEnabled, setTime } = useNotifications();
+  const { speed, setSpeed, options: speedOptions } = useSpeech();
 
   const previewVoice = () => SpeechEngine.speak(SPEECH_PHRASES.VOICE_PREVIEW_TEACHER, 'en-US');
+
+  // Change the speed AND immediately play a short preview so the grown-up hears
+  // how fast the teacher will now speak.
+  const pickSpeed = (value) => {
+    setSpeed(value);
+    SpeechEngine.speak(SPEECH_PHRASES.VOICE_PREVIEW_TEACHER, 'en-US');
+  };
   const bottomPad = useTabBarClearance();
 
   const [gate, setGate] = useState(null);
@@ -189,6 +197,36 @@ const SettingsScreen = ({ navigation }) => {
             </View>
             <Text style={[s.timeValue, { marginRight: 0 }]}>▶</Text>
           </TouchableOpacity>
+
+          {/* Speaking speed — scales every spoken word in the app. Younger
+              children can slow it right down to copy each sound. */}
+          <View style={s.speedHeaderRow}>
+            <Text style={s.speedTitle}>🏃 Speaking Speed</Text>
+            <Text style={s.speedCurrent}>
+              {speedOptions.find((o) => o.value === speed)?.hint || 'Normal'}
+            </Text>
+          </View>
+          <Text style={[s.infoLabel, { marginBottom: Spacing.md }]}>
+            How fast the teacher speaks everywhere. Tap to hear a preview.
+          </Text>
+          <View style={s.speedRow}>
+            {speedOptions.map((opt) => {
+              const active = opt.value === speed;
+              return (
+                <TouchableOpacity
+                  key={opt.value}
+                  style={[s.speedChip, active && s.speedChipActive]}
+                  onPress={() => pickSpeed(opt.value)}
+                  activeOpacity={0.85}
+                >
+                  <Text style={s.speedChipEmoji}>{opt.emoji}</Text>
+                  <Text style={[s.speedChipLabel, active && s.speedChipLabelActive]}>
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </Card>
 
         {/* Reminders */}
@@ -392,6 +430,35 @@ const makeStyles = (colors) =>
     timeChipLabel: { ...textStyles.bodyStrong, color: colors.textPrimary },
     timeChipTime: { ...textStyles.body, color: colors.textSecondary },
     timeChipTextActive: { color: colors.primary },
+
+    // Speaking-speed selector
+    speedHeaderRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: Spacing.lg,
+    },
+    speedTitle: { ...textStyles.bodyStrong, color: colors.textPrimary },
+    speedCurrent: { ...textStyles.caption, color: colors.primary, fontFamily: 'Baloo2_800ExtraBold' },
+    speedRow: {
+      flexDirection: 'row',
+      gap: Spacing.sm,
+    },
+    speedChip: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: Spacing.md,
+      paddingHorizontal: 2,
+      borderRadius: Radius.md,
+      borderWidth: 1.5,
+      borderColor: colors.borderStrong,
+      backgroundColor: colors.surface,
+    },
+    speedChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
+    speedChipEmoji: { fontSize: 18, marginBottom: 4 },
+    speedChipLabel: { ...textStyles.caption, color: colors.textSecondary, fontFamily: 'Baloo2_700Bold' },
+    speedChipLabelActive: { color: colors.primary },
   });
 
 const styles = StyleSheet.create({

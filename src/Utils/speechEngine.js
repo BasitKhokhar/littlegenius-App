@@ -65,6 +65,16 @@ let audioModeReady = false;       // setAudioModeAsync() run once, lazily
 const CLIP_PLAYBACK_RATE = 0.9;
 const TTS_RATE = 0.9;
 
+// Global speed multiplier a grown-up can set in Settings (0.5× … 2×). It scales
+// EVERY spoken word — pre-baked teacher clips and the device-TTS fallback alike —
+// on top of the per-call tuning above, so one control slows or speeds all of the
+// app's narration at once. 1.0 = the app's normal delivery (unchanged). Real Qari
+// Quran recitation (opts.audioClip) is deliberately NOT scaled — it always plays
+// exactly as recorded. Defaults to 0.75× (the gentle pace most kids start on) and
+// is set at boot from the saved preference via setGlobalSpeed().
+let globalSpeed = 0.75;
+const clampRate = (r, lo, hi) => Math.min(hi, Math.max(lo, r));
+
 // Kids often hold the phone on silent — make sure narration is still audible.
 const ensureAudioMode = () => {
   if (audioModeReady) return;
@@ -76,6 +86,12 @@ const ensureAudioMode = () => {
 const lookupClip = (language, text) => AUDIO[speechKey(language, text)] ?? null;
 
 const releasePlayer = (player) => {
+  // Pause BEFORE remove so playback is silenced instantly. remove()/release on
+  // its own can let a clip's tail keep sounding for a beat while native teardown
+  // happens — long enough for a freshly-tapped clip to overlap the previous one.
+  // Pausing first guarantees the old sound is gone before the new one starts, so
+  // rapidly tapping between Islamic recitations never double-voices.
+  try { player?.pause?.(); } catch { /* already gone */ }
   try { player?.remove?.(); } catch { /* already gone */ }
   if (currentPlayer === player) currentPlayer = null;
 };
@@ -140,6 +156,19 @@ const estimateDurationMs = (text, rate) => {
 };
 
 export const SpeechEngine = {
+  /**
+   * Set the global speech-speed multiplier (persisted grown-up preference).
+   * Scales every spoken word app-wide; 1.0 = the app's normal delivery.
+   * Ignored values that aren't a positive finite number.
+   */
+  setGlobalSpeed: (mult) => {
+    const n = Number(mult);
+    if (Number.isFinite(n) && n > 0) globalSpeed = n;
+  },
+
+  /** The current global speech-speed multiplier. */
+  getGlobalSpeed: () => globalSpeed,
+
   /**
    * True if the device has at least one installed voice for `language`.
    * Returns true when the voice list is unknown (don't block on uncertainty).
@@ -230,7 +259,9 @@ export const SpeechEngine = {
         // an older one this throws and the clip simply plays at normal speed.
         if (isTeacherClip) {
           try {
-            const clipRate = opts.clipRate ?? CLIP_PLAYBACK_RATE;
+            // Per-call tuning × the user's global speed, clamped so an extreme
+            // setting can't distort the voice into a chipmunk/drone.
+            const clipRate = clampRate((opts.clipRate ?? CLIP_PLAYBACK_RATE) * globalSpeed, 0.4, 3.0);
             player.shouldCorrectPitch = true;
             player.setPlaybackRate(clipRate, 'high');
           } catch { /* older expo-audio native — play at 1x */ }
@@ -304,7 +335,8 @@ export const SpeechEngine = {
       // Adult male pitch. If we found a real male voice keep it near-natural;
       // otherwise deepen the default voice a little so it still reads as male.
       const pitch = opts.pitch ?? (voice ? 0.97 : 0.9);
-      const rate = opts.rate ?? TTS_RATE; // brisk but clear for kids
+      // Brisk but clear for kids, scaled by the user's global speed setting.
+      const rate = clampRate((opts.rate ?? TTS_RATE) * globalSpeed, 0.3, 2.0);
 
       const utterance = {
         language: spokenLang,
@@ -361,10 +393,8 @@ export const SpeechEngine = {
 
   /** Stop currently playing speech (both pre-baked audio and device TTS). */
   stop: async () => {
-    if (currentPlayer) {
-      try { currentPlayer.pause(); } catch { /* noop */ }
-      releasePlayer(currentPlayer);
-    }
+    // releasePlayer() pauses before removing, so the clip is silenced at once.
+    if (currentPlayer) releasePlayer(currentPlayer);
     try {
       await Speech.stop();
     } catch (error) {

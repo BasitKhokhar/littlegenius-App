@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import Svg, { Circle } from 'react-native-svg';
 import { Header } from '../../Components/UI';
+import SpeakButton from '../../Components/Common/SpeakButton';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useDialog } from '../../Context';
 import { useTabBarClearance } from '../../Hooks';
@@ -146,10 +147,33 @@ const TasbeehScreen = ({ navigation }) => {
           })}
         </ScrollView>
 
-        {/* Current dhikr card */}
+        {/* Current dhikr card — one speaker for the Arabic dhikr, one for its
+            Urdu meaning, so a child can check either on its own. */}
         <View style={[styles.dhikrCard, { borderLeftColor: dhikr.color }]}>
-          <Text style={styles.arabic}>{dhikr.arabic}</Text>
-          <Text style={styles.urdu}>{dhikr.urdu}</Text>
+          <View style={styles.scriptRow}>
+            <SpeakButton
+              text={dhikr.arabic}
+              language="ar-SA"
+              fallbackText={dhikr.transliteration}
+              variant="icon"
+              size="sm"
+              color={dhikr.color}
+              accessibilityLabel="Play the Arabic"
+            />
+            <Text style={[styles.arabic, styles.scriptText]}>{dhikr.arabic}</Text>
+          </View>
+          <View style={styles.scriptRow}>
+            <SpeakButton
+              text={dhikr.urdu}
+              language="ur-PK"
+              fallbackText={dhikr.english}
+              variant="icon"
+              size="sm"
+              color={dhikr.color}
+              accessibilityLabel="Play the Urdu translation"
+            />
+            <Text style={[styles.urdu, styles.scriptText]}>{dhikr.urdu}</Text>
+          </View>
           <Text style={styles.english}>{dhikr.english}</Text>
         </View>
 
@@ -250,6 +274,15 @@ const makeStyles = (colors) => StyleSheet.create({
     marginTop: 14,
     alignItems: 'center',
   },
+  // Speaker on the left, script filling the rest — the text stays centred in
+  // the card because the button is the same width on every row.
+  scriptRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    gap: 10,
+  },
+  scriptText: { flex: 1 },
   arabic: {
     fontSize: 26,
     color: colors.textPrimary,

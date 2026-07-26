@@ -58,16 +58,44 @@ const tap = (fn, game) => {
 const PREVIEW_SCENE = coloringData.find((s) => s.id === 'trex') || coloringData[0];
 const PREVIEW_FILLS = PREVIEW_SCENE.preview || {};
 
+// Thumbnails are small, so the art's own stroke weights get scaled up a
+// little — otherwise the hairline texture lines vanish on the card.
+const PREVIEW_INK = 1.5;
+
 const ColoringPreview = ({ size }) => (
   <Svg width={size} height={size} viewBox={PREVIEW_SCENE.viewBox}>
     {PREVIEW_SCENE.regions.map((r) => (
-      <Path key={r.id} d={r.d} fill={PREVIEW_FILLS[r.id] || '#FFFFFF'} stroke="#2B2B3A" strokeWidth={4} strokeLinejoin="round" />
+      <Path
+        key={r.id}
+        d={r.d}
+        fill={PREVIEW_FILLS[r.id] || '#FFFFFF'}
+        stroke="#2B2B3A"
+        strokeWidth={(r.w ?? 2.8) * PREVIEW_INK}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
     ))}
     {PREVIEW_SCENE.outlines.map((o, i) => (
-      <Path key={`o${i}`} d={o.d} fill={o.fill ? '#2B2B3A' : 'none'} stroke="#2B2B3A" strokeWidth={3} strokeLinecap="round" />
+      <Path
+        key={`o${i}`}
+        d={o.d}
+        fill={o.fill ? '#2B2B3A' : 'none'}
+        stroke="#2B2B3A"
+        strokeWidth={(o.w ?? 1.6) * PREVIEW_INK}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     ))}
   </Svg>
 );
+
+// Explicit "what's new" order for the grid. Anything not listed keeps its
+// natural gamesList order behind these (offset well past the listed ranks).
+const GRID_ORDER = ['DrawingBoard', 'TracingWorksheet', 'LetterPuzzle'];
+const gridRank = (game) => {
+  const i = GRID_ORDER.indexOf(game.route);
+  return i === -1 ? 100 + game.id : i;
+};
 
 // ── Large featured showcase card ──────────────────────────────
 const FeaturedCard = ({ game, index, styles, onPress }) => {
@@ -169,7 +197,11 @@ const GamesScreen = ({ navigation }) => {
   const featured = coloring
     ? { ...coloring, preview: true, tag: 'ART' }
     : gamesList[0];
-  const rest = gamesList.filter((g) => g.id !== featured.id);
+  // Newest activities lead the grid (Neon Drawing first), then the classic
+  // mini-games — so what's new is the first thing a child sees.
+  const rest = gamesList
+    .filter((g) => g.id !== featured.id)
+    .sort((a, b) => gridRank(a) - gridRank(b));
 
   return (
     <View style={styles.container}>

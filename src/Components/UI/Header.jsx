@@ -15,6 +15,7 @@ const Header = ({
   stars = null,
   rightAction = null,
   useLogo = false,
+  variant = 'solid',
 }) => {
   const insets = useSafeAreaInsets();
   const auth = useAuth();
@@ -23,12 +24,20 @@ const Header = ({
   const displayStars = stars !== null ? stars : auth?.stars || 0;
   const displayAvatar = auth?.user?.avatar || avatar;
 
+  // `transparent` floats the back button / title / stars directly over a
+  // game's full-bleed gradient (no solid bar, no shadow) — used by the
+  // gameplay screens. Everything else keeps the default solid brand bar.
+  const isTransparent = variant === 'transparent';
+
   return (
     <View
       style={[
         styles.header,
-        coloredShadow(colors.brandSurface, 'md'),
-        { backgroundColor: colors.brandSurface, paddingTop: Math.max(insets.top, 10) },
+        !isTransparent && coloredShadow(colors.brandSurface, 'md'),
+        {
+          backgroundColor: isTransparent ? 'transparent' : colors.brandSurface,
+          paddingTop: Math.max(insets.top, 10),
+        },
       ]}
     >
       <View style={styles.headerContent}>

@@ -1,28 +1,59 @@
-﻿import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
-  ScrollView,
   FlatList,
   TouchableOpacity,
   Text,
   StyleSheet,
+  useWindowDimensions,
 } from 'react-native';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { Fonts } from '../../Theme/fonts';
 import { urduData } from '../../Data/urduData';
 import { Header } from '../../Components/UI';
+import { VocabularyTile, SketchCanvas } from '../../Components/Educational';
 import SpeakButton from '../../Components/Common/SpeakButton';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
-import { SketchButton, SketchCanvas } from '../../Components/Educational';
+import SpeechEngine from '../../Utils/speechEngine';
+import { useTabBarClearance } from '../../Hooks';
 
 const UrduScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
-  const styles = makeStyles(colors);
+  // Tight clearance so the Prev/Next bar hugs the bottom edge — same as the
+  // English alphabet detail view.
+  const bottomPad = useTabBarClearance(6);
+  const gridPad = useTabBarClearance();
+  const { height: winHeight } = useWindowDimensions();
+  // Keeps the glyph/emoji proportional on very short or very tall devices;
+  // everything else is flex, so the detail view always fits without scrolling.
+  const scale = Math.min(1.1, Math.max(0.8, winHeight / 800));
+  const styles = makeStyles(colors, scale);
   const [selectedLetter, setSelectedLetter] = useState(null);
   const [sketchOpen, setSketchOpen] = useState(false);
   const letter = selectedLetter !== null ? urduData[selectedLetter] : null;
 
-  if (letter) {
+  // Silence any clip when moving to another letter or leaving the detail view.
+  useEffect(() => {
+    return () => {
+      SpeechEngine.stop();
+    };
+  }, [selectedLetter]);
+
+  // ─── Detail view ──────────────────────────────────────────
+  if (selectedLetter !== null && letter) {
+    const total = urduData.length;
+    const hero = letter.vocabulary[0];
+    // 3 tiles per row — 6 words fill two rows exactly.
+    const wordRows = [letter.vocabulary.slice(0, 3), letter.vocabulary.slice(3, 6)];
+    // Wrap around at both ends so no button is ever dead.
+    const prevIdx = (selectedLetter - 1 + total) % total;
+    const nextIdx = (selectedLetter + 1) % total;
+
+    const goToLetter = (idx) => {
+      SpeechEngine.stop();
+      setSelectedLetter(idx);
+    };
+
     return (
       <View style={styles.container}>
         <Header
@@ -30,67 +61,126 @@ const UrduScreen = ({ navigation, route }) => {
           showBack={true}
           onBackPress={() => setSelectedLetter(null)}
         />
-        
-        <ScrollView contentContainerStyle={styles.detailContent} showsVerticalScrollIndicator={false}>
-          <View style={[styles.letterDisplay, { borderColor: letter.color }]}>
-            <Text style={[styles.letterText, { color: letter.color }]}>
-              {letter.letter}
-            </Text>
-            <Text style={styles.letterName}>{letter.name}</Text>
-            {/* Hear the letter itself. Speak the Urdu glyph (not the romanized
-                name) so the pre-baked Urdu voice pronounces it correctly; the
-                romanized name is the no-voice-pack fallback. */}
-            <View style={styles.letterSpeak}>
-              <SpeakButton
-                text={letter.letter}
-                language="ur-PK"
-                fallbackText={letter.name}
-                color={letter.color}
-                label="🔊 Hear letter"
-                size="sm"
-                clipRate={0.7}
-                rate={0.75}
-              />
-            </View>
-          </View>
 
-          {/* Sketch / handwriting practice */}
-          <View style={styles.sketchSection}>
-            <SketchButton
-              color={letter.color}
-              label={`Write ${letter.name}`}
-              onPress={() => setSketchOpen(true)}
-            />
-          </View>
+        <View style={styles.stage}>
+          {/* Hero — emoji beside the glyph, with both actions inside it so the
+              card stays short and the word grid gets the height. */}
+          <View style={[styles.hero, { backgroundColor: letter.color }]}>
+            <View style={styles.heroDecor} />
 
-          <Text style={styles.vocabularyTitle}>Vocabulary (ذخیرہ الفاظ)</Text>
-          {letter.vocabulary.map((vocab, idx) => (
-            <View key={idx} style={styles.vocabCard}>
-              <View style={styles.vocabLeft}>
-                <Text style={styles.vocabEmoji}>{vocab.emoji}</Text>
-                <View style={styles.vocabTextContainer}>
-                  <Text style={styles.vocabWord}>{vocab.word}</Text>
-                  <Text style={styles.vocabMeaning}>{vocab.meaning}</Text>
-                </View>
+            <View style={styles.heroTop}>
+              <View style={styles.heroEmojiBubble}>
+                <Text style={styles.heroEmoji}>{hero.emoji}</Text>
               </View>
-              {/* Speak the Urdu WORD, not its romanization: the pre-baked clip
-                  is an Urdu neural voice, which pronounces native script
-                  correctly and Latin ("Anaar") unreliably. The romanization
-                  stays as fallbackText for devices with no Urdu voice pack and
-                  no clip. */}
-              <SpeakButton
-                text={vocab.word}
-                language="ur-PK"
-                fallbackText={vocab.speak}
-                color={letter.color}
-                label="🔊 Pronounce"
-                size="sm"
-                clipRate={0.7}
-                rate={0.75}
-              />
+              <View style={styles.heroTextCol}>
+                <View style={styles.letterPair}>
+                  <Text style={styles.heroBig}>{letter.letter}</Text>
+                  <Text style={styles.heroSmall}>{letter.name}</Text>
+                </View>
+                <Text style={styles.heroWord} numberOfLines={1}>
+                  {hero.word}
+                </Text>
+              </View>
             </View>
-          ))}
-        </ScrollView>
+
+            <View style={styles.heroActions}>
+              <View style={styles.heroAction}>
+                {/* Speak the Urdu glyph (not the romanized name) so the
+                    pre-baked Urdu voice pronounces it correctly; the romanized
+                    name is the no-voice-pack fallback. */}
+                <SpeakButton
+                  text={letter.letter}
+                  language="ur-PK"
+                  fallbackText={letter.name}
+                  color="rgba(0,0,0,0.22)"
+                  label="🔊 Hear letter"
+                  size="sm"
+                  clipRate={0.7}
+                  rate={0.75}
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.sketchPill}
+                onPress={() => setSketchOpen(true)}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={`Practice writing letter ${letter.name}`}
+              >
+                <Text style={styles.sketchPillText}>✏️ Write {letter.name}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Six words — 3 per row, 2 rows, sized to fill the leftover height */}
+          <View style={styles.wordsSection}>
+            <Text style={styles.wordsTitle}>
+              📚 Words with{' '}
+              <Text style={[styles.wordsTitleGlyph, { color: letter.color }]}>
+                {letter.letter}
+              </Text>{' '}
+              • ذخیرہ الفاظ
+            </Text>
+            <View style={styles.wordsGrid}>
+              {wordRows.map((row, rowIdx) => (
+                <View key={`row-${rowIdx}`} style={styles.wordsRow}>
+                  {row.map((vocab, idx) => (
+                    <VocabularyTile
+                      key={`${vocab.word}-${idx}`}
+                      style={styles.wordTile}
+                      emoji={vocab.emoji}
+                      word={vocab.word}
+                      // The English meaning takes the badge slot the English
+                      // deck uses for the category.
+                      category={vocab.meaning}
+                      categoryColor={letter.color}
+                      // Speak the Urdu WORD, not its romanization: the pre-baked
+                      // clip is an Urdu neural voice, which pronounces native
+                      // script correctly and Latin ("Anaar") unreliably.
+                      language="ur-PK"
+                      fallbackText={vocab.speak}
+                      wordStyle={styles.tileWord}
+                    />
+                  ))}
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+
+        {/* Move between letters without going back to the grid */}
+        <View style={[styles.navBar, { paddingBottom: bottomPad }]}>
+          <TouchableOpacity
+            style={styles.navBtn}
+            onPress={() => goToLetter(prevIdx)}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={`Previous letter ${urduData[prevIdx].name}`}
+          >
+            {/* Arrow and glyph are separate Texts so the RTL script cannot
+                reorder the arrow to the wrong side of the button. */}
+            <Text style={styles.navBtnText}>←</Text>
+            <Text style={styles.navBtnGlyph}>{urduData[prevIdx].letter}</Text>
+          </TouchableOpacity>
+
+          <View style={styles.navCounter}>
+            <Text style={[styles.navCounterText, { color: letter.color }]}>
+              {selectedLetter + 1} / {total}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.navBtn, styles.navBtnPrimary, { backgroundColor: letter.color }]}
+            onPress={() => goToLetter(nextIdx)}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={`Next letter ${urduData[nextIdx].name}`}
+          >
+            <Text style={[styles.navBtnGlyph, styles.navBtnTextPrimary]}>
+              {urduData[nextIdx].letter}
+            </Text>
+            <Text style={[styles.navBtnText, styles.navBtnTextPrimary]}>→</Text>
+          </TouchableOpacity>
+        </View>
 
         <SketchCanvas
           visible={sketchOpen}
@@ -104,6 +194,7 @@ const UrduScreen = ({ navigation, route }) => {
     );
   }
 
+  // ─── Grid view ────────────────────────────────────────────
   return (
     <View style={styles.container}>
       <Header
@@ -116,8 +207,9 @@ const UrduScreen = ({ navigation, route }) => {
         data={urduData}
         keyExtractor={(item) => item.name}
         numColumns={2}
-        contentContainerStyle={styles.gridContent}
+        contentContainerStyle={[styles.gridContent, { paddingBottom: gridPad }]}
         columnWrapperStyle={styles.gridRow}
+        showsVerticalScrollIndicator={false}
         ListFooterComponent={
           <QuizEntryBar
             color="#8A6FF0"
@@ -134,7 +226,7 @@ const UrduScreen = ({ navigation, route }) => {
               {item.letter}
             </Text>
             <Text style={styles.gridNameText}>{item.name}</Text>
-            <Text style={styles.hint}>5 Words • ۵ الفاظ</Text>
+            <Text style={styles.hint}>6 Words • ۶ الفاظ</Text>
           </TouchableOpacity>
         )}
       />
@@ -142,15 +234,16 @@ const UrduScreen = ({ navigation, route }) => {
   );
 };
 
-const makeStyles = (colors) => StyleSheet.create({
+const makeStyles = (colors, s) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
   },
+
+  // Grid view
   gridContent: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    paddingBottom: 130,
     gap: 12,
   },
   gridRow: {
@@ -192,95 +285,206 @@ const makeStyles = (colors) => StyleSheet.create({
     color: colors.primary,
     textTransform: 'uppercase',
   },
-  detailContent: {
+
+  // Detail view — one screen, no scrolling
+  stage: {
+    flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    paddingBottom: 130,
+    paddingTop: 10,
+    gap: 10,
   },
-  letterDisplay: {
-    borderRadius: 28,
-    borderWidth: 3,
-    paddingVertical: 36,
+  // Short hero: it may grow into spare height but never past maxHeight, so
+  // the word grid always keeps the bigger share of the screen. Nastaliq needs
+  // a taller box than the Latin hero, hence the larger min/max.
+  hero: {
+    flex: 1,
+    minHeight: 168,
+    maxHeight: 212,
+    borderRadius: 26,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    gap: 10,
+    overflow: 'hidden',
+    borderBottomWidth: 4,
+    borderBottomColor: 'rgba(0,0,0,0.18)',
+    elevation: 8,
+    shadowColor: '#1E1B4B',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 20,
+  },
+  heroDecor: {
+    position: 'absolute',
+    top: -40,
+    right: -40,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  heroTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 10,
+  },
+  heroEmojiBubble: {
+    width: 90 * s,
+    height: 90 * s,
+    borderRadius: 45 * s,
+    backgroundColor: 'rgba(255,255,255,0.22)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
-    backgroundColor: colors.surface,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    borderBottomWidth: 6,
-    borderBottomColor: 'rgba(0,0,0,0.15)',
   },
-  letterText: {
-    fontSize: 80,
-    fontWeight: '900',
-    lineHeight: 130,
-    marginBottom: 8,
-    fontFamily: Fonts.urduBold, // Nastaliq Urdu rendering
+  heroEmoji: {
+    fontSize: 55 * s,
+    lineHeight: 65 * s,
+    textAlign: 'center',
   },
-  letterName: {
-    fontSize: 18,
+  heroTextCol: {
+    flex: 1,
+  },
+  letterPair: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  heroBig: {
+    fontSize: 44 * s,
     fontWeight: '900',
-    color: colors.textMuted,
+    color: '#FFFFFF',
+    // Nastaliq draws well below the baseline — ~1.6x or the glyph is clipped.
+    lineHeight: 70 * s,
+    fontFamily: Fonts.urduBold,
+    textShadowColor: 'rgba(0,0,0,0.2)',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 6,
+  },
+  heroSmall: {
+    fontSize: 17 * s,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.78)',
+    lineHeight: 24 * s,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 0.6,
+    flexShrink: 1,
   },
-  letterSpeak: {
-    marginTop: 16,
+  heroWord: {
+    fontSize: 16 * s,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    lineHeight: 28 * s,
+    fontFamily: Fonts.urduBold,
   },
-  sketchSection: {
-    marginBottom: 24,
+  heroActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  vocabularyTitle: {
+  heroAction: {
+    flex: 1,
+  },
+  // Mirrors SpeakButton size="sm" so both hero pills read as a pair.
+  sketchPill: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.22)',
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sketchPillText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+
+  wordsSection: {
+    flex: 2,
+  },
+  wordsTitle: {
+    fontSize: 14,
+    fontWeight: '900',
+    marginTop: 4,
+    marginBottom: 12,
+    color: colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  wordsTitleGlyph: {
+    fontSize: 16,
+    fontFamily: Fonts.urduBold,
+  },
+  wordsGrid: {
+    flex: 1,
+    gap: 10,
+  },
+  // maxHeight keeps the tiles near-square on tall devices instead of
+  // stretching them into columns; spare height becomes row spacing.
+  wordsRow: {
+    flex: 1,
+    maxHeight: 150,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  wordTile: {
+    flex: 1,
+  },
+  // Nastaliq inside the tile: bigger than the Latin word style and with the
+  // headroom the script needs, or the descenders get cut off.
+  tileWord: {
+    fontSize: 16,
+    lineHeight: 28,
+    fontFamily: Fonts.urduBold,
+  },
+
+  // Prev / Next bar — stays in normal flow so it never overlaps content
+  navBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+  },
+  navBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    borderRadius: 16,
+    paddingVertical: 8,
+  },
+  navBtnPrimary: {
+    borderWidth: 0,
+  },
+  navCounter: {
+    minWidth: 56,
+    alignItems: 'center',
+  },
+  navCounterText: {
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  navBtnText: {
     fontSize: 16,
     fontWeight: '900',
     color: colors.textPrimary,
-    marginBottom: 16,
   },
-  vocabCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: colors.border,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-  },
-  vocabLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    gap: 14,
-  },
-  vocabEmoji: {
-    fontSize: 34,
-  },
-  vocabTextContainer: {
-    flex: 1,
-    gap: 2,
-  },
-  vocabWord: {
-    fontSize: 22,
+  navBtnGlyph: {
+    fontSize: 20,
+    lineHeight: 34,
     fontWeight: '900',
+    fontFamily: Fonts.urduBold,
     color: colors.textPrimary,
-    textAlign: 'left',
-    lineHeight: 38,
-    fontFamily: Fonts.urduBold, // Nastaliq Urdu rendering
   },
-  vocabMeaning: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textMuted,
+  navBtnTextPrimary: {
+    color: '#FFFFFF',
   },
 });
 

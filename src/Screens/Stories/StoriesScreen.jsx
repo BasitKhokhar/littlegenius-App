@@ -9,6 +9,7 @@ import {
 import { storiesData, islamicStoriesData } from '../../Data';
 import { Header } from '../../Components/UI';
 import { useThemeColors } from '../../Context/ThemeContext';
+import { useHideTabBar } from '../../Context/TabBarContext';
 import { useTabBarClearance } from '../../Hooks';
 import SpeakButton from '../../Components/Common/SpeakButton';
 
@@ -22,6 +23,11 @@ const StoriesScreen = ({ navigation, route }) => {
   const isIslamic = route?.params?.source === 'islamic';
   const stories = isIslamic ? islamicStoriesData : storiesData;
   const story = selectedStory !== null ? stories[selectedStory] : null;
+
+  // Reading a story is a drill-down even though it isn't a pushed route, so
+  // the tab bar has to go — it would cover the last page card otherwise.
+  // Called before the early return below to keep hook order stable.
+  useHideTabBar(story !== null);
 
   // ─── Story Detail ──────────────────────────────────────────
   if (selectedStory !== null && story) {

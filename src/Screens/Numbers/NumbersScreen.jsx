@@ -16,11 +16,13 @@ import SpeakButton from '../../Components/Common/SpeakButton';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 import { SketchButton, SketchCanvas } from '../../Components/Educational';
 import SpeechEngine from '../../Utils/speechEngine';
+import { useTabBarClearance } from '../../Hooks';
 
 const { width } = Dimensions.get('window');
 
 const NumbersScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
+  const bottomPad = useTabBarClearance();
   const styles = makeStyles(colors);
   const [selectedNum, setSelectedNum] = useState(null);
   const [sketchOpen, setSketchOpen] = useState(false);
@@ -46,7 +48,7 @@ const NumbersScreen = ({ navigation, route }) => {
         data={numbersData}
         keyExtractor={(item) => item.number.toString()}
         numColumns={3}
-        contentContainerStyle={styles.gridContent}
+        contentContainerStyle={[styles.gridContent, { paddingBottom: bottomPad }]}
         columnWrapperStyle={styles.gridRow}
         ListFooterComponent={
           <QuizEntryBar
@@ -155,7 +157,6 @@ const makeStyles = (colors) => StyleSheet.create({
   gridContent: {
     paddingHorizontal: 12,
     paddingVertical: 16,
-    paddingBottom: 130,
     gap: 10,
   },
   gridRow: {

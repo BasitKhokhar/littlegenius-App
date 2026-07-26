@@ -17,9 +17,11 @@ import {
   colorMatchData,
   shapeQuizData,
 } from '../../Data/gamesData';
-import { useThemeColors } from '../../Context/ThemeContext';
+import { useTheme } from '../../Context/ThemeContext';
+import { getGameTheme } from '../../Theme/gameThemes';
 import { useTabBarClearance } from '../../Hooks';
 import { Header } from '../../Components/UI';
+import { GameStage, Mascot, CelebrationOverlay } from '../../Components/Games';
 import { useAuth } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
@@ -35,6 +37,10 @@ import { generateMathProblem, shuffleArray } from '../../Utils/dataHelpers';
 // ──────────────────────────────────────────────────────────────
 
 const MEMORY_PAIRS = memoryCardsList.length / 2;
+
+// Games whose play area has no visual subject of its own — only these get the
+// bobbing mascot above the question (Pattern Match & Math Race).
+const SHOWS_MASCOT = new Set([1, 4]);
 
 // ── Reusable answer tile (pattern / math / color / shape) ─────
 const OptionTile = ({ value, display, textStyle, correctValue, picked, onPress, colors }) => {
@@ -114,12 +120,16 @@ const MemoryCard = ({ card, isFlipped, isMatched, onPress, accent, colors }) => 
 const GamePlayScreen = ({ navigation, route }) => {
   const { gameId } = route.params;
   const { addStars } = useAuth();
-  const colors = useThemeColors();
+  const { colors, isDark } = useTheme();
+  const gt = getGameTheme(gameId, isDark);
   const bottomPad = useTabBarClearance();
   const styles = makeStyles(colors);
 
   const meta = gamesList.find((g) => g.id === gameId) || {};
-  const accent = [meta.gradStart || colors.primary, meta.gradEnd || colors.primaryDark];
+  // Inner "vivid box" gradient (math/shape/pattern-mark/memory back) —
+  // candy accent → the stage's deepest stop, so it harmonises with the
+  // themed background in both light and dark.
+  const accent = [gt.accent, gt.bg[gt.bg.length - 1]];
 
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -563,11 +573,22 @@ const GamePlayScreen = ({ navigation, route }) => {
   const barWidth = progressAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
 
   return (
-    <View style={styles.container}>
-      <Header title={getHeaderTitle()} showBack onBackPress={() => navigation.goBack()} />
+    <GameStage theme={gt}>
+      <Header title={getHeaderTitle()} showBack variant="transparent" onBackPress={() => navigation.goBack()} />
 
-      {/* Live HUD */}
-      {gameState === 'playing' && (
+      {gameState === 'won' ? (
+        <CelebrationOverlay
+          title="Awesome Job!"
+          scoreLabel={`You got ${score} correct in ${getHeaderTitle()}`}
+          reward={15}
+          accent={gt.accent}
+          onReplay={initGame}
+          onExit={() => navigation.goBack()}
+        />
+      ) : (
+      <>
+      {/* Live HUD (floating glass panel over the themed stage) */}
+      {(
         <View style={styles.hud}>
           <View style={styles.hudRow}>
             <View style={styles.hudChip}>
@@ -599,48 +620,22 @@ const GamePlayScreen = ({ navigation, route }) => {
       )}
 
       <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad }]}>
-        {gameState === 'playing' ? (
-          <>
-            {gameId === 1 && renderPatternGame()}
-            {gameId === 2 && renderMemoryGame()}
-            {gameId === 3 && renderOddGame()}
-            {gameId === 4 && renderMathGame()}
-            {gameId === 5 && renderColorGame()}
-            {gameId === 6 && renderShapeGame()}
-          </>
-        ) : (
-          <Animated.View style={{ transform: [{ scale: victoryScale }], opacity: victoryScale, width: '100%' }}>
-            <LinearGradient colors={accent} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.victoryCard}>
-              <View style={styles.victoryDecor} />
-              <Animated.Text style={[styles.victoryEmoji, { transform: [{ scale: trophyBounce }] }]}>🏆</Animated.Text>
-              <Text style={styles.victoryTitle}>Awesome Job!</Text>
-              <Text style={styles.victorySubtitle}>You completed {getHeaderTitle()}!</Text>
-
-              <View style={styles.victoryStatsRow}>
-                <View style={styles.victoryStat}>
-                  <Text style={styles.victoryStatValue}>{score}</Text>
-                  <Text style={styles.victoryStatLabel}>Correct</Text>
-                </View>
-                <View style={styles.victoryStatDivider} />
-                <View style={styles.victoryStat}>
-                  <Text style={styles.victoryStatValue}>+15</Text>
-                  <Text style={styles.victoryStatLabel}>Stars ⭐</Text>
-                </View>
-              </View>
-
-              <View style={styles.victoryButtons}>
-                <TouchableOpacity style={styles.victoryBtnPrimary} onPress={initGame} activeOpacity={0.9}>
-                  <Text style={styles.victoryBtnPrimaryText}>Play Again 🔁</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.victoryBtnGhost} onPress={() => navigation.goBack()} activeOpacity={0.9}>
-                  <Text style={styles.victoryBtnGhostText}>Back to Games ➔</Text>
-                </TouchableOpacity>
-              </View>
-            </LinearGradient>
-          </Animated.View>
+        {/* The mascot only earns its space where the puzzle itself has no
+            visual subject. Memory / Odd One Out / Color / Shape already show
+            big art of their own, so a second floating emoji just crowds them. */}
+        {SHOWS_MASCOT.has(gameId) && (
+          <Mascot emoji={gt.mascot} size={58} glow={gt.deco} style={styles.mascot} />
         )}
+        {gameId === 1 && renderPatternGame()}
+        {gameId === 2 && renderMemoryGame()}
+        {gameId === 3 && renderOddGame()}
+        {gameId === 4 && renderMathGame()}
+        {gameId === 5 && renderColorGame()}
+        {gameId === 6 && renderShapeGame()}
       </ScrollView>
-    </View>
+      </>
+      )}
+    </GameStage>
   );
 };
 
@@ -697,16 +692,25 @@ const memoStyles = (colors) =>
 
 const makeStyles = (colors) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.bg },
+    mascot: { alignSelf: 'center', marginBottom: 8 },
 
-    // HUD
+    // HUD — floating glass panel over the themed stage
     hud: {
-      paddingHorizontal: 16,
+      marginHorizontal: 16,
+      marginTop: 10,
+      marginBottom: 4,
+      paddingHorizontal: 14,
       paddingTop: 12,
       paddingBottom: 14,
       backgroundColor: colors.surface,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+      elevation: 6,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.16,
+      shadowRadius: 12,
     },
     hudRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
     hudChip: {
@@ -753,17 +757,23 @@ const makeStyles = (colors) =>
     questionText: {
       fontSize: 24,
       fontWeight: '900',
-      color: colors.textPrimary,
+      color: '#FFFFFF',
       textAlign: 'center',
       marginBottom: 6,
       letterSpacing: -0.4,
+      textShadowColor: 'rgba(0,0,0,0.22)',
+      textShadowOffset: { width: 0, height: 2 },
+      textShadowRadius: 4,
     },
     hint: {
       fontSize: 13,
-      fontWeight: '700',
-      color: colors.textSecondary,
+      fontWeight: '800',
+      color: 'rgba(255,255,255,0.92)',
       marginBottom: 26,
       textAlign: 'center',
+      textShadowColor: 'rgba(0,0,0,0.18)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 3,
     },
 
     // Pattern
@@ -884,81 +894,18 @@ const makeStyles = (colors) =>
     },
     colorEmoji: { fontSize: 52 },
 
-    // Shape
+    // Shape — the glyph IS the question here, so it gets the space the
+    // removed mascot used to take.
     shapeBox: {
-      borderRadius: 28,
+      borderRadius: 32,
       paddingVertical: 30,
-      paddingHorizontal: 48,
+      paddingHorizontal: 56,
       marginBottom: 32,
       alignItems: 'center',
       elevation: 4,
     },
-    shapeEmoji: { fontSize: 68, marginBottom: 6 },
-    shapeUrdu: { fontSize: 18, fontWeight: '800', color: 'rgba(255,255,255,0.92)' },
-
-    // Victory
-    victoryCard: {
-      borderRadius: 32,
-      padding: 30,
-      alignItems: 'center',
-      overflow: 'hidden',
-      elevation: 8,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.25,
-      shadowRadius: 16,
-    },
-    victoryDecor: {
-      position: 'absolute',
-      top: -50,
-      right: -30,
-      width: 160,
-      height: 160,
-      borderRadius: 80,
-      backgroundColor: 'rgba(255,255,255,0.12)',
-    },
-    victoryEmoji: { fontSize: 84, marginBottom: 12 },
-    victoryTitle: { fontSize: 30, fontWeight: '900', color: '#FFFFFF', marginBottom: 4, letterSpacing: -0.5 },
-    victorySubtitle: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: 'rgba(255,255,255,0.9)',
-      textAlign: 'center',
-      marginBottom: 22,
-    },
-    victoryStatsRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: 'rgba(255,255,255,0.18)',
-      borderRadius: 18,
-      paddingVertical: 14,
-      paddingHorizontal: 24,
-      marginBottom: 24,
-      gap: 20,
-    },
-    victoryStat: { alignItems: 'center', minWidth: 64 },
-    victoryStatValue: { fontSize: 26, fontWeight: '900', color: '#FFFFFF' },
-    victoryStatLabel: { fontSize: 11, fontWeight: '800', color: 'rgba(255,255,255,0.85)', letterSpacing: 0.4, marginTop: 2 },
-    victoryStatDivider: { width: 1.5, height: 34, backgroundColor: 'rgba(255,255,255,0.25)' },
-    victoryButtons: { width: '100%', gap: 12 },
-    victoryBtnPrimary: {
-      backgroundColor: '#FFFFFF',
-      paddingVertical: 15,
-      borderRadius: 16,
-      alignItems: 'center',
-      borderBottomWidth: 4,
-      borderBottomColor: 'rgba(0,0,0,0.12)',
-    },
-    victoryBtnPrimaryText: { color: colors.textPrimary, fontWeight: '900', fontSize: 15 },
-    victoryBtnGhost: {
-      backgroundColor: 'rgba(255,255,255,0.2)',
-      paddingVertical: 15,
-      borderRadius: 16,
-      alignItems: 'center',
-      borderWidth: 1.5,
-      borderColor: 'rgba(255,255,255,0.35)',
-    },
-    victoryBtnGhostText: { color: '#FFFFFF', fontWeight: '900', fontSize: 15 },
+    shapeEmoji: { fontSize: 128, lineHeight: 148, marginBottom: 2 },
+    shapeUrdu: { fontSize: 22, fontWeight: '800', color: 'rgba(255,255,255,0.92)' },
   });
 
 export default GamePlayScreen;

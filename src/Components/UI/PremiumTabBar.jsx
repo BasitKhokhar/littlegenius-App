@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { useThemeColors } from '../../Context/ThemeContext';
+import { useTheme } from '../../Context/ThemeContext';
+import { useTabBarVisibility } from '../../Context/TabBarContext';
 import { Radius } from '../../Theme';
 
 // ──────────────────────────────────────────────────────────────
@@ -42,6 +43,13 @@ const BAR_LIGHT = {
   label: '#1E1B4B', // active label
   shadow: '#000000',
 };
+
+// The "notch" ring around the raised circle. In LIGHT mode it shows the
+// soft screen background (`colors.bg`) so it reads as a bite into the pill.
+// In DARK mode that bg is near-black and the ring vanishes against the
+// dark screen, so we swap to a light periwinkle halo that glows around the
+// indigo circle and reads as premium.
+const DARK_RING = '#C7D2FE';
 
 const TabItem = ({
   focused,
@@ -110,8 +118,16 @@ const TabItem = ({
 };
 
 const PremiumTabBar = ({ state, descriptors, navigation }) => {
-  const colors = useThemeColors();
+  const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const { hidden } = useTabBarVisibility();
+  const ringColor = isDark ? DARK_RING : colors.bg;
+
+  // The bar only belongs on each tab's landing screen. Two ways it goes away:
+  //  • AppNavigator sets `tabBarStyle.display = 'none'` for pushed routes.
+  //  • A screen rendering an in-place detail calls `useHideTabBar()`.
+  const focusedOptions = descriptors[state.routes[state.index].key]?.options;
+  if (hidden || focusedOptions?.tabBarStyle?.display === 'none') return null;
 
   return (
     <View
@@ -144,7 +160,7 @@ const PremiumTabBar = ({ state, descriptors, navigation }) => {
               label={label}
               icon={icon}
               circleColor={BAR_LIGHT.circle}
-              cutoutColor={colors.bg}
+              cutoutColor={ringColor}
               iconOn={BAR_LIGHT.iconOn}
               idleColor={BAR_LIGHT.idle}
               labelColor={BAR_LIGHT.label}

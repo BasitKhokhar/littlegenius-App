@@ -1,4 +1,7 @@
 // Urdu Alphabet (Haroof) Data - Full 38 Letters
+// Six words per letter — same shape as alphabetData, so UrduScreen can lay them
+// out as a 3x2 grid exactly like AlphabetScreen. `speak` is the romanization,
+// used ONLY as the no-voice-pack fallback (the app speaks `word` in ur-PK).
 const COLORS = [
   '#F85A9B', '#FFAF3A', '#3EC38B', '#3C97F9', '#8A6FF0',
   '#FF6B5A', '#8B5CF6', '#00BCD4', '#E91E63', '#607D8B',
@@ -13,6 +16,7 @@ export const urduData = [
       { word: 'انڈہ', meaning: 'Egg', emoji: '🥚', speak: 'Anda' },
       { word: 'اونٹ', meaning: 'Camel', emoji: '🐫', speak: 'Oont' },
       { word: 'امرود', meaning: 'Guava', emoji: '🍏', speak: 'Amrood' },
+      { word: 'استاد', meaning: 'Teacher', emoji: '👨‍🏫', speak: 'Ustaad' },
     ],
   },
   {
@@ -23,6 +27,7 @@ export const urduData = [
       { word: 'بطخ', meaning: 'Duck', emoji: '🦆', speak: 'Batakh' },
       { word: 'باجا', meaning: 'Trumpet', emoji: '🎺', speak: 'Baja' },
       { word: 'بادل', meaning: 'Cloud', emoji: '☁️', speak: 'Baadal' },
+      { word: 'بندر', meaning: 'Monkey', emoji: '🐒', speak: 'Bandar' },
     ],
   },
   {
@@ -33,6 +38,7 @@ export const urduData = [
       { word: 'پنکھا', meaning: 'Fan', emoji: '🌀', speak: 'Pankha' },
       { word: 'پیاز', meaning: 'Onion', emoji: '🧅', speak: 'Pyaaz' },
       { word: 'پتنگ', meaning: 'Kite', emoji: '🪁', speak: 'Patang' },
+      { word: 'پرندہ', meaning: 'Bird', emoji: '🐦', speak: 'Parinda' },
     ],
   },
   {
@@ -43,6 +49,7 @@ export const urduData = [
       { word: 'ترازو', meaning: 'Scale', emoji: '⚖️', speak: 'Tarazoo' },
       { word: 'تربوز', meaning: 'Watermelon', emoji: '🍉', speak: 'Tarbooz' },
       { word: 'تارا', meaning: 'Star', emoji: '⭐', speak: 'Taara' },
+      { word: 'تصویر', meaning: 'Picture', emoji: '🖼️', speak: 'Tasveer' },
     ],
   },
   {
@@ -53,6 +60,7 @@ export const urduData = [
       { word: 'ٹب', meaning: 'Tub', emoji: '🛁', speak: 'Tab' },
       { word: 'ٹرک', meaning: 'Truck', emoji: '🚚', speak: 'Trak' },
       { word: 'ٹوکری', meaning: 'Basket', emoji: '🧺', speak: 'Tokri' },
+      { word: 'ٹرین', meaning: 'Train', emoji: '🚆', speak: 'Train' },
     ],
   },
   {
@@ -63,6 +71,7 @@ export const urduData = [
       { word: 'ثواب', meaning: 'Reward', emoji: '🎁', speak: 'Sawaab' },
       { word: 'ثقیل', meaning: 'Heavy', emoji: '🏋️', speak: 'Saqeel' },
       { word: 'ثقافت', meaning: 'Culture', emoji: '🏛️', speak: 'Saqafat' },
+      { word: 'ثابت', meaning: 'Proven', emoji: '✔️', speak: 'Saabit' },
     ],
   },
   {
@@ -73,6 +82,7 @@ export const urduData = [
       { word: 'جوتا', meaning: 'Shoe', emoji: '👟', speak: 'Joota' },
       { word: 'جوس', meaning: 'Juice', emoji: '🧃', speak: 'Juice' },
       { word: 'جانور', meaning: 'Animal', emoji: '🐾', speak: 'Janwar' },
+      { word: 'جھنڈا', meaning: 'Flag', emoji: '🚩', speak: 'Jhanda' },
     ],
   },
   {
@@ -83,6 +93,7 @@ export const urduData = [
       { word: 'چڑیا', meaning: 'Sparrow', emoji: '🐦', speak: 'Chidiya' },
       { word: 'چابی', meaning: 'Key', emoji: '🔑', speak: 'Chaabi' },
       { word: 'چہل پہل', meaning: 'Fun', emoji: '🎉', speak: 'Chehal Pehal' },
+      { word: 'چاند', meaning: 'Moon', emoji: '🌙', speak: 'Chaand' },
     ],
   },
   {
@@ -93,6 +104,7 @@ export const urduData = [
       { word: 'حل', meaning: 'Solution', emoji: '💡', speak: 'Hal' },
       { word: 'حوصلہ', meaning: 'Courage', emoji: '💪', speak: 'Hosla' },
       { word: 'حلقہ', meaning: 'Circle', emoji: '⭕', speak: 'Halqa' },
+      { word: 'حرف', meaning: 'Letter', emoji: '🔤', speak: 'Harf' },
     ],
   },
   {
@@ -103,6 +115,7 @@ export const urduData = [
       { word: 'خرگوش', meaning: 'Rabbit', emoji: '🐰', speak: 'Khargosh' },
       { word: 'خیمہ', meaning: 'Tent', emoji: '⛺', speak: 'Khaima' },
       { word: 'خاکہ', meaning: 'Map', emoji: '🗺️', speak: 'Khaka' },
+      { word: 'خط', meaning: 'Mail', emoji: '✉️', speak: 'Khat' },
     ],
   },
   {
@@ -113,6 +126,7 @@ export const urduData = [
       { word: 'دل', meaning: 'Heart', emoji: '❤️', speak: 'Dil' },
       { word: 'دستک', meaning: 'Knock', emoji: '🚪', speak: 'Dastak' },
       { word: 'دانت', meaning: 'Tooth', emoji: '🦷', speak: 'Daant' },
+      { word: 'دروازہ', meaning: 'Door', emoji: '🚪', speak: 'Darwaaza' },
     ],
   },
   {
@@ -123,6 +137,7 @@ export const urduData = [
       { word: 'ڈرم', meaning: 'Drum', emoji: '🥁', speak: 'Drum' },
       { word: 'ڈبہ', meaning: 'Box', emoji: '📦', speak: 'Dibba' },
       { word: 'ڈنڈا', meaning: 'Stick', emoji: '🪵', speak: 'Danda' },
+      { word: 'ڈاکیا', meaning: 'Postman', emoji: '📬', speak: 'Dakiya' },
     ],
   },
   {
@@ -133,6 +148,7 @@ export const urduData = [
       { word: 'ذائقہ', meaning: 'Taste', emoji: '👅', speak: 'Zaiqa' },
       { word: 'ذرا', meaning: 'A little', emoji: '🤏', speak: 'Zara' },
       { word: 'ذخیرہ', meaning: 'Treasure', emoji: '💎', speak: 'Zakheera' },
+      { word: 'ذمہ داری', meaning: 'Responsibility', emoji: '🤝', speak: 'Zimmedari' },
     ],
   },
   {
@@ -143,6 +159,7 @@ export const urduData = [
       { word: 'رسی', meaning: 'Rope', emoji: '🪢', speak: 'Rassi' },
       { word: 'راستہ', meaning: 'Path', emoji: '🛤️', speak: 'Raasta' },
       { word: 'روٹی', meaning: 'Bread', emoji: '🍞', speak: 'Roti' },
+      { word: 'ریل', meaning: 'Train', emoji: '🚆', speak: 'Rail' },
     ],
   },
   {
@@ -153,6 +170,9 @@ export const urduData = [
       { word: 'ڑنڈ', meaning: 'Stick', emoji: '🪵', speak: 'Dand' },
       { word: 'ڑاک', meaning: 'Post', emoji: '📮', speak: 'Daak' },
       { word: 'ڑیل', meaning: 'Sloth', emoji: '🦥', speak: 'Deel' },
+      // ڑ never begins an Urdu word, so this one teaches it where it really
+      // lives — inside a word the child already knows.
+      { word: 'پہاڑ', meaning: 'Mountain', emoji: '🏔️', speak: 'Pahaar' },
     ],
   },
   {
@@ -163,6 +183,7 @@ export const urduData = [
       { word: 'زر', meaning: 'Gold', emoji: '🥇', speak: 'Zar' },
       { word: 'زندگی', meaning: 'Life', emoji: '🌱', speak: 'Zindagi' },
       { word: 'زنجیر', meaning: 'Chain', emoji: '⛓️', speak: 'Zanjeer' },
+      { word: 'زیتون', meaning: 'Olive', emoji: '🫒', speak: 'Zaitoon' },
     ],
   },
   {
@@ -173,6 +194,7 @@ export const urduData = [
       { word: 'ژالہ باری', meaning: 'Hailstorm', emoji: '⛈️', speak: 'Zhaala Baari' },
       { word: 'ژرف', meaning: 'Deep', emoji: '🌊', speak: 'Zharf' },
       { word: 'ژنرل', meaning: 'General', emoji: '⭐', speak: 'General' },
+      { word: 'ژاپن', meaning: 'Japan', emoji: '🗾', speak: 'Japan' },
     ],
   },
   {
@@ -183,6 +205,7 @@ export const urduData = [
       { word: 'سکول', meaning: 'School', emoji: '🏫', speak: 'School' },
       { word: 'سپر', meaning: 'Super', emoji: '🦸', speak: 'Super' },
       { word: 'سردی', meaning: 'Cold', emoji: '❄️', speak: 'Sardi' },
+      { word: 'سیب', meaning: 'Apple', emoji: '🍎', speak: 'Saib' },
     ],
   },
   {
@@ -193,6 +216,7 @@ export const urduData = [
       { word: 'شیشہ', meaning: 'Glass', emoji: '🪟', speak: 'Sheesha' },
       { word: 'شام', meaning: 'Evening', emoji: '🌆', speak: 'Shaam' },
       { word: 'شہد', meaning: 'Honey', emoji: '🍯', speak: 'Shehad' },
+      { word: 'شمع', meaning: 'Candle', emoji: '🕯️', speak: 'Shama' },
     ],
   },
   {
@@ -203,6 +227,7 @@ export const urduData = [
       { word: 'صندوق', meaning: 'Box', emoji: '📦', speak: 'Sandooq' },
       { word: 'صحت', meaning: 'Health', emoji: '💚', speak: 'Sehat' },
       { word: 'صوف', meaning: 'Wool', emoji: '🧶', speak: 'Suf' },
+      { word: 'صراحی', meaning: 'Jug', emoji: '🏺', speak: 'Suraahi' },
     ],
   },
   {
@@ -213,6 +238,7 @@ export const urduData = [
       { word: 'ضمانت', meaning: 'Guarantee', emoji: '🤝', speak: 'Zamaanat' },
       { word: 'ضعف', meaning: 'Weakness', emoji: '😔', speak: 'Zauf' },
       { word: 'ضمیمہ', meaning: 'Supplement', emoji: '📎', speak: 'Zameema' },
+      { word: 'ضرب', meaning: 'Multiply', emoji: '✖️', speak: 'Zarb' },
     ],
   },
   {
@@ -223,6 +249,7 @@ export const urduData = [
       { word: 'طویل', meaning: 'Long', emoji: '📏', speak: 'Taweel' },
       { word: 'طاقت', meaning: 'Power', emoji: '💪', speak: 'Taaqat' },
       { word: 'طعام', meaning: 'Food', emoji: '🍽️', speak: 'Taam' },
+      { word: 'طالب علم', meaning: 'Student', emoji: '🧑‍🎓', speak: 'Taalib Ilm' },
     ],
   },
   {
@@ -233,6 +260,7 @@ export const urduData = [
       { word: 'ظاہر', meaning: 'Visible', emoji: '👁️', speak: 'Zaahir' },
       { word: 'ظہور', meaning: 'Appearance', emoji: '✨', speak: 'Zuhoor' },
       { word: 'ظفر', meaning: 'Victory', emoji: '🏆', speak: 'Zafar' },
+      { word: 'ظہر', meaning: 'Noon Prayer', emoji: '🕌', speak: 'Zuhr' },
     ],
   },
   {
@@ -243,6 +271,7 @@ export const urduData = [
       { word: 'عید', meaning: 'Eid', emoji: '🌙', speak: 'Eid' },
       { word: 'عطر', meaning: 'Perfume', emoji: '🌸', speak: 'Itr' },
       { word: 'عناب', meaning: 'Grapes', emoji: '🍇', speak: 'Anaab' },
+      { word: 'عینک', meaning: 'Glasses', emoji: '👓', speak: 'Ainak' },
     ],
   },
   {
@@ -253,6 +282,7 @@ export const urduData = [
       { word: 'غذا', meaning: 'Food', emoji: '🍲', speak: 'Ghiza' },
       { word: 'غلطی', meaning: 'Mistake', emoji: '❌', speak: 'Ghalti' },
       { word: 'غار', meaning: 'Cave', emoji: '🕳️', speak: 'Ghaar' },
+      { word: 'غزل', meaning: 'Poem', emoji: '🎶', speak: 'Ghazal' },
     ],
   },
   {
@@ -263,6 +293,7 @@ export const urduData = [
       { word: 'فصل', meaning: 'Season', emoji: '🍂', speak: 'Fasl' },
       { word: 'فیل', meaning: 'Elephant', emoji: '🐘', speak: 'Feel' },
       { word: 'فوج', meaning: 'Army', emoji: '🪖', speak: 'Fauj' },
+      { word: 'فٹ بال', meaning: 'Football', emoji: '⚽', speak: 'Football' },
     ],
   },
   {
@@ -273,6 +304,7 @@ export const urduData = [
       { word: 'قمر', meaning: 'Moon', emoji: '🌙', speak: 'Qamar' },
       { word: 'قصہ', meaning: 'Story', emoji: '📖', speak: 'Qissa' },
       { word: 'قنات', meaning: 'Canal', emoji: '🌊', speak: 'Naahar' },
+      { word: 'قمیض', meaning: 'Shirt', emoji: '👕', speak: 'Qameez' },
     ],
   },
   {
@@ -283,6 +315,7 @@ export const urduData = [
       { word: 'کپڑا', meaning: 'Cloth', emoji: '👕', speak: 'Kapra' },
       { word: 'کیلا', meaning: 'Banana', emoji: '🍌', speak: 'Kela' },
       { word: 'کمرہ', meaning: 'Room', emoji: '🏠', speak: 'Kamra' },
+      { word: 'کرسی', meaning: 'Chair', emoji: '🪑', speak: 'Kursi' },
     ],
   },
   {
@@ -293,6 +326,7 @@ export const urduData = [
       { word: 'گاڑی', meaning: 'Car', emoji: '🚗', speak: 'Gaari' },
       { word: 'گھڑی', meaning: 'Clock', emoji: '🕐', speak: 'Ghari' },
       { word: 'گھر', meaning: 'Home', emoji: '🏡', speak: 'Ghar' },
+      { word: 'گیند', meaning: 'Ball', emoji: '⚽', speak: 'Gaind' },
     ],
   },
   {
@@ -303,6 +337,7 @@ export const urduData = [
       { word: 'لڈو', meaning: 'Sweet', emoji: '🍬', speak: 'Laddu' },
       { word: 'لہر', meaning: 'Wave', emoji: '🌊', speak: 'Lehar' },
       { word: 'لالچ', meaning: 'Greed', emoji: '🤑', speak: 'Laalach' },
+      { word: 'لیموں', meaning: 'Lemon', emoji: '🍋', speak: 'Lemoon' },
     ],
   },
   {
@@ -313,6 +348,7 @@ export const urduData = [
       { word: 'مٹی', meaning: 'Soil', emoji: '🌱', speak: 'Mitti' },
       { word: 'موسم', meaning: 'Weather', emoji: '🌤️', speak: 'Mausam' },
       { word: 'مٹھائی', meaning: 'Sweet', emoji: '🍬', speak: 'Mithai' },
+      { word: 'مور', meaning: 'Peacock', emoji: '🦚', speak: 'Mor' },
     ],
   },
   {
@@ -323,6 +359,7 @@ export const urduData = [
       { word: 'نیلا', meaning: 'Blue', emoji: '🔵', speak: 'Neela' },
       { word: 'نہر', meaning: 'Canal', emoji: '🌊', speak: 'Nehr' },
       { word: 'نماز', meaning: 'Prayer', emoji: '🕌', speak: 'Namaaz' },
+      { word: 'ناشپاتی', meaning: 'Pear', emoji: '🍐', speak: 'Nashpaati' },
     ],
   },
   {
@@ -333,6 +370,7 @@ export const urduData = [
       { word: 'وزن', meaning: 'Weight', emoji: '⚖️', speak: 'Wazan' },
       { word: 'ورق', meaning: 'Page', emoji: '📄', speak: 'Waraq' },
       { word: 'وعدہ', meaning: 'Promise', emoji: '🤝', speak: 'Waada' },
+      { word: 'وردی', meaning: 'Uniform', emoji: '👔', speak: 'Wardi' },
     ],
   },
   {
@@ -343,6 +381,7 @@ export const urduData = [
       { word: 'ہدف', meaning: 'Target', emoji: '🎯', speak: 'Hadaf' },
       { word: 'ہنسی', meaning: 'Laughter', emoji: '😄', speak: 'Hansi' },
       { word: 'ہلدی', meaning: 'Turmeric', emoji: '🟡', speak: 'Haldi' },
+      { word: 'ہرن', meaning: 'Deer', emoji: '🦌', speak: 'Hiran' },
     ],
   },
   {
@@ -353,6 +392,7 @@ export const urduData = [
       { word: 'گھڑی', meaning: 'Clock', emoji: '🕐', speak: 'Ghari' },
       { word: 'چھتری', meaning: 'Umbrella', emoji: '☂️', speak: 'Chhatri' },
       { word: 'بھائی', meaning: 'Brother', emoji: '👦', speak: 'Bhai' },
+      { word: 'پھول', meaning: 'Flower', emoji: '🌸', speak: 'Phool' },
     ],
   },
   {
@@ -363,6 +403,7 @@ export const urduData = [
       { word: 'آئینہ', meaning: 'Mirror', emoji: '🪞', speak: 'Aaina' },
       { word: 'آواز', meaning: 'Voice', emoji: '🔊', speak: 'Aawaaz' },
       { word: 'آم', meaning: 'Mango', emoji: '🥭', speak: 'Aam' },
+      { word: 'آنکھ', meaning: 'Eye', emoji: '👁️', speak: 'Aankh' },
     ],
   },
   {
@@ -373,6 +414,7 @@ export const urduData = [
       { word: 'یخ', meaning: 'Ice', emoji: '🧊', speak: 'Yakh' },
       { word: 'یقین', meaning: 'Belief', emoji: '💫', speak: 'Yaqeen' },
       { word: 'یار', meaning: 'Friend', emoji: '🤝', speak: 'Yaar' },
+      { word: 'یاقوت', meaning: 'Ruby', emoji: '💎', speak: 'Yaqoot' },
     ],
   },
   {
@@ -383,6 +425,7 @@ export const urduData = [
       { word: 'رہے', meaning: 'Stayed', emoji: '🏠', speak: 'Rahe' },
       { word: 'گئے', meaning: 'Went', emoji: '🚶', speak: 'Gaye' },
       { word: 'آئے', meaning: 'Came', emoji: '🚪', speak: 'Aaye' },
+      { word: 'کھلونے', meaning: 'Toys', emoji: '🧸', speak: 'Khilone' },
     ],
   },
 ];

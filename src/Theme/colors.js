@@ -1,19 +1,3 @@
-// ──────────────────────────────────────────────────────────────
-// Colors — SINGLE SOURCE OF TRUTH for every colour in the app.
-//
-// Little Genius "Refined Indigo" premium-kids palette.
-//   • Brand     → Indigo #6366F1  +  Gold #FCD34D
-//   • Surfaces  → soft violet-white bg, white cards, deep-indigo hero
-//
-// Exposes a LIGHT and a DARK palette with identical keys so the app is
-// dark-ready. The default `colors` export = light, so existing static
-// StyleSheets keep working while we migrate screens onto the tokens.
-//
-// Each palette carries BOTH semantic names (bg, surface, brandSurface,
-// textPrimary…) AND the legacy key aliases the codebase already uses
-// (bodyBackground, cardBackground, textDark, bgCard…) so nothing breaks
-// mid-migration.
-// ──────────────────────────────────────────────────────────────
 
 // Brand constants (theme-independent identity).
 const BRAND = {
