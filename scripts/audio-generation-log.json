@@ -231,7 +231,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:11.928Z"
+    "generatedAt": "2026-07-26T18:02:56.958Z"
   },
   {
     "file": "0169fc918d6fe2d7.mp3",
@@ -519,7 +519,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:47:15.942Z"
+    "generatedAt": "2026-07-26T18:01:51.420Z"
   },
   {
     "file": "0364a087f8dd47f1.mp3",
@@ -864,6 +864,15 @@
     "generatedAt": "2026-07-16T06:08:20.688Z"
   },
   {
+    "file": "052904dca9d97072.mp3",
+    "text": "هَدِيَّةُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 17,
+    "generatedAt": "2026-07-26T18:03:09.938Z"
+  },
+  {
     "file": "053c202658879fd8.mp3",
     "text": "سڑسٹھ",
     "lang": "en-US",
@@ -972,6 +981,15 @@
     "generatedAt": "2026-07-26T13:27:23.313Z"
   },
   {
+    "file": "05f86a2fc4dc72e9.mp3",
+    "text": "الْقَيُّومُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:01:34.739Z"
+  },
+  {
     "file": "060908aca978adfa.mp3",
     "text": "Objects",
     "lang": "en-US",
@@ -997,6 +1015,15 @@
     "source": "quiz",
     "chars": 29,
     "generatedAt": "2026-07-16T06:20:38.388Z"
+  },
+  {
+    "file": "067bc51057ae0366.mp3",
+    "text": "اَللّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ ۔ اَللّٰهُمَّ بَارِكْ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 291,
+    "generatedAt": "2026-07-26T18:03:28.396Z"
   },
   {
     "file": "0684fd4d8be72ac3.mp3",
@@ -1141,6 +1168,15 @@
     "source": "learn",
     "chars": 44,
     "generatedAt": "2026-07-16T06:05:13.870Z"
+  },
+  {
+    "file": "07a77b94849f3742.mp3",
+    "text": "الْحَيُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 8,
+    "generatedAt": "2026-07-26T18:01:34.115Z"
   },
   {
     "file": "07b1d3f85b71a12e.mp3",
@@ -1449,6 +1485,15 @@
     "generatedAt": "2026-07-16T06:01:51.976Z"
   },
   {
+    "file": "0a0b1a5a343b95f4.mp3",
+    "text": "لَا إِلٰهَ إِلَّا اللَّهُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "tasbeeh",
+    "chars": 25,
+    "generatedAt": "2026-07-26T18:03:17.029Z"
+  },
+  {
     "file": "0a0be9e807a3a0ee.mp3",
     "text": "7. Seven",
     "lang": "en-US",
@@ -1519,6 +1564,15 @@
     "source": "urdu",
     "chars": 5,
     "generatedAt": "2026-07-26T12:59:14.356Z"
+  },
+  {
+    "file": "0aae0b714268b40f.mp3",
+    "text": "اللَّهُمَّ عَافِنِي فِي بَدَنِي",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 31,
+    "generatedAt": "2026-07-26T18:00:15.988Z"
   },
   {
     "file": "0acbf995d792f9a3.mp3",
@@ -1656,13 +1710,22 @@
     "generatedAt": "2026-07-16T06:15:08.378Z"
   },
   {
+    "file": "0b9289cd05e32f73.mp3",
+    "text": "يَرْحَمُكَ ٱللَّهُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 18,
+    "generatedAt": "2026-07-26T18:00:08.247Z"
+  },
+  {
     "file": "0b9f87754cac3383.mp3",
     "text": "مَتِينٌ",
     "lang": "ar-SA",
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:13.690Z"
+    "generatedAt": "2026-07-26T18:02:58.922Z"
   },
   {
     "file": "0bb42a413dc0e977.mp3",
@@ -1824,7 +1887,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 5,
-    "generatedAt": "2026-07-17T17:48:03.151Z"
+    "generatedAt": "2026-07-26T18:02:47.644Z"
   },
   {
     "file": "0c70f3506c23cc36.mp3",
@@ -2007,6 +2070,15 @@
     "generatedAt": "2026-07-16T06:04:41.852Z"
   },
   {
+    "file": "0e199a07798cc829.mp3",
+    "text": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 60,
+    "generatedAt": "2026-07-26T18:00:04.947Z"
+  },
+  {
     "file": "0e1ac032139f5ef4.mp3",
     "text": "44",
     "lang": "en-US",
@@ -2049,7 +2121,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:36.397Z"
+    "generatedAt": "2026-07-26T18:02:20.707Z"
   },
   {
     "file": "0e4d2f12a0d5fb94.mp3",
@@ -2376,6 +2448,15 @@
     "generatedAt": "2026-07-23T18:50:43.297Z"
   },
   {
+    "file": "1053991481b21282.mp3",
+    "text": "رَبِّ زِدْنِي عِلْمًا نَافِعًا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 30,
+    "generatedAt": "2026-07-26T18:00:06.361Z"
+  },
+  {
     "file": "105a1e124caf5484.mp3",
     "text": "The Clock Tower is a famous old landmark in Faisalabad.",
     "lang": "en-US",
@@ -2472,7 +2553,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:47.489Z"
+    "generatedAt": "2026-07-26T18:01:25.010Z"
   },
   {
     "file": "10e5c98a1e01fdbc.mp3",
@@ -2500,6 +2581,24 @@
     "source": "numbers",
     "chars": 6,
     "generatedAt": "2026-07-16T05:57:41.814Z"
+  },
+  {
+    "file": "116ada12b7d24a24.mp3",
+    "text": "سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَٰهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "kalmas",
+    "chars": 151,
+    "generatedAt": "2026-07-26T18:00:21.416Z"
+  },
+  {
+    "file": "1177f882e5f637a4.mp3",
+    "text": "الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي هَذَا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 40,
+    "generatedAt": "2026-07-26T18:00:13.243Z"
   },
   {
     "file": "117c7e3c1be6115a.mp3",
@@ -2706,7 +2805,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 13,
-    "generatedAt": "2026-07-17T17:47:10.494Z"
+    "generatedAt": "2026-07-26T18:01:46.371Z"
   },
   {
     "file": "12eb2e4a833406ec.mp3",
@@ -2751,7 +2850,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:28.717Z"
+    "generatedAt": "2026-07-26T18:02:02.933Z"
   },
   {
     "file": "13457c30e4af44ee.mp3",
@@ -2778,7 +2877,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:45.258Z"
+    "generatedAt": "2026-07-26T18:01:23.180Z"
   },
   {
     "file": "135eccae12bd1a98.mp3",
@@ -2895,7 +2994,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:47:40.185Z"
+    "generatedAt": "2026-07-26T18:02:24.667Z"
   },
   {
     "file": "141f97514bf77957.mp3",
@@ -2913,7 +3012,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:01.860Z"
+    "generatedAt": "2026-07-26T18:02:46.000Z"
   },
   {
     "file": "14428e746d20359a.mp3",
@@ -3084,7 +3183,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 17,
-    "generatedAt": "2026-07-17T17:47:12.476Z"
+    "generatedAt": "2026-07-26T18:01:48.250Z"
   },
   {
     "file": "156274aba5b777ed.mp3",
@@ -3103,6 +3202,15 @@
     "source": "urdu",
     "chars": 3,
     "generatedAt": "2026-07-16T06:00:23.908Z"
+  },
+  {
+    "file": "1590ff1aee7d309c.mp3",
+    "text": "الرَّؤُوفُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:47.635Z"
   },
   {
     "file": "15bea779ca37af8f.mp3",
@@ -3138,7 +3246,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:28.826Z"
+    "generatedAt": "2026-07-26T18:01:07.083Z"
   },
   {
     "file": "162b26e506706b93.mp3",
@@ -3184,6 +3292,15 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-07-23T18:48:53.263Z"
+  },
+  {
+    "file": "1657cd1591e04d1b.mp3",
+    "text": "وَلِيٌّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 7,
+    "generatedAt": "2026-07-26T18:02:54.194Z"
   },
   {
     "file": "165893183b6bcdde.mp3",
@@ -3400,6 +3517,15 @@
     "source": "urdu",
     "chars": 4,
     "generatedAt": "2026-07-26T12:59:14.033Z"
+  },
+  {
+    "file": "18013ab4eb9fbc02.mp3",
+    "text": "كَلِيمُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 15,
+    "generatedAt": "2026-07-26T18:02:29.315Z"
   },
   {
     "file": "18187dd32f6490f5.mp3",
@@ -3645,6 +3771,15 @@
     "generatedAt": "2026-07-26T13:30:34.624Z"
   },
   {
+    "file": "19fa5837ef4310e9.mp3",
+    "text": "نَبِيٌّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 7,
+    "generatedAt": "2026-07-26T18:02:18.361Z"
+  },
+  {
     "file": "19ff7744cf86d9e2.mp3",
     "text": "What category is Vase?",
     "lang": "en-US",
@@ -3786,7 +3921,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:42.583Z"
+    "generatedAt": "2026-07-26T18:01:20.298Z"
   },
   {
     "file": "1ade6e80f6428676.mp3",
@@ -4680,6 +4815,15 @@
     "generatedAt": "2026-07-26T13:29:27.192Z"
   },
   {
+    "file": "203db4cc928fdcd2.mp3",
+    "text": "الظَّاهِرُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:42.311Z"
+  },
+  {
     "file": "203eaadb79a4fc1d.mp3",
     "text": "پہاڑ",
     "lang": "en-US",
@@ -4822,6 +4966,15 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-07-23T18:51:22.408Z"
+  },
+  {
+    "file": "21608d3fa0dd4d41.mp3",
+    "text": "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 28,
+    "generatedAt": "2026-07-26T18:03:23.480Z"
   },
   {
     "file": "216a785734ce2131.mp3",
@@ -5283,6 +5436,15 @@
     "generatedAt": "2026-07-23T18:50:25.640Z"
   },
   {
+    "file": "243814c5d2c6f0a3.mp3",
+    "text": "نَجِيُّ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 15,
+    "generatedAt": "2026-07-26T18:02:28.285Z"
+  },
+  {
     "file": "243ab04ae119eb5c.mp3",
     "text": "الرَّحِيمُ",
     "lang": "ar-SA",
@@ -5317,6 +5479,24 @@
     "source": "quiz",
     "chars": 19,
     "generatedAt": "2026-07-16T06:14:04.243Z"
+  },
+  {
+    "file": "24831184e8c924aa.mp3",
+    "text": "عَفُوٌّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 7,
+    "generatedAt": "2026-07-26T18:02:53.489Z"
+  },
+  {
+    "file": "248544af5dee4059.mp3",
+    "text": "بِسْمِ اللَّهِ وَعَلَى بَرَكَةِ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 39,
+    "generatedAt": "2026-07-26T17:59:57.779Z"
   },
   {
     "file": "248ff06e35047188.mp3",
@@ -5370,7 +5550,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:48.982Z"
+    "generatedAt": "2026-07-26T18:02:33.099Z"
   },
   {
     "file": "24cc032f9b79ecd1.mp3",
@@ -5766,7 +5946,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:46:59.042Z"
+    "generatedAt": "2026-07-26T18:01:37.493Z"
   },
   {
     "file": "275ec54526ee7c63.mp3",
@@ -5803,6 +5983,15 @@
     "source": "quizAnswers",
     "chars": 2,
     "generatedAt": "2026-07-23T18:52:10.845Z"
+  },
+  {
+    "file": "27c3553fa8569321.mp3",
+    "text": "الْوَهَّابُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:01:05.144Z"
   },
   {
     "file": "27c3b4e05a915916.mp3",
@@ -5856,7 +6045,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:33.799Z"
+    "generatedAt": "2026-07-26T18:01:11.391Z"
   },
   {
     "file": "28487b87977ca981.mp3",
@@ -5920,6 +6109,15 @@
     "source": "quizAnswers",
     "chars": 3,
     "generatedAt": "2026-07-23T18:49:15.122Z"
+  },
+  {
+    "file": "290889227399fc8c.mp3",
+    "text": "أَسْتَغْفِرُ اللَّهَ رَبِّي مِنْ كُلِّ ذَنْبٍ أَذْنَبْتُهُ عَمْدًا أَوْ خَطَأً سِرًّا أَوْ عَلَانِيَةً وَأَتُوبُ إِلَيْهِ مِنَ الذَّنْبِ الَّذِي أَعْلَمُ وَمِنَ الذَّنْبِ الَّذِي لَا أَعْلَمُ، إِنَّكَ أَنْتَ عَلَّامُ الْغُيُوبِ وَسَتَّارُ الْعُيُوبِ وَغَفَّارُ الذُّنُوبِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "kalmas",
+    "chars": 337,
+    "generatedAt": "2026-07-26T18:00:24.383Z"
   },
   {
     "file": "290e24882cdfbaa6.mp3",
@@ -6126,7 +6324,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:33.688Z"
+    "generatedAt": "2026-07-26T18:02:17.398Z"
   },
   {
     "file": "2a5534432701e295.mp3",
@@ -6172,6 +6370,15 @@
     "source": "alphabetLetters",
     "chars": 1,
     "generatedAt": "2026-07-26T17:27:35.745Z"
+  },
+  {
+    "file": "2a94a82ea929d408.mp3",
+    "text": "الصَّمَدُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:01:38.026Z"
   },
   {
     "file": "2aa490cf8de159b1.mp3",
@@ -6279,7 +6486,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:47:21.052Z"
+    "generatedAt": "2026-07-26T18:01:55.858Z"
   },
   {
     "file": "2b23a488ed01e1a6.mp3",
@@ -6720,7 +6927,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 6,
-    "generatedAt": "2026-07-17T17:47:47.463Z"
+    "generatedAt": "2026-07-26T18:02:31.879Z"
   },
   {
     "file": "2e2b396a625779cc.mp3",
@@ -6819,7 +7026,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:29.326Z"
+    "generatedAt": "2026-07-26T18:02:03.536Z"
   },
   {
     "file": "2edf12396d811627.mp3",
@@ -7038,6 +7245,15 @@
     "generatedAt": "2026-07-23T18:49:55.365Z"
   },
   {
+    "file": "3023d6b8613ec0b6.mp3",
+    "text": "الْمُعِزُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:09.847Z"
+  },
+  {
     "file": "302fa9d02006c80e.mp3",
     "text": "صوف",
     "lang": "ur-PK",
@@ -7179,7 +7395,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 11,
-    "generatedAt": "2026-07-17T17:45:23.725Z"
+    "generatedAt": "2026-07-26T18:00:58.065Z"
   },
   {
     "file": "31369f7203346f34.mp3",
@@ -7422,7 +7638,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 13,
-    "generatedAt": "2026-07-17T17:47:06.815Z"
+    "generatedAt": "2026-07-26T18:01:44.664Z"
   },
   {
     "file": "3339381312c0e865.mp3",
@@ -7432,6 +7648,15 @@
     "source": "quizAnswers",
     "chars": 5,
     "generatedAt": "2026-07-26T13:01:17.911Z"
+  },
+  {
+    "file": "333c9327e0489ba9.mp3",
+    "text": "اللَّهُمَّ ٱهْدِنِي لِأَحْسَنِ ٱلْأَخْلَاقِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 43,
+    "generatedAt": "2026-07-26T18:00:14.557Z"
   },
   {
     "file": "333f251ac0b14aec.mp3",
@@ -7639,6 +7864,15 @@
     "source": "quizAnswers",
     "chars": 3,
     "generatedAt": "2026-07-26T13:01:09.605Z"
+  },
+  {
+    "file": "34dd8d3bbc08f185.mp3",
+    "text": "مُدَّثِّرٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:02:25.220Z"
   },
   {
     "file": "34dfb5984d02101e.mp3",
@@ -8097,7 +8331,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:48:02.561Z"
+    "generatedAt": "2026-07-26T18:02:46.922Z"
   },
   {
     "file": "387d8d9a96d3711c.mp3",
@@ -8565,7 +8799,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:46.764Z"
+    "generatedAt": "2026-07-26T18:01:24.393Z"
   },
   {
     "file": "3c99ecd199853e5f.mp3",
@@ -8619,7 +8853,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 13,
-    "generatedAt": "2026-07-17T17:48:20.737Z"
+    "generatedAt": "2026-07-26T18:03:05.836Z"
   },
   {
     "file": "3ce961c95931ee9f.mp3",
@@ -8658,6 +8892,15 @@
     "generatedAt": "2026-07-16T06:03:11.919Z"
   },
   {
+    "file": "3d2e7c3b032c77d5.mp3",
+    "text": "الْمُتَكَبِّرُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 14,
+    "generatedAt": "2026-07-26T18:01:01.042Z"
+  },
+  {
     "file": "3d2efc82db42b1d4.mp3",
     "text": "چھپن",
     "lang": "en-US",
@@ -8665,6 +8908,15 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-07-23T18:51:41.615Z"
+  },
+  {
+    "file": "3d4a932ff497d191.mp3",
+    "text": "اَلتَّحِيَّاتُ لِلّٰهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ ، اَلسَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ ، اَلسَّلَامُ عَلَيْنَا وَعَلَىٰ عِبَادِ اللَّهِ الصَّالِحِينَ ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 283,
+    "generatedAt": "2026-07-26T18:03:27.064Z"
   },
   {
     "file": "3d6cf5df2e39e5f9.mp3",
@@ -8854,6 +9106,15 @@
     "source": "quiz",
     "chars": 19,
     "generatedAt": "2026-07-16T06:14:55.570Z"
+  },
+  {
+    "file": "3ec65cb0e85101c6.mp3",
+    "text": "اَللَّهُ أَكْبَرُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "tasbeeh",
+    "chars": 17,
+    "generatedAt": "2026-07-26T18:03:16.400Z"
   },
   {
     "file": "3ec72e1a60b3911c.mp3",
@@ -9090,6 +9351,15 @@
     "generatedAt": "2026-07-23T18:51:00.081Z"
   },
   {
+    "file": "3fde9ed3fd26e9cd.mp3",
+    "text": "رَبِّ زِدْنِي عِلْمًا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 21,
+    "generatedAt": "2026-07-26T18:00:01.656Z"
+  },
+  {
     "file": "3fe1b17709936241.mp3",
     "text": "حرف ر سے کون سا لفظ شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -9294,7 +9564,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:41.937Z"
+    "generatedAt": "2026-07-26T18:01:19.681Z"
   },
   {
     "file": "40d7f63ab940d954.mp3",
@@ -9367,6 +9637,15 @@
     "source": "quiz",
     "chars": 24,
     "generatedAt": "2026-07-26T12:48:36.953Z"
+  },
+  {
+    "file": "414295f3b8533f0d.mp3",
+    "text": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 38,
+    "generatedAt": "2026-07-26T18:00:15.244Z"
   },
   {
     "file": "41511937b7eb35c1.mp3",
@@ -9987,7 +10266,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:53.436Z"
+    "generatedAt": "2026-07-26T18:02:40.983Z"
   },
   {
     "file": "46118cdd0735edab.mp3",
@@ -10114,6 +10393,15 @@
     "source": "learn",
     "chars": 35,
     "generatedAt": "2026-07-16T06:03:31.820Z"
+  },
+  {
+    "file": "46d4075693ed7658.mp3",
+    "text": "السَّلَامُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:00:39.948Z"
   },
   {
     "file": "46db0f4bc5775a05.mp3",
@@ -10251,6 +10539,15 @@
     "generatedAt": "2026-07-23T18:46:40.702Z"
   },
   {
+    "file": "47c0683a916d776c.mp3",
+    "text": "الْمُؤَخِّرُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 12,
+    "generatedAt": "2026-07-26T18:01:40.439Z"
+  },
+  {
     "file": "47d3b95b7625ca1d.mp3",
     "text": "What category is Question?",
     "lang": "en-US",
@@ -10266,7 +10563,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:44.625Z"
+    "generatedAt": "2026-07-26T18:01:22.647Z"
   },
   {
     "file": "47df1788318cdf3e.mp3",
@@ -10413,6 +10710,15 @@
     "generatedAt": "2026-07-17T17:46:32.606Z"
   },
   {
+    "file": "48f47db44d8935e2.mp3",
+    "text": "رَسُولُ الرَّاحَةِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 18,
+    "generatedAt": "2026-07-26T18:02:23.471Z"
+  },
+  {
     "file": "48f9693d3ccae62b.mp3",
     "text": "ہ",
     "lang": "en-US",
@@ -10491,7 +10797,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:47:14.725Z"
+    "generatedAt": "2026-07-26T18:01:50.192Z"
   },
   {
     "file": "49427c6a8da9177c.mp3",
@@ -10701,6 +11007,15 @@
     "generatedAt": "2026-07-23T18:47:52.792Z"
   },
   {
+    "file": "4b4e9c0fb3cfcb09.mp3",
+    "text": "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 47,
+    "generatedAt": "2026-07-26T18:00:12.533Z"
+  },
+  {
     "file": "4b5c0a26fe2806a0.mp3",
     "text": "بائیس",
     "lang": "ur-PK",
@@ -10717,6 +11032,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:16:35.781Z"
+  },
+  {
+    "file": "4b67571103c1246f.mp3",
+    "text": "الْوَلِيُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:29.305Z"
   },
   {
     "file": "4b72fcb578d2f82b.mp3",
@@ -11196,6 +11520,15 @@
     "generatedAt": "2026-07-16T06:00:35.089Z"
   },
   {
+    "file": "4f6e9355db588503.mp3",
+    "text": "اَللّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "tasbeeh",
+    "chars": 34,
+    "generatedAt": "2026-07-26T18:03:18.258Z"
+  },
+  {
     "file": "4f9165c53abc3b93.mp3",
     "text": "Sweet Potato. A sweet vegetable we eat roasted.",
     "lang": "en-US",
@@ -11364,7 +11697,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:47:54.829Z"
+    "generatedAt": "2026-07-26T18:02:42.519Z"
   },
   {
     "file": "5070f02009aa2316.mp3",
@@ -11374,6 +11707,15 @@
     "source": "quiz",
     "chars": 24,
     "generatedAt": "2026-07-16T06:19:07.125Z"
+  },
+  {
+    "file": "507641d8b1771c1e.mp3",
+    "text": "سُبْحَانَ رَبِّيَ الْأَعْلَىٰ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 29,
+    "generatedAt": "2026-07-26T18:03:24.675Z"
   },
   {
     "file": "5076d60993f0e1ff.mp3",
@@ -11445,7 +11787,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:47:06.188Z"
+    "generatedAt": "2026-07-26T18:01:44.057Z"
   },
   {
     "file": "50b01da2a782e1a4.mp3",
@@ -12228,7 +12570,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:57.177Z"
+    "generatedAt": "2026-07-26T18:01:35.447Z"
   },
   {
     "file": "552b5997df4dce61.mp3",
@@ -12393,6 +12735,15 @@
     "generatedAt": "2026-07-16T06:11:21.827Z"
   },
   {
+    "file": "56a0224a478d4d8c.mp3",
+    "text": "طَيِّبٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 7,
+    "generatedAt": "2026-07-26T18:02:06.371Z"
+  },
+  {
     "file": "56afbd96cdc2dbc0.mp3",
     "text": "Why did Ibrahim (AS) break the idols?",
     "lang": "en-US",
@@ -12499,6 +12850,24 @@
     "source": "numbers",
     "chars": 6,
     "generatedAt": "2026-07-16T05:58:16.628Z"
+  },
+  {
+    "file": "5763d9e8f45cc8ee.mp3",
+    "text": "الرَّقِيبُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:22.031Z"
+  },
+  {
+    "file": "578a387bd6ff75ad.mp3",
+    "text": "ذُو قُوَّةٍ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:03:01.154Z"
   },
   {
     "file": "5797df0b6aaf8255.mp3",
@@ -12789,6 +13158,15 @@
     "generatedAt": "2026-07-16T06:16:27.177Z"
   },
   {
+    "file": "5980932606bf3f38.mp3",
+    "text": "سُبْحَانَكَ اللّٰهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَىٰ جَدُّكَ وَلَا إِلٰهَ غَيْرُكَ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 97,
+    "generatedAt": "2026-07-26T18:03:19.389Z"
+  },
+  {
     "file": "59a1be6e245288e8.mp3",
     "text": "Barber",
     "lang": "en-US",
@@ -13011,7 +13389,16 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:23.892Z"
+    "generatedAt": "2026-07-26T18:01:02.320Z"
+  },
+  {
+    "file": "5aad68b837382af6.mp3",
+    "text": "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 42,
+    "generatedAt": "2026-07-26T18:00:09.543Z"
   },
   {
     "file": "5ab2d0fae9b15a5c.mp3",
@@ -13194,6 +13581,15 @@
     "generatedAt": "2026-07-16T05:58:58.305Z"
   },
   {
+    "file": "5bc8b6af06e747f9.mp3",
+    "text": "النُّورُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 8,
+    "generatedAt": "2026-07-26T18:01:53.697Z"
+  },
+  {
     "file": "5bcb6315f2852043.mp3",
     "text": "Navy Blue. A very dark shade of blue.",
     "lang": "en-US",
@@ -13362,7 +13758,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:36.338Z"
+    "generatedAt": "2026-07-26T18:01:13.737Z"
   },
   {
     "file": "5d3baaaadfae322c.mp3",
@@ -13515,7 +13911,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 4,
-    "generatedAt": "2026-07-17T17:47:29.945Z"
+    "generatedAt": "2026-07-26T18:02:04.069Z"
   },
   {
     "file": "5eac06ac5c47f75a.mp3",
@@ -13524,7 +13920,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:36.990Z"
+    "generatedAt": "2026-07-26T18:01:14.456Z"
   },
   {
     "file": "5ec1ceb141c75e17.mp3",
@@ -13543,6 +13939,15 @@
     "source": "quizAnswers",
     "chars": 3,
     "generatedAt": "2026-07-23T18:51:15.248Z"
+  },
+  {
+    "file": "5ed1fe60ef0ac9be.mp3",
+    "text": "الْعَفُوُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:47.019Z"
   },
   {
     "file": "5ed7ecb25a55ddc4.mp3",
@@ -13597,6 +14002,15 @@
     "source": "numbers",
     "chars": 5,
     "generatedAt": "2026-07-16T05:57:39.047Z"
+  },
+  {
+    "file": "5f29be20df479ed6.mp3",
+    "text": "صِرَاطُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 15,
+    "generatedAt": "2026-07-26T18:03:11.069Z"
   },
   {
     "file": "5f4397683d140a0e.mp3",
@@ -13725,6 +14139,15 @@
     "generatedAt": "2026-07-16T06:19:11.764Z"
   },
   {
+    "file": "5ffd3e12f621ca74.mp3",
+    "text": "مُطَهَّرٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:02:05.757Z"
+  },
+  {
     "file": "6012613170ca8ba7.mp3",
     "text": "Later hunters caught the lion in a net.",
     "lang": "en-US",
@@ -13759,6 +14182,15 @@
     "source": "quiz",
     "chars": 25,
     "generatedAt": "2026-07-26T12:48:26.664Z"
+  },
+  {
+    "file": "6051520cde6d8eca.mp3",
+    "text": "ذِكْرُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 14,
+    "generatedAt": "2026-07-26T18:03:12.232Z"
   },
   {
     "file": "6061c2bf46b5caf9.mp3",
@@ -13803,7 +14235,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 16,
-    "generatedAt": "2026-07-17T17:48:29.746Z"
+    "generatedAt": "2026-07-26T18:03:13.962Z"
   },
   {
     "file": "609ce57334377455.mp3",
@@ -13848,7 +14280,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:37.620Z"
+    "generatedAt": "2026-07-26T18:01:15.174Z"
   },
   {
     "file": "60c075f3f3103f95.mp3",
@@ -14109,7 +14541,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:07.108Z"
+    "generatedAt": "2026-07-26T18:02:52.350Z"
   },
   {
     "file": "62375e9b35e75885.mp3",
@@ -14146,6 +14578,15 @@
     "source": "quiz",
     "chars": 28,
     "generatedAt": "2026-07-16T06:11:46.618Z"
+  },
+  {
+    "file": "62515ca017258c76.mp3",
+    "text": "مُبَشِّرٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:02:43.749Z"
   },
   {
     "file": "625f450bbb4ddd9d.mp3",
@@ -14199,7 +14640,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "tasbeeh",
     "chars": 18,
-    "generatedAt": "2026-07-26T13:39:22.330Z"
+    "generatedAt": "2026-07-26T18:03:15.800Z"
   },
   {
     "file": "627626037d4b1d4d.mp3",
@@ -14272,6 +14713,15 @@
     "source": "quizAnswers",
     "chars": 3,
     "generatedAt": "2026-07-23T18:50:50.131Z"
+  },
+  {
+    "file": "633386febe652fd0.mp3",
+    "text": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 65,
+    "generatedAt": "2026-07-26T18:00:17.317Z"
   },
   {
     "file": "633662e7f01003b1.mp3",
@@ -14676,7 +15126,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:30.116Z"
+    "generatedAt": "2026-07-26T18:01:08.108Z"
   },
   {
     "file": "66507626ade94e70.mp3",
@@ -14919,7 +15369,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:31.259Z"
+    "generatedAt": "2026-07-26T18:02:05.127Z"
   },
   {
     "file": "67e8fafe7f44f408.mp3",
@@ -15063,7 +15513,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "duas",
     "chars": 11,
-    "generatedAt": "2026-07-17T17:44:40.253Z"
+    "generatedAt": "2026-07-26T18:00:05.586Z"
   },
   {
     "file": "692cee19bad611c7.mp3",
@@ -15363,6 +15813,15 @@
     "generatedAt": "2026-07-26T13:32:07.641Z"
   },
   {
+    "file": "6adbc5d0af397e96.mp3",
+    "text": "حَقٌّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 5,
+    "generatedAt": "2026-07-26T18:02:54.809Z"
+  },
+  {
     "file": "6ae5dd1bb678f07d.mp3",
     "text": "Chhoti Hay",
     "lang": "en-US",
@@ -15648,7 +16107,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:54.945Z"
+    "generatedAt": "2026-07-26T18:01:32.989Z"
   },
   {
     "file": "6cef3c7222154fb4.mp3",
@@ -15813,6 +16272,24 @@
     "generatedAt": "2026-07-16T05:56:23.938Z"
   },
   {
+    "file": "6dd23c323fda788c.mp3",
+    "text": "اللَّهُمَّ كَمَا حَسَّنْتَ خَلْقِي فَحَسِّنْ خُلُقِي",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 52,
+    "generatedAt": "2026-07-26T18:00:10.345Z"
+  },
+  {
+    "file": "6ddcfe2cbc084e72.mp3",
+    "text": "النَّافِعُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:53.165Z"
+  },
+  {
     "file": "6deedb400c725ba6.mp3",
     "text": "Feeling sad, he left the town and boarded a ship sailing across the big sea.",
     "lang": "en-US",
@@ -15820,6 +16297,15 @@
     "source": "islamicStories",
     "chars": 76,
     "generatedAt": "2026-07-26T13:31:12.500Z"
+  },
+  {
+    "file": "6dfdfafd54290ca3.mp3",
+    "text": "حَفِيٌّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 7,
+    "generatedAt": "2026-07-26T18:02:52.893Z"
   },
   {
     "file": "6e19f6034c2885d5.mp3",
@@ -15838,6 +16324,15 @@
     "source": "namesAllah",
     "chars": 10,
     "generatedAt": "2026-07-17T17:47:23.084Z"
+  },
+  {
+    "file": "6e348d7882cbbed6.mp3",
+    "text": "بِسْمِ اللَّهِ وَالْحَمْدُ لِلَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 34,
+    "generatedAt": "2026-07-26T18:00:13.943Z"
   },
   {
     "file": "6e42ebf6bdd275a0.mp3",
@@ -15874,6 +16369,15 @@
     "source": "quizAnswers",
     "chars": 3,
     "generatedAt": "2026-07-23T18:48:50.958Z"
+  },
+  {
+    "file": "6e882a2cdd96261a.mp3",
+    "text": "الْحَقُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 8,
+    "generatedAt": "2026-07-26T18:01:26.810Z"
   },
   {
     "file": "6e9cedc458bb91b2.mp3",
@@ -15966,6 +16470,15 @@
     "generatedAt": "2026-07-16T06:12:45.898Z"
   },
   {
+    "file": "6f40bba11f1ca35f.mp3",
+    "text": "الْغَنِيُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:50.808Z"
+  },
+  {
     "file": "6f52c805bffb6a73.mp3",
     "text": "Which letter is for Ladder?",
     "lang": "en-US",
@@ -16035,7 +16548,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:48:29.045Z"
+    "generatedAt": "2026-07-26T18:03:13.359Z"
   },
   {
     "file": "6ff0132c9fea6a92.mp3",
@@ -16092,6 +16605,24 @@
     "generatedAt": "2026-07-16T06:01:11.884Z"
   },
   {
+    "file": "704227da77cb6c94.mp3",
+    "text": "الْغَفَّارُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:01:04.082Z"
+  },
+  {
+    "file": "705846fa675ef93c.mp3",
+    "text": "أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّا عَبْدُهُ وَرَسُولُهُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "kalmas",
+    "chars": 87,
+    "generatedAt": "2026-07-26T18:00:20.322Z"
+  },
+  {
     "file": "706787cbe72ad38d.mp3",
     "text": "Faisal Mosque is a very large and beautiful mosque in Islamabad.",
     "lang": "en-US",
@@ -16134,7 +16665,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:58.406Z"
+    "generatedAt": "2026-07-26T18:01:36.886Z"
   },
   {
     "file": "70c3733463f570e2.mp3",
@@ -16278,7 +16809,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:54.349Z"
+    "generatedAt": "2026-07-26T18:01:32.377Z"
   },
   {
     "file": "717dee177fa1e4a1.mp3",
@@ -16524,6 +17055,15 @@
     "generatedAt": "2026-07-16T06:02:01.805Z"
   },
   {
+    "file": "72eb07978f07ed31.mp3",
+    "text": "سُبْحَانَ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "tasbeeh",
+    "chars": 17,
+    "generatedAt": "2026-07-26T18:03:15.184Z"
+  },
+  {
     "file": "72eb838024b3ed2e.mp3",
     "text": "غزل",
     "lang": "ur-PK",
@@ -16686,6 +17226,15 @@
     "generatedAt": "2026-07-26T13:31:22.769Z"
   },
   {
+    "file": "7423e3d1f3bc099f.mp3",
+    "text": "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 48,
+    "generatedAt": "2026-07-26T17:59:59.097Z"
+  },
+  {
     "file": "742c9adce2ceee7a.mp3",
     "text": "Which number is Ninety Five?",
     "lang": "en-US",
@@ -16701,7 +17250,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:51.264Z"
+    "generatedAt": "2026-07-26T18:01:28.687Z"
   },
   {
     "file": "745aa09e485faef8.mp3",
@@ -16720,6 +17269,15 @@
     "source": "storyQuizAnswers",
     "chars": 10,
     "generatedAt": "2026-07-23T18:46:22.528Z"
+  },
+  {
+    "file": "7471cb72bd53a86c.mp3",
+    "text": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "kalmas",
+    "chars": 160,
+    "generatedAt": "2026-07-26T18:00:22.846Z"
   },
   {
     "file": "74790547c6735cb1.mp3",
@@ -16755,7 +17313,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:55.401Z"
+    "generatedAt": "2026-07-26T18:02:43.140Z"
   },
   {
     "file": "74b498f5a1b32b33.mp3",
@@ -17016,7 +17574,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:47:25.987Z"
+    "generatedAt": "2026-07-26T18:02:00.577Z"
   },
   {
     "file": "768d50a6464b0d30.mp3",
@@ -17190,6 +17748,15 @@
     "generatedAt": "2026-07-17T17:48:26.461Z"
   },
   {
+    "file": "773a200efea99a08.mp3",
+    "text": "عَبْدُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 14,
+    "generatedAt": "2026-07-26T18:02:26.385Z"
+  },
+  {
     "file": "773dbaac9cf23aea.mp3",
     "text": "کس حرف سے ترازو شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -17340,7 +17907,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 13,
-    "generatedAt": "2026-07-17T17:47:00.837Z"
+    "generatedAt": "2026-07-26T18:01:39.340Z"
   },
   {
     "file": "781ce1c81d5ea2ee.mp3",
@@ -17440,6 +18007,15 @@
     "source": "learn",
     "chars": 46,
     "generatedAt": "2026-07-16T06:03:00.350Z"
+  },
+  {
+    "file": "787f3bae73fb9d50.mp3",
+    "text": "الرَّحِيمُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:00:30.423Z"
   },
   {
     "file": "7883ac85ba646b23.mp3",
@@ -17565,7 +18141,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 8,
-    "generatedAt": "2026-07-17T17:47:24.722Z"
+    "generatedAt": "2026-07-26T18:01:59.213Z"
   },
   {
     "file": "7938e8ce27431228.mp3",
@@ -17673,7 +18249,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:29.414Z"
+    "generatedAt": "2026-07-26T18:01:07.492Z"
   },
   {
     "file": "79e63d0750fd8021.mp3",
@@ -17790,7 +18366,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 15,
-    "generatedAt": "2026-07-17T17:48:30.389Z"
+    "generatedAt": "2026-07-26T18:03:14.570Z"
   },
   {
     "file": "7a76f8a28655da74.mp3",
@@ -17881,6 +18457,15 @@
     "source": "urdu",
     "chars": 2,
     "generatedAt": "2026-07-16T06:00:13.361Z"
+  },
+  {
+    "file": "7b57f270cf8f6fde.mp3",
+    "text": "رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 35,
+    "generatedAt": "2026-07-26T18:00:18.640Z"
   },
   {
     "file": "7b581ff631baaf28.mp3",
@@ -18087,7 +18672,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:26.667Z"
+    "generatedAt": "2026-07-26T18:02:01.149Z"
   },
   {
     "file": "7cd66314b2b15842.mp3",
@@ -18124,6 +18709,15 @@
     "source": "quiz",
     "chars": 21,
     "generatedAt": "2026-07-16T06:10:14.545Z"
+  },
+  {
+    "file": "7ceb73214bd0c157.mp3",
+    "text": "سَيِّدٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 7,
+    "generatedAt": "2026-07-26T18:02:14.565Z"
   },
   {
     "file": "7cf2e03b934afd3d.mp3",
@@ -18178,6 +18772,15 @@
     "source": "wuduSalah",
     "chars": 33,
     "generatedAt": "2026-07-26T13:31:06.438Z"
+  },
+  {
+    "file": "7d28c77533bccc7b.mp3",
+    "text": "الْجَبَّارُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:01:00.427Z"
   },
   {
     "file": "7d361dd05e250376.mp3",
@@ -18348,7 +18951,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:46:34.421Z"
+    "generatedAt": "2026-07-26T18:01:11.997Z"
   },
   {
     "file": "7ecd610b04eab70d.mp3",
@@ -18420,7 +19023,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:39.570Z"
+    "generatedAt": "2026-07-26T18:02:24.085Z"
   },
   {
     "file": "7f3b54c23db26d54.mp3",
@@ -18429,7 +19032,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:39.817Z"
+    "generatedAt": "2026-07-26T18:01:17.836Z"
   },
   {
     "file": "7f515a7077904666.mp3",
@@ -18501,7 +19104,16 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:27.339Z"
+    "generatedAt": "2026-07-26T18:02:01.778Z"
+  },
+  {
+    "file": "7fc7d2c9a4a77e5f.mp3",
+    "text": "رَبِّ اغْفِرْ لِي",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 17,
+    "generatedAt": "2026-07-26T18:03:25.220Z"
   },
   {
     "file": "7fcff4870abb6969.mp3",
@@ -18852,7 +19464,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 8,
-    "generatedAt": "2026-07-17T17:48:21.330Z"
+    "generatedAt": "2026-07-26T18:03:06.278Z"
   },
   {
     "file": "82674e8ddf3d3a1b.mp3",
@@ -18906,7 +19518,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:48.112Z"
+    "generatedAt": "2026-07-26T18:01:25.547Z"
   },
   {
     "file": "82ca3546e3a61600.mp3",
@@ -19257,7 +19869,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:49.965Z"
+    "generatedAt": "2026-07-26T18:01:27.468Z"
   },
   {
     "file": "852bd0a172156b17.mp3",
@@ -19347,7 +19959,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:23.795Z"
+    "generatedAt": "2026-07-26T18:03:08.733Z"
   },
   {
     "file": "85d0e910caa4ba36.mp3",
@@ -19521,6 +20133,24 @@
     "generatedAt": "2026-07-26T13:32:28.219Z"
   },
   {
+    "file": "869ac3cd67d02323.mp3",
+    "text": "اللَّطِيفُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:13.129Z"
+  },
+  {
+    "file": "86a2ba2e7f6d5cb8.mp3",
+    "text": "الرَّزَّاقُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:01:05.752Z"
+  },
+  {
     "file": "86c5962e00f83c08.mp3",
     "text": "چاند",
     "lang": "ur-PK",
@@ -19563,7 +20193,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 13,
-    "generatedAt": "2026-07-17T17:48:17.571Z"
+    "generatedAt": "2026-07-26T18:03:03.063Z"
   },
   {
     "file": "87a005c4323fbb72.mp3",
@@ -19665,6 +20295,15 @@
     "generatedAt": "2026-07-16T05:57:12.755Z"
   },
   {
+    "file": "88198b630cdaf9ad.mp3",
+    "text": "خَاتَمُ الرُّسُلِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 17,
+    "generatedAt": "2026-07-26T18:02:30.641Z"
+  },
+  {
     "file": "8845c31d3f56aceb.mp3",
     "text": "Sea Creatures",
     "lang": "en-US",
@@ -19726,6 +20365,15 @@
     "source": "quiz",
     "chars": 21,
     "generatedAt": "2026-07-16T06:14:46.669Z"
+  },
+  {
+    "file": "88fe3af2271c7764.mp3",
+    "text": "الْأَوَّلُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:41.064Z"
   },
   {
     "file": "8905df6e14659828.mp3",
@@ -19962,15 +20610,6 @@
     "generatedAt": "2026-07-16T06:00:11.924Z"
   },
   {
-    "file": "8a6619bf79558cd9.mp3",
-    "text": "اَللهُ أَكْبَرُ",
-    "lang": "ar-SA",
-    "voice": "ar-SA-HamedNeural",
-    "source": "namaz",
-    "chars": 15,
-    "generatedAt": "2026-07-17T17:48:31.935Z"
-  },
-  {
     "file": "8a6e803a22ca986c.mp3",
     "text": "Apple",
     "lang": "en-US",
@@ -20157,7 +20796,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 8,
-    "generatedAt": "2026-07-17T17:47:03.560Z"
+    "generatedAt": "2026-07-26T18:01:41.695Z"
   },
   {
     "file": "8bb6c46f0f83f5f9.mp3",
@@ -20175,7 +20814,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:47:19.807Z"
+    "generatedAt": "2026-07-26T18:01:54.289Z"
   },
   {
     "file": "8bbb531013d270b6.mp3",
@@ -20203,6 +20842,15 @@
     "source": "manners",
     "chars": 59,
     "generatedAt": "2026-07-26T13:30:36.602Z"
+  },
+  {
+    "file": "8c20a1b303a838ed.mp3",
+    "text": "مُذَكِّرٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:02:32.482Z"
   },
   {
     "file": "8c2fb6df7435eb09.mp3",
@@ -20349,6 +20997,15 @@
     "generatedAt": "2026-07-26T13:30:47.189Z"
   },
   {
+    "file": "8d2d0ccb70f33bc5.mp3",
+    "text": "الرَّافِعُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:09.233Z"
+  },
+  {
     "file": "8d2f6e42bcd01804.mp3",
     "text": "چاند",
     "lang": "en-US",
@@ -20400,7 +21057,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:21.996Z"
+    "generatedAt": "2026-07-26T18:03:06.889Z"
   },
   {
     "file": "8d7896d34e96b4b5.mp3",
@@ -20464,6 +21121,15 @@
     "source": "quiz",
     "chars": 27,
     "generatedAt": "2026-07-16T06:07:43.817Z"
+  },
+  {
+    "file": "8dbd1bbb77e6f4b5.mp3",
+    "text": "بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 51,
+    "generatedAt": "2026-07-26T18:00:03.258Z"
   },
   {
     "file": "8dd3cc4c03f36b5a.mp3",
@@ -20671,6 +21337,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:16:21.656Z"
+  },
+  {
+    "file": "8ec1bd9ca3e06be2.mp3",
+    "text": "الْقَهَّارُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:01:04.726Z"
   },
   {
     "file": "8ed1f90b7aef94ad.mp3",
@@ -21069,6 +21744,15 @@
     "generatedAt": "2026-07-16T06:08:07.470Z"
   },
   {
+    "file": "9267422fc36b5981.mp3",
+    "text": "مُقَفَّى",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 8,
+    "generatedAt": "2026-07-26T18:02:21.940Z"
+  },
+  {
     "file": "927b8678d458bb0e.mp3",
     "text": "ذرا کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -21192,7 +21876,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:23.269Z"
+    "generatedAt": "2026-07-26T18:01:01.653Z"
   },
   {
     "file": "933ac65e447e7718.mp3",
@@ -21310,6 +21994,15 @@
     "source": "quiz",
     "chars": 33,
     "generatedAt": "2026-07-16T06:17:39.266Z"
+  },
+  {
+    "file": "94568f8fc1895021.mp3",
+    "text": "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 43,
+    "generatedAt": "2026-07-26T18:00:08.848Z"
   },
   {
     "file": "9459bcdb6ee91ded.mp3",
@@ -21786,7 +22479,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:47:20.405Z"
+    "generatedAt": "2026-07-26T18:01:55.336Z"
   },
   {
     "file": "97f71674c7d0d6e2.mp3",
@@ -22140,6 +22833,15 @@
     "generatedAt": "2026-07-23T18:49:57.927Z"
   },
   {
+    "file": "9a0881fb57ee1a65.mp3",
+    "text": "الشَّهِيدُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:26.130Z"
+  },
+  {
     "file": "9a27b941791f0de7.mp3",
     "text": "عَبْدُ اللهِ",
     "lang": "ar-SA",
@@ -22174,6 +22876,15 @@
     "source": "storyQuizAnswers",
     "chars": 9,
     "generatedAt": "2026-07-23T18:46:32.205Z"
+  },
+  {
+    "file": "9a660514da5a4b42.mp3",
+    "text": "الْعَلِيُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:17.221Z"
   },
   {
     "file": "9a924d186ca66a7e.mp3",
@@ -22410,6 +23121,15 @@
     "generatedAt": "2026-07-16T06:16:56.462Z"
   },
   {
+    "file": "9cacb9694c721b97.mp3",
+    "text": "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 38,
+    "generatedAt": "2026-07-26T17:59:59.913Z"
+  },
+  {
     "file": "9cb512745b7decd2.mp3",
     "text": "97",
     "lang": "en-US",
@@ -22533,7 +23253,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 11,
-    "generatedAt": "2026-07-17T17:46:53.724Z"
+    "generatedAt": "2026-07-26T18:01:31.760Z"
   },
   {
     "file": "9dc477c7798805b1.mp3",
@@ -22570,6 +23290,15 @@
     "source": "quiz",
     "chars": 27,
     "generatedAt": "2026-07-16T06:09:30.636Z"
+  },
+  {
+    "file": "9decc88b046f04ed.mp3",
+    "text": "الْمُذِلُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:10.399Z"
   },
   {
     "file": "9dfa64f9e9a7a82f.mp3",
@@ -22623,7 +23352,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 16,
-    "generatedAt": "2026-07-17T17:48:25.820Z"
+    "generatedAt": "2026-07-26T18:03:10.516Z"
   },
   {
     "file": "9e76999d56125013.mp3",
@@ -22644,13 +23373,22 @@
     "generatedAt": "2026-07-16T06:00:16.945Z"
   },
   {
+    "file": "9e95fa7223a68e14.mp3",
+    "text": "أَسْتَغْفِرُ اللَّهَ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "tasbeeh",
+    "chars": 20,
+    "generatedAt": "2026-07-26T18:03:17.641Z"
+  },
+  {
     "file": "9eac515ad2f31194.mp3",
     "text": "مُطِيعٌ",
     "lang": "ar-SA",
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:20.113Z"
+    "generatedAt": "2026-07-26T18:03:05.264Z"
   },
   {
     "file": "9eba14060f15fc00.mp3",
@@ -22704,7 +23442,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:47:00.247Z"
+    "generatedAt": "2026-07-26T18:01:38.726Z"
   },
   {
     "file": "9f2170134d8dacfd.mp3",
@@ -22723,6 +23461,24 @@
     "source": "quizAnswers",
     "chars": 3,
     "generatedAt": "2026-07-26T13:01:02.815Z"
+  },
+  {
+    "file": "9f28654f72b88601.mp3",
+    "text": "بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيمِ ۝ اَلْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِينَ ۝ الرَّحْمٰنِ الرَّحِيمِ ۝ مَالِكِ يَوْمِ الدِّينِ ۝ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝ اِهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ۝ صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 302,
+    "generatedAt": "2026-07-26T18:03:21.846Z"
+  },
+  {
+    "file": "9f2976e9b899bc9f.mp3",
+    "text": "الرَّشِيدُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:57.054Z"
   },
   {
     "file": "9f2cfd4ef2d14e98.mp3",
@@ -22776,7 +23532,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:47:49.587Z"
+    "generatedAt": "2026-07-26T18:02:33.713Z"
   },
   {
     "file": "9f979a6d906b42a3.mp3",
@@ -22812,7 +23568,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 6,
-    "generatedAt": "2026-07-17T17:48:22.579Z"
+    "generatedAt": "2026-07-26T18:03:07.607Z"
   },
   {
     "file": "a0145e1a0aa45dbc.mp3",
@@ -22905,6 +23661,15 @@
     "generatedAt": "2026-07-23T18:51:57.384Z"
   },
   {
+    "file": "a09e372a2b1aa804.mp3",
+    "text": "رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 45,
+    "generatedAt": "2026-07-26T18:00:02.332Z"
+  },
+  {
     "file": "a0a42839a8ddca5f.mp3",
     "text": "What category is Guitar?",
     "lang": "en-US",
@@ -22930,6 +23695,15 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-07-26T13:01:24.109Z"
+  },
+  {
+    "file": "a0e026041ba3bdd2.mp3",
+    "text": "مُكَرَّمٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:02:57.780Z"
   },
   {
     "file": "a0e079f69a0907e0.mp3",
@@ -22965,7 +23739,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:14.343Z"
+    "generatedAt": "2026-07-26T18:02:59.436Z"
   },
   {
     "file": "a129dcd61128e748.mp3",
@@ -23074,6 +23848,15 @@
     "source": "quiz",
     "chars": 24,
     "generatedAt": "2026-07-16T06:18:47.879Z"
+  },
+  {
+    "file": "a1c086b1d73d66bf.mp3",
+    "text": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ أَنْ أُشْرِكَ بِكَ شَيْئًا وَأَنَا أَعْلَمُ بِهِ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ بِهِ، تُبْتُ عَنْهُ وَتَبَرَّأْتُ مِنَ الْكُفْرِ وَالشِّرْكِ وَالْكِذْبِ وَالْغِيبَةِ وَالْبِدْعَةِ وَالنَّمِيمَةِ وَالْفَوَاحِشِ وَالْبُهْتَانِ وَالْمَعَاصِي كُلِّهَا، وَأَسْلَمْتُ وَأَقُولُ لَا إِلَٰهَ إِلَّا اللَّهُ مُحَمَّدٌ رَسُولُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "kalmas",
+    "chars": 366,
+    "generatedAt": "2026-07-26T18:00:26.336Z"
   },
   {
     "file": "a1dc18b036895ed6.mp3",
@@ -23308,6 +24091,15 @@
     "source": "catalog",
     "chars": 43,
     "generatedAt": "2026-07-16T06:06:50.956Z"
+  },
+  {
+    "file": "a3f7b894ab1a436a.mp3",
+    "text": "الشَّكُورُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:16.505Z"
   },
   {
     "file": "a3fd4baf08487b89.mp3",
@@ -23703,7 +24495,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:45:21.673Z"
+    "generatedAt": "2026-07-26T18:00:31.039Z"
   },
   {
     "file": "a6745182f4ca27b4.mp3",
@@ -23856,7 +24648,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:48:11.520Z"
+    "generatedAt": "2026-07-26T18:02:56.454Z"
   },
   {
     "file": "a80086145a9ff5ba.mp3",
@@ -23946,7 +24738,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:04.482Z"
+    "generatedAt": "2026-07-26T18:02:49.278Z"
   },
   {
     "file": "a89b770917a8a687.mp3",
@@ -23983,6 +24775,15 @@
     "source": "quizAnswers",
     "chars": 7,
     "generatedAt": "2026-07-23T18:51:25.870Z"
+  },
+  {
+    "file": "a8c97b15c6d89e23.mp3",
+    "text": "نَبِيُّ التَّوْبَةِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 19,
+    "generatedAt": "2026-07-26T18:02:35.656Z"
   },
   {
     "file": "a8dbb1ec84572c32.mp3",
@@ -24669,6 +25470,15 @@
     "generatedAt": "2026-07-16T05:58:42.845Z"
   },
   {
+    "file": "ae412d82f4a3b694.mp3",
+    "text": "الْبَرُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 8,
+    "generatedAt": "2026-07-26T18:01:45.196Z"
+  },
+  {
     "file": "ae5a3c182e991796.mp3",
     "text": "آدمی کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -24750,6 +25560,15 @@
     "generatedAt": "2026-07-16T06:05:20.767Z"
   },
   {
+    "file": "af5e77b1bda166ef.mp3",
+    "text": "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 58,
+    "generatedAt": "2026-07-26T18:00:00.864Z"
+  },
+  {
     "file": "af6bf2c5516b0503.mp3",
     "text": "What category is Fire?",
     "lang": "en-US",
@@ -24757,6 +25576,15 @@
     "source": "quiz",
     "chars": 22,
     "generatedAt": "2026-07-26T12:48:41.461Z"
+  },
+  {
+    "file": "af7e98216c9e429f.mp3",
+    "text": "الْقُدُّوسُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:00:31.576Z"
   },
   {
     "file": "af878f8f8c293ca1.mp3",
@@ -24993,6 +25821,15 @@
     "generatedAt": "2026-07-26T12:48:46.547Z"
   },
   {
+    "file": "b0ad8756246cf6c8.mp3",
+    "text": "الْفَتَّاحُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:01:06.365Z"
+  },
+  {
     "file": "b0c20d9a4a888fb4.mp3",
     "text": "صندوق",
     "lang": "ur-PK",
@@ -25119,6 +25956,15 @@
     "generatedAt": "2026-07-23T18:47:35.806Z"
   },
   {
+    "file": "b1b8be1b353bf415.mp3",
+    "text": "قَوِيٌّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 7,
+    "generatedAt": "2026-07-26T18:02:55.385Z"
+  },
+  {
     "file": "b1d53c4339b1c605.mp3",
     "text": "Which number is Forty Two?",
     "lang": "en-US",
@@ -25179,7 +26025,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 20,
-    "generatedAt": "2026-07-17T17:47:38.356Z"
+    "generatedAt": "2026-07-26T18:02:22.855Z"
   },
   {
     "file": "b2234d94ed21ed92.mp3",
@@ -25317,6 +26163,15 @@
     "generatedAt": "2026-07-16T06:00:11.212Z"
   },
   {
+    "file": "b310c78025e61646.mp3",
+    "text": "لَا إِلَٰهَ إِلَّا ٱللَّهُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 26,
+    "generatedAt": "2026-07-26T18:00:11.766Z"
+  },
+  {
     "file": "b3119b1edb48ecf0.mp3",
     "text": "درخت کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -25395,7 +26250,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:40.469Z"
+    "generatedAt": "2026-07-26T18:01:18.554Z"
   },
   {
     "file": "b40506ddf193831b.mp3",
@@ -25461,6 +26316,15 @@
     "generatedAt": "2026-07-16T06:01:34.900Z"
   },
   {
+    "file": "b454922e49191cd8.mp3",
+    "text": "اَلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 41,
+    "generatedAt": "2026-07-26T18:03:29.009Z"
+  },
+  {
     "file": "b4549bd2739549e4.mp3",
     "text": "کس حرف سے شمع شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -25512,7 +26376,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:43.250Z"
+    "generatedAt": "2026-07-26T18:01:21.420Z"
   },
   {
     "file": "b4fbe00300476e35.mp3",
@@ -25620,7 +26484,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 11,
-    "generatedAt": "2026-07-17T17:47:14.110Z"
+    "generatedAt": "2026-07-26T18:01:49.580Z"
   },
   {
     "file": "b5b54632ab8ba4ac.mp3",
@@ -25764,7 +26628,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:57.766Z"
+    "generatedAt": "2026-07-26T18:01:35.989Z"
   },
   {
     "file": "b71111ec0d22d7ca.mp3",
@@ -25800,7 +26664,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:54.173Z"
+    "generatedAt": "2026-07-26T18:02:41.905Z"
   },
   {
     "file": "b76bd4b008cd8806.mp3",
@@ -25908,7 +26772,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:56.706Z"
+    "generatedAt": "2026-07-26T18:02:44.363Z"
   },
   {
     "file": "b8170d6580a191fb.mp3",
@@ -26001,6 +26865,15 @@
     "generatedAt": "2026-07-16T06:10:39.556Z"
   },
   {
+    "file": "b87530dadf963f0c.mp3",
+    "text": "مَهْدِيٌّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:02:48.560Z"
+  },
+  {
     "file": "b880ec99505c660f.mp3",
     "text": "C",
     "lang": "en-US",
@@ -26073,6 +26946,15 @@
     "generatedAt": "2026-07-23T18:51:05.202Z"
   },
   {
+    "file": "b90b5fe5e96eb0ab.mp3",
+    "text": "مُزَّمِّلٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:02:25.828Z"
+  },
+  {
     "file": "b944065439054782.mp3",
     "text": "دوسری رکعت کے لیے کھڑے ہوں: الفاتحہ، چھوٹی سورت، پھر رکوع اور دونوں سجدے پہلے کی طرح کریں۔",
     "lang": "ur-PK",
@@ -26097,7 +26979,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 8,
-    "generatedAt": "2026-07-17T17:47:37.010Z"
+    "generatedAt": "2026-07-26T18:02:21.329Z"
   },
   {
     "file": "b962a183efbadd85.mp3",
@@ -26196,7 +27078,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 5,
-    "generatedAt": "2026-07-17T17:47:27.999Z"
+    "generatedAt": "2026-07-26T18:02:02.379Z"
   },
   {
     "file": "b9ec51782eaa73ee.mp3",
@@ -26313,7 +27195,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:47:05.373Z"
+    "generatedAt": "2026-07-26T18:01:43.436Z"
   },
   {
     "file": "baf0da2346104d75.mp3",
@@ -26431,6 +27313,15 @@
     "source": "quiz",
     "chars": 25,
     "generatedAt": "2026-07-16T06:14:49.349Z"
+  },
+  {
+    "file": "bb84864eddca8390.mp3",
+    "text": "قَيِّمٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 7,
+    "generatedAt": "2026-07-26T18:02:19.785Z"
   },
   {
     "file": "bb8707d706187ab9.mp3",
@@ -26700,7 +27591,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 29,
-    "generatedAt": "2026-07-17T17:47:13.459Z"
+    "generatedAt": "2026-07-26T18:01:48.968Z"
   },
   {
     "file": "bd06bebf8cc47b49.mp3",
@@ -26853,7 +27744,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:06.447Z"
+    "generatedAt": "2026-07-26T18:00:59.712Z"
   },
   {
     "file": "be3dd73df0bb1d4b.mp3",
@@ -26998,6 +27889,15 @@
     "source": "quiz",
     "chars": 33,
     "generatedAt": "2026-07-16T06:17:40.193Z"
+  },
+  {
+    "file": "bf0c661e7b497540.mp3",
+    "text": "قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اَللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 110,
+    "generatedAt": "2026-07-26T18:03:22.868Z"
   },
   {
     "file": "bf16031981533177.mp3",
@@ -27297,6 +28197,15 @@
     "generatedAt": "2026-07-16T05:59:09.583Z"
   },
   {
+    "file": "c0a0f3ce6e5c7270.mp3",
+    "text": "رَسُولُ الرَّحْمَةِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 19,
+    "generatedAt": "2026-07-26T18:02:18.969Z"
+  },
+  {
     "file": "c0a25ffbc30d462d.mp3",
     "text": "Wao",
     "lang": "en-US",
@@ -27348,7 +28257,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:46.868Z"
+    "generatedAt": "2026-07-26T18:02:31.253Z"
   },
   {
     "file": "c11cb34a2ad97dac.mp3",
@@ -27367,6 +28276,15 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-07-23T18:50:56.509Z"
+  },
+  {
+    "file": "c133e26f71fbaa41.mp3",
+    "text": "حَبِيبُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 15,
+    "generatedAt": "2026-07-26T18:02:26.958Z"
   },
   {
     "file": "c14ebe8ce13d0402.mp3",
@@ -27456,7 +28374,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 13,
-    "generatedAt": "2026-07-17T17:46:02.108Z"
+    "generatedAt": "2026-07-26T18:00:59.149Z"
   },
   {
     "file": "c1d8cf3111484cf7.mp3",
@@ -27519,7 +28437,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:06.398Z"
+    "generatedAt": "2026-07-26T18:02:51.735Z"
   },
   {
     "file": "c2220b0c28f8b92a.mp3",
@@ -27547,6 +28465,15 @@
     "source": "quiz",
     "chars": 32,
     "generatedAt": "2026-07-16T06:13:06.787Z"
+  },
+  {
+    "file": "c24eeefa16a43cac.mp3",
+    "text": "الصَّبُورُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:57.666Z"
   },
   {
     "file": "c2608a11e1dd4b5f.mp3",
@@ -27765,6 +28692,15 @@
     "generatedAt": "2026-07-16T06:04:57.655Z"
   },
   {
+    "file": "c38d009fe2d6ab21.mp3",
+    "text": "الْقَوِيُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:28.075Z"
+  },
+  {
     "file": "c393583e1657df38.mp3",
     "text": "Fish",
     "lang": "en-US",
@@ -27861,7 +28797,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:48:18.866Z"
+    "generatedAt": "2026-07-26T18:03:04.226Z"
   },
   {
     "file": "c4544fdcd92d5352.mp3",
@@ -28077,7 +29013,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:15.694Z"
+    "generatedAt": "2026-07-26T18:03:00.540Z"
   },
   {
     "file": "c6410acef5f56c48.mp3",
@@ -28177,6 +29113,15 @@
     "source": "quiz",
     "chars": 33,
     "generatedAt": "2026-07-16T06:13:19.487Z"
+  },
+  {
+    "file": "c6a41a47db671709.mp3",
+    "text": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 67,
+    "generatedAt": "2026-07-26T18:00:04.017Z"
   },
   {
     "file": "c6b5014198983e47.mp3",
@@ -28350,6 +29295,15 @@
     "generatedAt": "2026-07-16T06:03:44.404Z"
   },
   {
+    "file": "c7dfaecdc77e4563.mp3",
+    "text": "الْمُقَدِّمُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 12,
+    "generatedAt": "2026-07-26T18:01:39.893Z"
+  },
+  {
     "file": "c7f5e8def9c5a638.mp3",
     "text": "What category is Banana?",
     "lang": "en-US",
@@ -28383,7 +29337,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 22,
-    "generatedAt": "2026-07-17T17:47:45.566Z"
+    "generatedAt": "2026-07-26T18:02:30.021Z"
   },
   {
     "file": "c839a7a52658230b.mp3",
@@ -28527,7 +29481,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:13.129Z"
+    "generatedAt": "2026-07-26T18:02:58.397Z"
   },
   {
     "file": "c9ad0a015682b52f.mp3",
@@ -28545,7 +29499,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:38.258Z"
+    "generatedAt": "2026-07-26T18:01:15.785Z"
   },
   {
     "file": "c9da6cc76961ff41.mp3",
@@ -28824,7 +29778,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:19.508Z"
+    "generatedAt": "2026-07-26T18:03:04.750Z"
   },
   {
     "file": "cbeb7c0212b6c7b4.mp3",
@@ -29106,6 +30060,15 @@
     "generatedAt": "2026-07-26T13:31:27.440Z"
   },
   {
+    "file": "cdf903a7f8e8b211.mp3",
+    "text": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 62,
+    "generatedAt": "2026-07-26T18:00:11.110Z"
+  },
+  {
     "file": "cdffa1214ddc46d7.mp3",
     "text": "اپنا کھانا اور کھلونے بانٹو۔ دوسروں کی مدد اللہ کو پسند ہے۔",
     "lang": "ur-PK",
@@ -29142,15 +30105,6 @@
     "generatedAt": "2026-07-16T06:11:14.666Z"
   },
   {
-    "file": "ce4ef3a53048b4a3.mp3",
-    "text": "أَسْتَغْفِرُ اللهَ",
-    "lang": "ar-SA",
-    "voice": "ar-SA-HamedNeural",
-    "source": "tasbeeh",
-    "chars": 18,
-    "generatedAt": "2026-07-26T13:39:25.301Z"
-  },
-  {
     "file": "ce53f92083cb3ef6.mp3",
     "text": "Seventy One",
     "lang": "en-US",
@@ -29167,6 +30121,15 @@
     "source": "quiz",
     "chars": 28,
     "generatedAt": "2026-07-16T06:10:48.546Z"
+  },
+  {
+    "file": "ce5bc0516c11854f.mp3",
+    "text": "التَّوَّابُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:01:45.791Z"
   },
   {
     "file": "ce7023bdaa007a5b.mp3",
@@ -29319,7 +30282,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:52.778Z"
+    "generatedAt": "2026-07-26T18:02:40.366Z"
   },
   {
     "file": "cf68a5a24e8a4d84.mp3",
@@ -29391,7 +30354,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 6,
-    "generatedAt": "2026-07-17T17:48:23.220Z"
+    "generatedAt": "2026-07-26T18:03:08.112Z"
   },
   {
     "file": "cfbcd2dfae3638a9.mp3",
@@ -29754,6 +30717,15 @@
     "generatedAt": "2026-07-23T18:49:03.041Z"
   },
   {
+    "file": "d341bf3fb548e5f9.mp3",
+    "text": "اللَّهُمَّ صَيِّبًا نَافِعًا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 28,
+    "generatedAt": "2026-07-26T18:00:07.064Z"
+  },
+  {
     "file": "d35c7a2fc068a0e9.mp3",
     "text": "Eighty Seven",
     "lang": "en-US",
@@ -29880,6 +30852,15 @@
     "generatedAt": "2026-07-16T06:10:34.620Z"
   },
   {
+    "file": "d455b12af13b2404.mp3",
+    "text": "مُؤَمَّلٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:03:00.031Z"
+  },
+  {
     "file": "d4720e23d4439df5.mp3",
     "text": "Y",
     "lang": "en-US",
@@ -29895,7 +30876,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:30.713Z"
+    "generatedAt": "2026-07-26T18:01:08.622Z"
   },
   {
     "file": "d477439a14abd0ac.mp3",
@@ -30057,7 +31038,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 5,
-    "generatedAt": "2026-07-17T17:48:05.069Z"
+    "generatedAt": "2026-07-26T18:02:49.893Z"
   },
   {
     "file": "d5be38b746036111.mp3",
@@ -30193,6 +31174,15 @@
     "source": "quizAnswers",
     "chars": 7,
     "generatedAt": "2026-07-23T18:50:44.313Z"
+  },
+  {
+    "file": "d65a00d05e7d943e.mp3",
+    "text": "السَّمِيعُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 10,
+    "generatedAt": "2026-07-26T18:01:10.813Z"
   },
   {
     "file": "d68134f8c23c8abe.mp3",
@@ -30726,6 +31716,15 @@
     "generatedAt": "2026-07-26T13:01:16.540Z"
   },
   {
+    "file": "da8aa2aaa5689a04.mp3",
+    "text": "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ ، رَبَّنَا لَكَ الْحَمْدُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namaz",
+    "chars": 56,
+    "generatedAt": "2026-07-26T18:03:24.096Z"
+  },
+  {
     "file": "daa25d83fb18db05.mp3",
     "text": "Nature",
     "lang": "en-US",
@@ -30915,6 +31914,15 @@
     "generatedAt": "2026-07-16T06:04:38.379Z"
   },
   {
+    "file": "dbe0a8b1ebabb7a7.mp3",
+    "text": "مَدْعُوٌّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:02:51.030Z"
+  },
+  {
     "file": "dc11c8b9f1ba916f.mp3",
     "text": "What category is Telephone?",
     "lang": "en-US",
@@ -31039,15 +32047,6 @@
     "source": "numbers",
     "chars": 11,
     "generatedAt": "2026-07-23T18:45:31.362Z"
-  },
-  {
-    "file": "dd1aee602b2e65a6.mp3",
-    "text": "سُبْحَانَ اللهِ",
-    "lang": "ar-SA",
-    "voice": "ar-SA-HamedNeural",
-    "source": "tasbeeh",
-    "chars": 15,
-    "generatedAt": "2026-07-26T13:39:20.506Z"
   },
   {
     "file": "dd3f3db4c40dc7b2.mp3",
@@ -31192,6 +32191,15 @@
     "source": "quiz",
     "chars": 26,
     "generatedAt": "2026-07-26T13:00:05.264Z"
+  },
+  {
+    "file": "deca614a8a522864.mp3",
+    "text": "نَبِيُّ الرَّحْمَةِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 19,
+    "generatedAt": "2026-07-26T18:02:35.056Z"
   },
   {
     "file": "deccfef4c2a54412.mp3",
@@ -31452,7 +32460,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:47:21.719Z"
+    "generatedAt": "2026-07-26T18:01:56.442Z"
   },
   {
     "file": "e07c9a3e069cda28.mp3",
@@ -31587,7 +32595,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:47:25.337Z"
+    "generatedAt": "2026-07-26T18:02:00.024Z"
   },
   {
     "file": "e12938e2e560755c.mp3",
@@ -31597,6 +32605,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:14:05.765Z"
+  },
+  {
+    "file": "e1428083b53e9905.mp3",
+    "text": "صَفِيُّ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 15,
+    "generatedAt": "2026-07-26T18:02:27.570Z"
   },
   {
     "file": "e1442e8abb5fd01c.mp3",
@@ -31668,7 +32685,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 4,
-    "generatedAt": "2026-07-17T17:47:30.662Z"
+    "generatedAt": "2026-07-26T18:02:04.603Z"
   },
   {
     "file": "e1cf5ba681affc28.mp3",
@@ -31777,6 +32794,15 @@
     "source": "quiz",
     "chars": 23,
     "generatedAt": "2026-07-16T06:10:27.964Z"
+  },
+  {
+    "file": "e25a58e425e585f2.mp3",
+    "text": "مُحَمَّدٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:01:58.281Z"
   },
   {
     "file": "e2663c7f3ee111e9.mp3",
@@ -31983,7 +33009,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:48:28.434Z"
+    "generatedAt": "2026-07-26T18:03:12.830Z"
   },
   {
     "file": "e361805bbf993d8d.mp3",
@@ -32190,7 +33216,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:47:52.112Z"
+    "generatedAt": "2026-07-26T18:02:39.447Z"
   },
   {
     "file": "e548f61dbb89044b.mp3",
@@ -32208,7 +33234,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:52.476Z"
+    "generatedAt": "2026-07-26T18:01:30.505Z"
   },
   {
     "file": "e55fae096719a627.mp3",
@@ -32244,7 +33270,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 7,
-    "generatedAt": "2026-07-17T17:48:10.881Z"
+    "generatedAt": "2026-07-26T18:02:55.919Z"
   },
   {
     "file": "e580e92a09a2400c.mp3",
@@ -32355,6 +33381,24 @@
     "generatedAt": "2026-07-23T18:45:23.186Z"
   },
   {
+    "file": "e63d8bd753cc82a1.mp3",
+    "text": "لَا إِلَٰهَ إِلَّا اللَّهُ مُحَمَّدٌ رَسُولُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "kalmas",
+    "chars": 52,
+    "generatedAt": "2026-07-26T18:00:19.366Z"
+  },
+  {
+    "file": "e65162ce78ffb4c8.mp3",
+    "text": "الضَّارُّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:01:52.616Z"
+  },
+  {
     "file": "e66d6dec1513fd3a.mp3",
     "text": "Be Grateful. Thank Allah for everything you have.",
     "lang": "en-US",
@@ -32424,7 +33468,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 9,
-    "generatedAt": "2026-07-17T17:46:34.998Z"
+    "generatedAt": "2026-07-26T18:01:12.564Z"
   },
   {
     "file": "e6d749fed6d688b8.mp3",
@@ -33090,7 +34134,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 5,
-    "generatedAt": "2026-07-17T17:47:59.234Z"
+    "generatedAt": "2026-07-26T18:02:45.488Z"
   },
   {
     "file": "eb34239787c61e11.mp3",
@@ -33279,7 +34323,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 12,
-    "generatedAt": "2026-07-17T17:48:16.927Z"
+    "generatedAt": "2026-07-26T18:03:01.769Z"
   },
   {
     "file": "ec825cd340549835.mp3",
@@ -33450,7 +34494,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:46.023Z"
+    "generatedAt": "2026-07-26T18:01:23.774Z"
   },
   {
     "file": "edcafa986a8c5b5e.mp3",
@@ -33523,6 +34567,15 @@
     "source": "quizAnswers",
     "chars": 5,
     "generatedAt": "2026-07-23T18:51:50.352Z"
+  },
+  {
+    "file": "ee7af64fc9972931.mp3",
+    "text": "نِعْمَةُ اللَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 16,
+    "generatedAt": "2026-07-26T18:03:09.348Z"
   },
   {
     "file": "eea680071ef7a901.mp3",
@@ -33657,7 +34710,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:47:16.572Z"
+    "generatedAt": "2026-07-26T18:01:52.034Z"
   },
   {
     "file": "efc37513198aaa95.mp3",
@@ -33873,7 +34926,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 19,
-    "generatedAt": "2026-07-17T17:48:27.186Z"
+    "generatedAt": "2026-07-26T18:03:11.702Z"
   },
   {
     "file": "f175bd73d00b9c05.mp3",
@@ -33955,6 +35008,15 @@
     "source": "storyQuizAnswers",
     "chars": 16,
     "generatedAt": "2026-07-23T18:46:34.262Z"
+  },
+  {
+    "file": "f1cff2f3d43007c5.mp3",
+    "text": "اللَّهُمَّ رَبَّ هَٰذِهِ الدَّعْوَةِ التَّامَّةِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 48,
+    "generatedAt": "2026-07-26T18:00:17.994Z"
   },
   {
     "file": "f1dc84038c9ac7c5.mp3",
@@ -34054,6 +35116,15 @@
     "source": "quiz",
     "chars": 19,
     "generatedAt": "2026-07-16T06:15:24.935Z"
+  },
+  {
+    "file": "f2b7f29ec9e07c90.mp3",
+    "text": "ذُو عِزٍّ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesMuhammad",
+    "chars": 9,
+    "generatedAt": "2026-07-26T18:03:03.596Z"
   },
   {
     "file": "f2c9a64ef1ad8ff8.mp3",
@@ -34557,7 +35628,16 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:53.112Z"
+    "generatedAt": "2026-07-26T18:01:31.148Z"
+  },
+  {
+    "file": "f77fbf99d31a1697.mp3",
+    "text": "الْمُصَوِّرُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 12,
+    "generatedAt": "2026-07-26T18:01:02.853Z"
   },
   {
     "file": "f7a971f233ee556c.mp3",
@@ -34773,7 +35853,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:41.274Z"
+    "generatedAt": "2026-07-26T18:01:19.107Z"
   },
   {
     "file": "f8f2270b1dc98e7d.mp3",
@@ -34998,7 +36078,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesAllah",
     "chars": 10,
-    "generatedAt": "2026-07-17T17:46:55.554Z"
+    "generatedAt": "2026-07-26T18:01:33.577Z"
   },
   {
     "file": "fa4ec67e51bbe6e0.mp3",
@@ -35124,7 +36204,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 18,
-    "generatedAt": "2026-07-17T17:47:51.465Z"
+    "generatedAt": "2026-07-26T18:02:38.836Z"
   },
   {
     "file": "fbab4233a5edbc7d.mp3",
@@ -35170,6 +36250,15 @@
     "source": "quiz",
     "chars": 30,
     "generatedAt": "2026-07-26T13:00:06.070Z"
+  },
+  {
+    "file": "fbf4747cf6266d0a.mp3",
+    "text": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 30,
+    "generatedAt": "2026-07-26T18:00:16.592Z"
   },
   {
     "file": "fc00eb2e84a14ca8.mp3",
@@ -35322,7 +36411,7 @@
     "voice": "ar-SA-HamedNeural",
     "source": "namesMuhammad",
     "chars": 8,
-    "generatedAt": "2026-07-17T17:47:58.002Z"
+    "generatedAt": "2026-07-26T18:02:44.884Z"
   },
   {
     "file": "fd48855fcf0075c9.mp3",
@@ -35341,6 +36430,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:15:07.001Z"
+  },
+  {
+    "file": "fd521b2a388f0d0c.mp3",
+    "text": "الرَّحْمٰنُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "namesAllah",
+    "chars": 11,
+    "generatedAt": "2026-07-26T18:00:28.478Z"
   },
   {
     "file": "fd538e08b422a2ae.mp3",
@@ -35629,6 +36727,15 @@
     "source": "quiz",
     "chars": 22,
     "generatedAt": "2026-07-16T06:21:49.632Z"
+  },
+  {
+    "file": "ff8e70bbc109b6f5.mp3",
+    "text": "الْحَمْدُ لِلَّهِ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "duas",
+    "chars": 17,
+    "generatedAt": "2026-07-26T18:00:07.693Z"
   },
   {
     "file": "ff917dbec47e8738.mp3",

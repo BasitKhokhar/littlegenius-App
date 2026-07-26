@@ -187,9 +187,8 @@ export const duasData = [
   {
     title: 'When Feeling Scared (ڈر لگنے پر)',
     arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ',
-    // Spoken form: ٱ (alef wasla) tells the voice to elide across the
-    // word break — "yarhamukallah", not "yarhamuka Allah". Display keeps the
-    // plain alif, which is easier for a child to read.
+    // Spoken form — see the note on the sneezing dua above:
+    // "illallah", not "illa Allah".
     arabicSpeak: 'لَا إِلَٰهَ إِلَّا ٱللَّهُ',
     transliteration: 'La ilaha illallah',
     urdu: 'اللہ کے سوا کوئی معبود نہیں',
@@ -231,9 +230,8 @@ export const duasData = [
   {
     title: 'For Good Manners (اچھے اخلاق کی دعا)',
     arabic: 'اللَّهُمَّ اهْدِنِي لِأَحْسَنِ الْأَخْلَاقِ',
-    // Spoken form: ٱ (alef wasla) tells the voice to elide across the
-    // word break — "yarhamukallah", not "yarhamuka Allah". Display keeps the
-    // plain alif, which is easier for a child to read.
+    // Spoken form — see the note on the sneezing dua above:
+    // "Allahummahdini", not "Allahumma ihdini".
     arabicSpeak: 'اللَّهُمَّ ٱهْدِنِي لِأَحْسَنِ ٱلْأَخْلَاقِ',
     transliteration: 'Allahummahdini li ahsanil akhlaq',
     urdu: 'اے اللہ! مجھے بہترین اخلاق کی ہدایت دے',

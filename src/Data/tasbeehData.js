@@ -5,7 +5,7 @@
 const tasbeehData = [
   {
     id: 'subhanallah',
-    arabic: 'سُبْحَانَ اللهِ',
+    arabic: 'سُبْحَانَ اللَّهِ',
     transliteration: 'SubhanAllah',
     urdu: 'اللہ پاک ہے',
     english: 'Glory be to Allah',
@@ -23,7 +23,7 @@ const tasbeehData = [
   },
   {
     id: 'allahuakbar',
-    arabic: 'اَللهُ أَكْبَرُ',
+    arabic: 'اَللَّهُ أَكْبَرُ',
     transliteration: 'Allahu Akbar',
     urdu: 'اللہ سب سے بڑا ہے',
     english: 'Allah is the Greatest',
@@ -32,7 +32,7 @@ const tasbeehData = [
   },
   {
     id: 'lailahaillallah',
-    arabic: 'لَا إِلٰهَ إِلَّا اللهُ',
+    arabic: 'لَا إِلٰهَ إِلَّا اللَّهُ',
     transliteration: 'La ilaha illallah',
     urdu: 'اللہ کے سوا کوئی معبود نہیں',
     english: 'There is no god but Allah',
@@ -41,7 +41,7 @@ const tasbeehData = [
   },
   {
     id: 'astaghfirullah',
-    arabic: 'أَسْتَغْفِرُ اللهَ',
+    arabic: 'أَسْتَغْفِرُ اللَّهَ',
     transliteration: 'Astaghfirullah',
     urdu: 'میں اللہ سے معافی مانگتا ہوں',
     english: 'I seek forgiveness from Allah',
