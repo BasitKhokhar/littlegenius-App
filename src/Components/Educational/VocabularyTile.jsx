@@ -23,6 +23,11 @@ const VocabularyTile = ({
   // pack; `wordStyle` carries the script font (Nastaliq needs a taller line).
   language = 'en-US',
   fallbackText = null,
+  // Full phrase to actually SPEAK (e.g. "A for Apple" / "ا سے انار") while `word` stays
+  // the short label shown on the tile — teaches the letter-sound link. Falls back to
+  // `word` when omitted, so any other caller keeps today's bare-word behavior.
+  speakText = null,
+  speakFallbackText = null,
   wordStyle = null,
   style,
 }) => {
@@ -30,7 +35,17 @@ const VocabularyTile = ({
   const scale = useRef(new Animated.Value(1)).current;
   const { isSpeaking, toggle } = useSpeak();
 
-  const speak = () => toggle(word, language, { clipRate: 0.7, rate: 0.75, fallbackText });
+  const speak = () =>
+    toggle(speakText ?? word, language, {
+      clipRate: 0.7,
+      rate: 0.75,
+      // Urdu clips reported (2026-08-01) sounding distorted at the default
+      // 0.7 * 0.75 globalSpeed ≈ 0.525x effective rate — floor it so Urdu
+      // playback never drops below a legible speed. English wasn't reported
+      // as affected, so it keeps the old unfloored behavior.
+      minClipRate: language === 'ur-PK' ? 0.85 : undefined,
+      fallbackText: speakFallbackText ?? fallbackText,
+    });
 
   const handlePressIn = () =>
     Animated.spring(scale, { toValue: Motion.pressScale, useNativeDriver: true, ...Motion.spring.soft }).start();

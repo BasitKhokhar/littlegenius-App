@@ -8,6 +8,16 @@ const BRAND = {
   indigoTint: '#EDE9FE',
   gold: '#FCD34D',
   goldDeep: '#F59E0B',
+  lilac: '#C4B5FD',
+};
+
+// Translucent white-on-brand overlays — used on deep-indigo brand surfaces
+// (e.g. Onboarding) that stay on-brand regardless of light/dark mode.
+export const onBrandOverlay = {
+  faint: 'rgba(255,255,255,0.14)',
+  text: 'rgba(255,255,255,0.9)',
+  textStrong: 'rgba(255,255,255,0.92)',
+  textMuted: 'rgba(255,255,255,0.78)',
 };
 
 // Status colours (shared across themes).
@@ -144,6 +154,7 @@ export const gradients = {
   splash: [BRAND.indigoDeep, BRAND.indigoDark],
   cta: [BRAND.indigo, BRAND.indigoDark],
   gold: [BRAND.gold, BRAND.goldDeep],
+  onboarding: [BRAND.indigoTint, BRAND.lilac],
 };
 
 // ── Per-module accent gradients (kids modules, harmonised) ──

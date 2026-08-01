@@ -18,9 +18,24 @@ const useSpeak = () => {
   const mountedRef = useRef(true);
   // Read inside callbacks so `toggle` stays stable across renders.
   const speakingRef = useRef(false);
+  // Stable per-instance identity for the cross-component "one speaker at a
+  // time" registry — see SpeechEngine.registerSpeaker/claimSpeaker. Each card
+  // in a list (e.g. VocabularyTile grid) is its own instance.
+  const ownerIdRef = useRef(null);
+  if (!ownerIdRef.current) ownerIdRef.current = Symbol('speaker');
+
+  const finish = useCallback(() => {
+    speakingRef.current = false;
+    if (mountedRef.current) setIsSpeaking(false);
+  }, []);
 
   useEffect(() => {
     mountedRef.current = true;
+    // Tapping a DIFFERENT word's sound icon already silences this one's audio
+    // (SpeechEngine has a single active player) — this makes sure the icon
+    // itself flips back from "playing" to idle at the same moment, instead of
+    // staying stuck until this instance happens to unmount.
+    const unregister = SpeechEngine.registerSpeaker(ownerIdRef.current, finish);
     return () => {
       // Stop audio on unmount (e.g. navigating away mid-sentence) and
       // block any late state updates from an in-flight utterance.
@@ -29,17 +44,13 @@ const useSpeak = () => {
       // live in a windowed FlatList, so an off-screen card unmounting
       // must not cut off the card the child is actually listening to.
       mountedRef.current = false;
+      unregister();
       if (speakingRef.current) {
         speakingRef.current = false;
         SpeechEngine.stop();
       }
     };
-  }, []);
-
-  const finish = useCallback(() => {
-    speakingRef.current = false;
-    if (mountedRef.current) setIsSpeaking(false);
-  }, []);
+  }, [finish]);
 
   const stop = useCallback(async () => {
     await SpeechEngine.stop();
@@ -57,6 +68,7 @@ const useSpeak = () => {
 
       speakingRef.current = true;
       setIsSpeaking(true);
+      SpeechEngine.claimSpeaker(ownerIdRef.current);
       await SpeechEngine.speak(text, language, {
         ...opts,
         onDone: finish,

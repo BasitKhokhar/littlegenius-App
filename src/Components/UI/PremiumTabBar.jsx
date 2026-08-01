@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
+import { View, Pressable, StyleSheet, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../Context/ThemeContext';
 import { useTabBarVisibility } from '../../Context/TabBarContext';
-import { Radius } from '../../Theme';
+import { Radius, Layout, Colors, coloredShadow } from '../../Theme';
 
 // ──────────────────────────────────────────────────────────────
 // PremiumTabBar — floating white pill bar with a carved notch.
@@ -17,19 +19,22 @@ import { Radius } from '../../Theme';
 // so we own every pixel.
 // ──────────────────────────────────────────────────────────────
 
-// Route → emoji glyph (keeps screens icon-agnostic).
+// Route → vector icon (filled when active, outline when idle).
+// Islamic uses MaterialCommunityIcons — Ionicons has no mosque glyph.
 const ICONS = {
-  Home: '🏠',
-  Stories: '📚',
-  Islamic: '🕌',
-  Games: '🧠',
-  Settings: '⚙️',
+  Home: { Icon: Ionicons, active: 'home', inactive: 'home-outline' },
+  Stories: { Icon: Ionicons, active: 'book', inactive: 'book-outline' },
+  Islamic: { Icon: MaterialCommunityIcons, active: 'mosque', inactive: 'mosque-outline' },
+  Games: { Icon: Ionicons, active: 'game-controller', inactive: 'game-controller-outline' },
+  Settings: { Icon: Ionicons, active: 'settings', inactive: 'settings-outline' },
 };
 
-const ROW_H = 60; // inner height of the bar's tab row
-const RAISE = 26; // how far the active circle pokes above the bar
-const CIRCLE = 54; // raised circle diameter
-const NOTCH = 66; // cut-out diameter (leaves a thin ring around the circle)
+const ROW_H = Layout.tabBarHeight; // inner height of the bar's tab row
+const RAISE = 20; // how far the active circle pokes above the bar
+const CIRCLE = 46; // raised circle diameter
+const NOTCH = 56; // cut-out diameter (leaves a thin ring around the circle)
+const ICON_SIZE_ACTIVE = 22;
+const ICON_SIZE_IDLE = 22;
 
 // The pill is ALWAYS light — it must read the same in light & dark mode.
 // In dark mode the themed `surface`/`textPrimary` tokens go near-black,
@@ -37,12 +42,17 @@ const NOTCH = 66; // cut-out diameter (leaves a thin ring around the circle)
 // the bar's own colours to fixed light values regardless of theme.
 const BAR_LIGHT = {
   surface: '#FFFFFF', // white pill
-  circle: '#1E1B4B', // deep-indigo raised circle
   iconOn: '#FFFFFF', // glyph on the indigo circle
   idle: '#1E1B4B', // inactive glyph
   label: '#1E1B4B', // active label
   shadow: '#000000',
 };
+
+// Same gradient/tint the rest of the app uses for primary CTAs (Button.jsx,
+// GradientCard) — keeps the raised circle visually consistent with the
+// app's existing "premium depth" system instead of a one-off flat fill.
+const CIRCLE_GRADIENT = Colors.gradients.cta;
+const CIRCLE_SHADOW = coloredShadow(Colors.primary, 'lg');
 
 // The "notch" ring around the raised circle. In LIGHT mode it shows the
 // soft screen background (`colors.bg`) so it reads as a bite into the pill.
@@ -55,7 +65,7 @@ const TabItem = ({
   focused,
   label,
   icon,
-  circleColor,
+  circleGradient,
   cutoutColor,
   iconOn,
   idleColor,
@@ -88,20 +98,37 @@ const TabItem = ({
     transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) }],
   };
 
+  const { Icon, active, inactive } = icon;
+  const iconName = focused ? active : inactive;
+
   return (
     <Pressable
       style={styles.item}
       onPress={onPress}
-      android_ripple={{ color: 'rgba(30,27,75,0.10)', borderless: true, radius: 38 }}
+      android_ripple={{ color: 'rgba(30,27,75,0.10)', borderless: true, radius: 32 }}
       hitSlop={6}
     >
       {focused ? (
         <>
           {/* Cut-out: a bg-coloured disc that carves a hole into the bar */}
           <Animated.View style={[styles.notch, { backgroundColor: cutoutColor }, notchStyle]} />
-          {/* Raised dark circle sitting in the notch */}
-          <Animated.View style={[styles.circle, { backgroundColor: circleColor }, circleStyle]}>
-            <Text style={[styles.circleIcon, { color: iconOn }]}>{icon}</Text>
+          {/* Raised gradient circle sitting in the notch */}
+          <Animated.View style={[styles.circle, circleStyle]}>
+            <LinearGradient
+              colors={circleGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.circleFill}
+            >
+              {/* Glossy top highlight — lilac-tinted (Theme's indigoTint) so it reads
+                  as a lit brand surface rather than a plain white gloss */}
+              <LinearGradient
+                colors={['rgba(237,233,254,0.45)', 'rgba(237,233,254,0)']}
+                pointerEvents="none"
+                style={styles.circleSheen}
+              />
+              <Icon name={iconName} size={ICON_SIZE_ACTIVE} color={iconOn} />
+            </LinearGradient>
           </Animated.View>
           <Animated.Text
             numberOfLines={1}
@@ -111,7 +138,7 @@ const TabItem = ({
           </Animated.Text>
         </>
       ) : (
-        <Text style={[styles.idleIcon, { color: idleColor }]}>{icon}</Text>
+        <Icon name={iconName} size={ICON_SIZE_IDLE} color={idleColor} style={styles.idleIcon} />
       )}
     </Pressable>
   );
@@ -139,7 +166,8 @@ const PremiumTabBar = ({ state, descriptors, navigation }) => {
           const { options } = descriptors[route.key];
           const focused = state.index === index;
           const label = options.tabBarLabel ?? options.title ?? route.name;
-          const icon = ICONS[route.name] ?? '•';
+          const icon =
+            ICONS[route.name] ?? { Icon: Ionicons, active: 'ellipse', inactive: 'ellipse-outline' };
 
           const onPress = () => {
             Haptics.selectionAsync().catch(() => {});
@@ -159,7 +187,7 @@ const PremiumTabBar = ({ state, descriptors, navigation }) => {
               focused={focused}
               label={label}
               icon={icon}
-              circleColor={BAR_LIGHT.circle}
+              circleGradient={CIRCLE_GRADIENT}
               cutoutColor={ringColor}
               iconOn={BAR_LIGHT.iconOn}
               idleColor={BAR_LIGHT.idle}
@@ -202,7 +230,9 @@ const styles = StyleSheet.create({
   },
   notch: {
     position: 'absolute',
-    top: -(NOTCH / 2) + 1, // centre aligned with the resting circle centre
+    // Concentric with the circle (same centre as `circle.top + CIRCLE/2`) so
+    // the ring reads as an even-width halo on every side, not just the top.
+    top: -RAISE + (CIRCLE - NOTCH) / 2,
     width: NOTCH,
     height: NOTCH,
     borderRadius: NOTCH / 2,
@@ -214,17 +244,24 @@ const styles = StyleSheet.create({
     width: CIRCLE,
     height: CIRCLE,
     borderRadius: CIRCLE / 2,
+    borderWidth: 1.5,
+    borderColor: 'rgba(196,181,253,0.45)', // lilac (Theme BRAND.lilac), not plain white
+    // Raised look — stronger, indigo-tinted shadow so it "floats" higher.
+    ...CIRCLE_SHADOW,
+  },
+  circleFill: {
+    flex: 1,
+    borderRadius: CIRCLE / 2,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    // Raised look — stronger shadow than the bar so it "floats" higher.
-    shadowColor: '#1E1B4B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 10,
   },
-  circleIcon: {
-    fontSize: 24,
+  circleSheen: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '55%',
   },
   label: {
     position: 'absolute',
@@ -234,7 +271,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   idleIcon: {
-    fontSize: 23,
     opacity: 0.75,
   },
 });

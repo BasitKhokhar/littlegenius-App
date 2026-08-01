@@ -119,6 +119,53 @@ const LETTER_IPA = {
 const isSingleEnglishLetter = (text, voice) =>
   voice.locale.startsWith('en') && /^[A-Za-z]$/.test(text.trim());
 
+// ── Letter PHONICS (the sound, not the name) ───────────────────────────────
+// The AlphabetScreen hero "Hear A" button used to speak the letter NAME via
+// LETTER_IPA above ("ay"), which is correct when teaching the alphabet song
+// but is NOT what a child expects when a card is teaching "A for Apple" — they
+// expect the phonics sound (/æ/), not "ay for Apple". This is a second, distinct
+// table read through the SAME IPA-phoneme mechanism, just with the standard
+// General-American phonics sound per letter instead of its name.
+//
+// CONSONANTS carry a light trailing schwa (b->'bə' "buh", not bare 'b'). A bare
+// stop/glide consonant has NO vowel nucleus at all, and that is out-of-
+// distribution for Azure's neural vocoder — measured (2026-08-01) as garbled/
+// glitchy audio for exactly the consonants that were left bare, while the SAME
+// sound embedded in real speech (e.g. the "B" in "B for Ball") rendered clean.
+// LETTER_IPA above never hit this because every letter NAME already ends in a
+// vowel ("bee", "dee", "kay", …) — the schwa release here gives phonics clips
+// the same vowel-bearing-syllable shape that has always rendered reliably.
+// Vowels stay bare — they ARE the nucleus, nothing to release.
+//
+// These clips render at NORMAL rate (0%), not LETTER_RATE — see the `phonic`
+// branch of `ssml()` below for why: baking a slowdown into an isolated
+// phoneme hyperarticulates it (measured 2026-08-01: B/C/D/… came back as
+// "ba"/"caa"/"daa", a fuller vowel than the light schwa this table asks for).
+const LETTER_PHONICS_IPA = {
+  A: 'æ', B: 'bə', C: 'kə', D: 'də', E: 'ɛ', F: 'fə', G: 'gə', H: 'hə', I: 'ɪ', J: 'dʒə',
+  K: 'kə', L: 'lə', M: 'mə', N: 'nə', O: 'ɑ', P: 'pə', Q: 'kwə', R: 'rə', S: 'sə', T: 'tə',
+  U: 'ʌ', V: 'və', W: 'wə', X: 'ksə', Y: 'jə', Z: 'zə',
+};
+
+// Text marker for a phonics request — a real spoken phrase ("sound of B"), not
+// gibberish, so a device-TTS fallback (before this is baked, or if the clip is
+// ever missing) still says something sensible instead of reading a hyphenated
+// key literally. Distinct from the bare letter text used by LETTER_IPA above,
+// so the two get different speechKeys and can't collide.
+const PHONIC_MARKER_RE = /^sound of ([A-Za-z])$/i;
+const matchPhonicMarker = (text, voice) =>
+  voice.locale.startsWith('en') ? text.trim().match(PHONIC_MARKER_RE) : null;
+
+// "A for Apple" style teaching phrases (VocabularyTile on the Alphabet screen) hit the
+// SAME article-vs-letter-name ambiguity as a lone letter: left bare, Azure reads a
+// leading "A" as "a" (schwa), not the letter name. Unlike a lone letter, a full phrase
+// has enough syllables to survive normal-speed playback, so only the leading letter gets
+// the IPA phoneme treatment — the rest of the phrase (and the overall rate) stays plain,
+// same as every other baked sentence in the app.
+const LETTER_FOR_RE = /^([A-Za-z])\s+for\s+/;
+const matchLetterForPhrase = (text, voice) =>
+  voice.locale.startsWith('en') ? text.trim().match(LETTER_FOR_RE) : null;
+
 // Azure occasionally returns a single-letter clip with ~0.9s of trailing silence
 // stapled on — the SAME request rendered 1.78s, 1.78s, then 0.98s on three
 // consecutive tries. A padded clip leaves dead air after the sound and delays the
@@ -132,18 +179,129 @@ const clipSeconds = (buf) => (buf.length * 8) / 48000;
 // Explicit neutral prosody on every clip. Azure's default already is rate/pitch
 // 0%, but stating it means a future voice swap can't quietly change the pace of
 // SOME clips and not others — every phrase in the app is spoken identically.
-const ssml = (text, voice) => {
+const ssml = (text, voice, source) => {
   const letter = isSingleEnglishLetter(text, voice);
-  const ipa = letter ? LETTER_IPA[text.trim().toUpperCase()] : null;
-  const inner = ipa
-    ? `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(text.trim())}</phoneme>`
-    : xmlEscape(text);
+  const phonic = !letter ? matchPhonicMarker(text, voice) : null;
+  const forMatch = !letter && !phonic ? matchLetterForPhrase(text, voice) : null;
+  let inner;
+  if (letter) {
+    const ipa = LETTER_IPA[text.trim().toUpperCase()];
+    inner = ipa
+      ? `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(text.trim())}</phoneme>`
+      : xmlEscape(text);
+  } else if (phonic) {
+    const L = phonic[1].toUpperCase();
+    const ipa = LETTER_PHONICS_IPA[L];
+    inner = ipa
+      ? `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(L)}</phoneme>`
+      : xmlEscape(L);
+  } else if (forMatch) {
+    const ipa = LETTER_IPA[forMatch[1].toUpperCase()];
+    const rest = text.trim().slice(forMatch[0].length);
+    inner = ipa
+      ? `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(forMatch[1])}</phoneme> for ${xmlEscape(rest)}`
+      : xmlEscape(text);
+  } else {
+    inner = xmlEscape(applyUrduHomographFix(text, voice, source));
+  }
+  // Only bare letter NAMES (LETTER_IPA, "ay"/"bee"/"kay") get the baked -25%
+  // slowdown. `phonic` clips ("sound of B") deliberately do NOT — measured
+  // 2026-08-01: at LETTER_RATE the isolated schwa/vowel hyperarticulates into
+  // the wrong sound ("bə" -> "baa"), while the identical phoneme embedded in
+  // the `forMatch` phrase path ("B for Ball", always 0%) renders correctly.
+  // Slow-for-kids on this button still happens, just at PLAYBACK time
+  // (AlphabetScreen's clipRate/minClipRate + speechEngine's globalSpeed),
+  // same mechanism every other clip in the app already uses.
+  //
+  // Urdu standalone letter clips (source 'urduLetters') get the SAME
+  // treatment for the same reason: a 1-token render ("سے", "شین", "ڑے") is
+  // exactly the short-utterance case Azure clips/truncates unpredictably —
+  // reported 2026-08-01 as "shen" instead of "sheen", "he" instead of "hay".
+  // Urdu vocab words/phrases (multiple syllables) are left at 0% — they were
+  // NOT reported as needing this.
+  const urduLetter = source === 'urduLetters' && voice.locale.startsWith('ur');
+  const rate = letter || urduLetter ? LETTER_RATE : '0%';
   return (
     `<speak version='1.0' xml:lang='${voice.locale}'>` +
     `<voice name='${voice.name}'>` +
-    `<prosody rate="${letter ? LETTER_RATE : '0%'}" pitch="0%">${inner}</prosody>` +
+    `<prosody rate="${rate}" pitch="0%">${inner}</prosody>` +
     `</voice></speak>`
   );
+};
+
+// ── Urdu homograph disambiguation ──────────────────────────────────────────
+// Urdu script normally omits short-vowel diacritics (اعراب), which a fluent
+// reader fills in from context but leaves Azure's ur-PK voice to guess — and
+// for a few words in the Haroof vocabulary it guesses the WRONG common word:
+//   بکری bare -> "bikri" (sale), not "bakri" (goat), the word being taught.
+//   شکر  bare -> "shukr" (thanks/gratitude — very common across the app's
+//                Islamic content), not "shakar" (sugar), the word being taught.
+// The fix is a diacritized form used ONLY for synthesis; urduData.js, the
+// display, and the pre-baked-clip lookup key all keep using the bare word
+// (mirrors LETTER_IPA above: phoneme/diacritic overrides never change what's
+// displayed or how the clip is looked up, only what gets sent to Azure).
+//
+// Scoped to sources where the word is unambiguously this alphabet-vocabulary
+// entry (see scripts/collect.mjs: 'urdu', 'urduVocabPhrase', and the 'quiz'
+// questions ModuleQuizScreen generates directly from urduData word/letter, per
+// quizGenerators.js generateUrduHarfMatchBank/WordMatchBank/MeaningBank). Other
+// sources (duas, prophets, pillars, kalmas, …) use شکر correctly to mean
+// "thanks" in free-form sentences and must NOT be rewritten.
+const URDU_HOMOGRAPH_FIX = {
+  'بکری': 'بَکری',
+  'شکر': 'شَکَر',
+  // Jeem — vowel homograph (بغیر اعراب "جگ" easily reads as "jag", not "jug")
+  'جگ': 'جُگ',
+  // Chhoti Hay — vowel homograph (ہوا bare -> "hua" [happened], not "hawa" [air])
+  'ہوا': 'ہَوا',
+  // Say (ث) — light vowel diacritics
+  'ثعلب': 'ثَعْلَب', 'ثمر': 'ثَمَر', 'ثواب': 'ثَواب',
+  'ثقیل': 'ثَقِیل', 'ثقافت': 'ثَقافَت', 'ثابت': 'ثابِت',
+  // Chay (چ) — light vowel diacritics
+  'چائے': 'چَائے', 'چمچہ': 'چَمچَہ', 'چڑیا': 'چِڑیا', 'چہل پہل': 'چَہَل پَہَل',
+  // Hay (ح) — light vowel diacritics
+  'حلوا': 'حَلوا', 'حجام': 'حَجّام', 'حل': 'حَل',
+  'حوصلہ': 'حَوصَلہ', 'حلقہ': 'حَلقَہ', 'حرف': 'حَرف',
+  // Daal (د) — light vowel diacritics
+  'درخت': 'دَرَخت', 'دل': 'دِل', 'دستک': 'دَستَک', 'دروازہ': 'دَروازَہ',
+};
+const URDU_HOMOGRAPH_SOURCES = new Set(['urdu', 'urduVocabPhrase', 'quiz']);
+
+// Bare isolated Urdu letter glyphs (e.g. a lone 'ث') have no vowel to voice,
+// so Azure's ur-PK guesses — and often lands on a different letter entirely
+// (ث/چ/ح collapsing to a plain س sound, ژ reading as ی, ء reading as the
+// generic word "ishariya" instead of "hamza"). Substitute the standard,
+// already-correct spelled-out Urdu-script letter name (matches the `name`
+// field in urduData.js) for SYNTHESIS ONLY — display, emoji, and speechKey
+// are untouched (mirrors URDU_HOMOGRAPH_FIX above).
+// ث/س and ح/ہ are pronounced IDENTICALLY in standard Urdu (no audible "th" or
+// pharyngeal-h distinction) — so for those two, substitute the far MORE COMMON
+// letter's spelling rather than the rarer one; Azure renders common graphemes
+// (سے "from", ہے "is") far more reliably than rare artificial letter-name
+// tokens like ثے/حے. Confirmed empirically 2026-08-01: سے fixed Say; ثے did not.
+const URDU_LETTER_NAME_FIX = {
+  'ث': 'سے', 'چ': 'چے', 'ح': 'ہے', 'د': 'دال', 'ڑ': 'ڑے',
+  'ژ': 'ژے', 'ش': 'شین', 'گ': 'گاف', 'و': 'واؤ', 'ء': 'ہمزہ',
+};
+const URDU_LETTER_NAME_SOURCES = new Set(['urduLetters', 'urduVocabPhrase']);
+
+const applyUrduHomographFix = (text, voice, source) => {
+  if (!voice.locale.startsWith('ur')) return text;
+  let out = text;
+  if (URDU_HOMOGRAPH_SOURCES.has(source)) {
+    for (const [bare, fixed] of Object.entries(URDU_HOMOGRAPH_FIX)) {
+      // Urdu has no case; match the bare word flanked by non-letter boundaries
+      // (start/end of string or whitespace) so it isn't rewritten as a substring
+      // inside a longer, unrelated word.
+      out = out.replace(new RegExp(`(^|\\s)${bare}(?=$|\\s)`, 'g'), `$1${fixed}`);
+    }
+  }
+  if (URDU_LETTER_NAME_SOURCES.has(source)) {
+    for (const [bare, fixed] of Object.entries(URDU_LETTER_NAME_FIX)) {
+      out = out.replace(new RegExp(`(^|\\s)${bare}(?=$|\\s)`, 'g'), `$1${fixed}`);
+    }
+  }
+  return out;
 };
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -174,11 +332,17 @@ async function loadPairs() {
 // Single letters get an extra pass on top: see LETTER_MAX_SECONDS — Azure pads
 // these tiny renders with trailing silence at random, so a busted clip is
 // re-requested and the shortest take is kept (padding only ever ADDS).
-async function synthesize(text, voice, key, region, attempt = 0) {
-  if (isSingleEnglishLetter(text, voice) && attempt === 0) {
+async function synthesize(text, voice, key, region, source, attempt = 0) {
+  // NOTE: Urdu 'urduLetters' clips deliberately do NOT get this retry — unlike
+  // an English letter name ("ay", "bee"), the Urdu substitutes are short WORDS
+  // (سے, شین, ہمزہ, 2-4 chars) that legitimately run 1.6-2.2s at LETTER_RATE.
+  // Tried 2026-08-01: all 38 letters "failed" LETTER_MAX_SECONDS every time
+  // (5x Azure calls each, zero benefit) because the ceiling is English-tuned.
+  const isLoneLetter = isSingleEnglishLetter(text, voice) || matchPhonicMarker(text, voice);
+  if (isLoneLetter && attempt === 0) {
     let best = null;
     for (let take = 0; take < LETTER_TAKES; take++) {
-      const buf = await synthesizeOnce(text, voice, key, region, 0);
+      const buf = await synthesizeOnce(text, voice, key, region, source, 0);
       if (!best || buf.length < best.length) best = buf;
       if (clipSeconds(best) <= LETTER_MAX_SECONDS) break;
       await sleep(600);
@@ -192,10 +356,10 @@ async function synthesize(text, voice, key, region, attempt = 0) {
     }
     return best;
   }
-  return synthesizeOnce(text, voice, key, region, attempt);
+  return synthesizeOnce(text, voice, key, region, source, attempt);
 }
 
-async function synthesizeOnce(text, voice, key, region, attempt = 0) {
+async function synthesizeOnce(text, voice, key, region, source, attempt = 0) {
   const MAX_ATTEMPTS = 6;
   let res;
   try {
@@ -207,13 +371,13 @@ async function synthesizeOnce(text, voice, key, region, attempt = 0) {
         'X-Microsoft-OutputFormat': OUTPUT_FORMAT,
         'User-Agent': 'littlegenius-audiogen',
       },
-      body: ssml(text, voice),
+      body: ssml(text, voice, source),
     });
   } catch (e) {
     // Network blip — treat like a 5xx.
     if (attempt >= MAX_ATTEMPTS) throw e;
     await sleep(2 ** attempt * 1000);
-    return synthesizeOnce(text, voice, key, region, attempt + 1);
+    return synthesizeOnce(text, voice, key, region, source, attempt + 1);
   }
 
   if (res.ok) return Buffer.from(await res.arrayBuffer());
@@ -224,7 +388,7 @@ async function synthesizeOnce(text, voice, key, region, attempt = 0) {
     const waitMs = Number.isFinite(hinted) ? hinted * 1000 : 2 ** attempt * 1000;
     if (res.status === 429) process.stdout.write(`\n  ⏳ rate-limited, waiting ${Math.round(waitMs / 1000)}s…`);
     await sleep(waitMs);
-    return synthesizeOnce(text, voice, key, region, attempt + 1);
+    return synthesizeOnce(text, voice, key, region, source, attempt + 1);
   }
 
   // NOTE: never include `key` in this message.
@@ -371,7 +535,7 @@ async function main() {
     const outPath = path.join(outDir, file);
     if (fs.existsSync(outPath) && !FORCE) { skipped++; continue; }
     try {
-      const buf = await synthesize(it.text, voice, KEY, REGION);
+      const buf = await synthesize(it.text, voice, KEY, REGION, it.source);
       fs.writeFileSync(outPath, buf);
       made++;
       log.push({

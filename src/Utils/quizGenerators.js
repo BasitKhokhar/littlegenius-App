@@ -124,6 +124,7 @@ export const generateUrduHarfMatchBank = () => {
         speech: speakUr(`کس حرف سے ${word} شروع ہوتا ہے؟`),
         options: [letter, ...pickWrong(letters, letter)],
         answer: letter,
+        answerLanguage: 'ur-PK',
       });
     });
   });
@@ -140,6 +141,7 @@ export const generateUrduWordMatchBank = () => {
         speech: speakUr(`حرف ${letter} سے کون سا لفظ شروع ہوتا ہے؟`),
         options: [word, ...pickWrong(words, word)],
         answer: word,
+        answerLanguage: 'ur-PK',
       });
     });
   });

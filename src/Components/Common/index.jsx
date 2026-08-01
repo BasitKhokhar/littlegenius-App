@@ -3,6 +3,7 @@ export { default as Input } from './Input';
 export { default as Loader } from './Loader';
 export { default as GradientButton } from './GradientButton';
 export { default as SpeakButton } from './SpeakButton';
+export { default as SpeedMiniPicker } from './SpeedMiniPicker';
 export { default as BrandSplash } from './BrandSplash';
 
 // Design-system primitives

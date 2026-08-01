@@ -8,6 +8,7 @@ import {
   Linking,
   Switch,
   Modal,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Header, ParentalGate } from '../../Components/UI';
@@ -41,6 +42,23 @@ const SettingsScreen = ({ navigation }) => {
   const { speed, setSpeed, options: speedOptions } = useSpeech();
 
   const previewVoice = () => SpeechEngine.speak(SPEECH_PHRASES.VOICE_PREVIEW_TEACHER, 'en-US');
+
+  // Audio check — reports whether the bundled teacher clips actually play on THIS
+  // device. A store-installed build has no console, so when narration goes quiet
+  // this is the only way to see why: it plays one known clip and then shows what
+  // the clip resolved to and whether it loaded. On a release Android build the
+  // source should read like "assets_audio_teacher_<hash>"; an empty source means
+  // the app cannot locate its audio at all and everything falls back to the
+  // device voice. See SpeechEngine.getDiagnostics().
+  const [audioCheck, setAudioCheck] = useState(null);
+  const runAudioCheck = () => {
+    setAudioCheck({ running: true });
+    const finish = () => setAudioCheck({ running: false, ...SpeechEngine.getDiagnostics() });
+    SpeechEngine.speak(SPEECH_PHRASES.VOICE_PREVIEW_TEACHER, 'en-US', {
+      onDone: finish,
+      onError: finish,
+    });
+  };
 
   // Change the speed AND immediately play a short preview so the grown-up hears
   // how fast the teacher will now speak.
@@ -227,6 +245,41 @@ const SettingsScreen = ({ navigation }) => {
               );
             })}
           </View>
+
+          {/* Audio check — diagnostic, shown only once a grown-up runs it. */}
+          <TouchableOpacity
+            style={[s.timeChip, { marginTop: Spacing.md }]}
+            onPress={runAudioCheck}
+            activeOpacity={0.85}
+          >
+            <View style={s.infoIconCircle}>
+              <Text style={styles.infoIcon}>🩺</Text>
+            </View>
+            <View style={[styles.infoTextBlock, { marginLeft: Spacing.md }]}>
+              <Text style={s.timeChipLabel}>Audio check</Text>
+              <Text style={s.infoLabel}>
+                {audioCheck?.running ? 'Testing…' : 'Check the teacher audio is working'}
+              </Text>
+            </View>
+            <Text style={[s.timeValue, { marginRight: 0 }]}>▶</Text>
+          </TouchableOpacity>
+
+          {audioCheck && !audioCheck.running && (
+            <View style={s.audioCheckBox}>
+              <Text style={s.audioCheckLine}>
+                Clips bundled: {audioCheck.manifestSize}
+              </Text>
+              <Text style={s.audioCheckLine}>
+                Played: {audioCheck.clipAttempts - audioCheck.clipFailures} of {audioCheck.clipAttempts}
+              </Text>
+              <Text style={s.audioCheckLine}>
+                Source: {audioCheck.lastResolvedUri || '(empty — clips cannot be found)'}
+              </Text>
+              <Text style={s.audioCheckLine}>
+                Last error: {audioCheck.lastClipError || 'none'}
+              </Text>
+            </View>
+          )}
         </Card>
 
         {/* Reminders */}
@@ -459,6 +512,22 @@ const makeStyles = (colors) =>
     speedChipEmoji: { fontSize: 18, marginBottom: 4 },
     speedChipLabel: { ...textStyles.caption, color: colors.textSecondary, fontFamily: 'Baloo2_700Bold' },
     speedChipLabelActive: { color: colors.primary },
+
+    // Audio-check readout. Deliberately plain and monospaced — it exists to be
+    // read back to a developer from a store build, not to look pretty.
+    audioCheckBox: {
+      marginTop: Spacing.sm,
+      padding: Spacing.md,
+      borderRadius: Radius.md,
+      backgroundColor: colors.surfaceAlt ?? colors.surface,
+      borderWidth: 1,
+      borderColor: colors.borderStrong,
+    },
+    audioCheckLine: {
+      ...textStyles.caption,
+      color: colors.textSecondary,
+      fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    },
   });
 
 const styles = StyleSheet.create({

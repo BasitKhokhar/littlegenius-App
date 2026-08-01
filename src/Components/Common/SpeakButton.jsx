@@ -44,16 +44,12 @@ const SpeakButton = ({
   const mountedRef = useRef(true);
   // Increments to cancel an in-flight clip sequence (tap-to-stop / unmount).
   const seqRef = useRef(0);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      // Stop speech on unmount and block any late state updates.
-      mountedRef.current = false;
-      seqRef.current++;
-      SpeechEngine.stop();
-    };
-  }, []);
+  // Stable per-instance identity for the cross-component "one speaker at a
+  // time" registry — see SpeechEngine.registerSpeaker/claimSpeaker. Without
+  // this, tapping a DIFFERENT SpeakButton silences this one's audio (single
+  // shared player) but leaves this icon stuck showing "playing" forever.
+  const ownerIdRef = useRef(null);
+  if (!ownerIdRef.current) ownerIdRef.current = Symbol('speaker');
 
   // Central reset — safe to call from any callback; ignored after unmount.
   const finish = () => {
@@ -61,6 +57,23 @@ const SpeakButton = ({
     setIsSpeaking(false);
     if (onSpeakEnd) onSpeakEnd();
   };
+  // The registry callback below is registered once (mount-only effect) but
+  // must always run the LATEST finish (closes over onSpeakEnd), so route it
+  // through a ref instead of re-registering on every render.
+  const finishRef = useRef(finish);
+  finishRef.current = finish;
+
+  useEffect(() => {
+    mountedRef.current = true;
+    const unregister = SpeechEngine.registerSpeaker(ownerIdRef.current, () => finishRef.current());
+    return () => {
+      // Stop speech on unmount and block any late state updates.
+      mountedRef.current = false;
+      unregister();
+      seqRef.current++;
+      SpeechEngine.stop();
+    };
+  }, []);
 
   const handleSpeak = async () => {
     // Tap-to-stop: pressing while playing cancels instead of being a dead
@@ -74,6 +87,7 @@ const SpeakButton = ({
     }
 
     setIsSpeaking(true);
+    SpeechEngine.claimSpeaker(ownerIdRef.current);
     if (onSpeakStart) onSpeakStart();
 
     // Multi-clip sequence (e.g. a whole surah): play each bundled clip in turn,

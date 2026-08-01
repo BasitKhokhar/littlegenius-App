@@ -29,7 +29,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ROUTES } from '../../Constants';
 import SpeechEngine from '../../Utils/speechEngine';
-import { lightColors as C, gradients } from '../../Theme/colors';
+import { lightColors as C, gradients, onBrandOverlay as O } from '../../Theme/colors';
 import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
 
 const { width, height } = Dimensions.get('window');
@@ -37,16 +37,14 @@ const TRACK_W = width - Spacing.xl * 2;
 const ART = Math.min(width * 0.72, 300);
 
 // ── Slides ──────────────────────────────────────────────────────
-// Each slide pairs an offline Lottie (pure-vector, no external assets)
-// with a module accent so the whole screen shifts colour as you swipe.
+// One premium brand theme carries the whole flow — only the copy and
+// the Lottie art change as you swipe, never the palette.
 const SLIDES = [
   {
     id: '1',
     title: 'Learn Languages Offline',
     description:
       'Bilingual English phonics, vocabulary & beautiful Nastaliq script — perfect for Playgroup, Nursery & Class One.',
-    accent: '#FB7185',
-    gradient: ['#FB7185', '#F43F5E'],
     lottie: require('../../../assets/lottie/learn-languages.json'),
   },
   {
@@ -54,8 +52,6 @@ const SLIDES = [
     title: 'Solve Brain & IQ Games',
     description:
       'Memory pairs, logic patterns, rapid math races & odd-one-out puzzles curated to grow young, curious minds.',
-    accent: '#60A5FA',
-    gradient: ['#60A5FA', '#6366F1'],
     lottie: require('../../../assets/lottie/brain-games.json'),
   },
   {
@@ -63,8 +59,6 @@ const SLIDES = [
     title: 'Islamic Values & Stories',
     description:
       'Gentle manners with everyday Duas, the 6 Kalmas and audio moral stories — calm, beautiful & 100% offline.',
-    accent: '#38BDF8',
-    gradient: ['#38BDF8', '#4F46E5'],
     lottie: require('../../../assets/lottie/islamic.json'),
   },
   {
@@ -72,15 +66,16 @@ const SLIDES = [
     title: 'Writing & Tracing Practice',
     description:
       'Trace every letter & number with guided strokes and playful worksheets that build confident little hands.',
-    accent: '#F59E0B',
-    gradient: ['#FBBF24', '#F97316'],
     lottie: require('../../../assets/lottie/writing-tracing.json'),
   },
 ];
 
 const LAST = SLIDES.length - 1;
-const OFFSETS = SLIDES.map((_, i) => i * width);
-const ACCENTS = SLIDES.map((s) => s.accent);
+
+// Single brand accent used everywhere (CTA, progress, glow) — never swaps
+// per slide, so the theme reads as one cohesive premium app, not four.
+const THEME_ACCENT = C.primaryLight;
+const THEME_GRADIENT = gradients.onboarding;
 
 // ── A single floating decor orb (ambient premium motion) ────────
 const Orb = ({ style, delay = 0, drift = 26, dur = 3200 }) => {
@@ -114,13 +109,6 @@ const Slide = ({ item, index, scrollX }) => {
     ],
   }));
 
-  const haloStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollX.value, input, [0, 0.55, 0], Extrapolation.CLAMP),
-    transform: [
-      { scale: interpolate(scrollX.value, input, [0.6, 1, 0.6], Extrapolation.CLAMP) },
-    ],
-  }));
-
   const textStyle = useAnimatedStyle(() => ({
     opacity: interpolate(scrollX.value, input, [0, 1, 0], Extrapolation.CLAMP),
     transform: [
@@ -131,8 +119,7 @@ const Slide = ({ item, index, scrollX }) => {
   return (
     <View style={styles.slide}>
       <View style={styles.artWrap}>
-        <Animated.View style={[styles.halo, { backgroundColor: item.accent }, haloStyle]} pointerEvents="none" />
-        <Animated.View style={[styles.artCard, coloredShadow(item.accent, 'xl'), artStyle]}>
+        <Animated.View style={[styles.artCard, artStyle]}>
           <LottieView source={item.lottie} autoPlay loop resizeMode="contain" style={styles.lottie} />
         </Animated.View>
       </View>
@@ -153,6 +140,7 @@ const Dot = ({ index, scrollX }) => {
   const aStyle = useAnimatedStyle(() => ({
     width: interpolate(scrollX.value, input, [8, 26, 8], Extrapolation.CLAMP),
     opacity: interpolate(scrollX.value, input, [0.35, 1, 0.35], Extrapolation.CLAMP),
+    backgroundColor: interpolateColor(scrollX.value, input, [C.onBrand, THEME_ACCENT, C.onBrand]),
   }));
   return <Animated.View style={[styles.dot, aStyle]} />;
 };
@@ -195,15 +183,9 @@ const Onboarding = ({ navigation }) => {
     }
   );
 
-  // Continuous accent tint behind everything (colour shifts as you swipe).
-  const auraStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(scrollX.value, OFFSETS, ACCENTS),
-  }));
-
-  // Progress fill grows across the four slides.
+  // Progress fill grows across the four slides — same accent throughout.
   const fillStyle = useAnimatedStyle(() => ({
     width: interpolate(scrollX.value, [0, LAST * width], [TRACK_W / SLIDES.length, TRACK_W], Extrapolation.CLAMP),
-    backgroundColor: interpolateColor(scrollX.value, OFFSETS, ACCENTS),
   }));
 
   // CTA press feedback.
@@ -226,21 +208,20 @@ const Onboarding = ({ navigation }) => {
     }
   }, [activeIndex, goToProfile]);
 
-  const current = SLIDES[activeIndex];
   const isLast = activeIndex === LAST;
 
   return (
     <View style={styles.container}>
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
-      {/* Base deep-indigo gradient + shifting accent aura */}
+      {/* Base deep-indigo gradient + one static premium glow (never re-tints) */}
       <LinearGradient colors={gradients.splash} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
-      <Animated.View style={[styles.aura, auraStyle]} pointerEvents="none" />
+      <View style={styles.aura} pointerEvents="none" />
 
       {/* Ambient floating orbs */}
-      <Orb style={[styles.orb, { top: height * 0.14, left: -50, width: 150, height: 150, backgroundColor: 'rgba(255,255,255,0.06)' }]} delay={0} />
+      {/* <Orb style={[styles.orb, { top: height * 0.14, left: -50, width: 150, height: 150, backgroundColor: 'rgba(255,255,255,0.06)' }]} delay={0} />
       <Orb style={[styles.orb, { top: height * 0.30, right: -40, width: 110, height: 110, backgroundColor: 'rgba(252,211,77,0.10)' }]} delay={600} drift={20} dur={3800} />
-      <Orb style={[styles.orb, { bottom: height * 0.20, left: width * 0.16, width: 70, height: 70, backgroundColor: 'rgba(165,180,252,0.12)' }]} delay={1200} drift={16} dur={2800} />
+      <Orb style={[styles.orb, { bottom: height * 0.20, left: width * 0.16, width: 70, height: 70, backgroundColor: 'rgba(165,180,252,0.12)' }]} delay={1200} drift={16} dur={2800} /> */}
 
       <Animated.View style={[styles.content, { paddingTop: insets.top + Spacing.md, paddingBottom: insets.bottom + Spacing.xl }, enterStyle]}>
         {/* Header: step badge + Skip */}
@@ -290,12 +271,12 @@ const Onboarding = ({ navigation }) => {
               style={styles.ctaPress}
             >
               <LinearGradient
-                colors={current.gradient}
+                colors={THEME_GRADIENT}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={[styles.cta, coloredShadow(current.accent, 'lg')]}
+                style={[styles.cta, coloredShadow(THEME_ACCENT, 'lg')]}
               >
-                <Text style={styles.ctaText}>{isLast ? "🚀  Let's Begin!" : 'Next  →'}</Text>
+                <Text style={styles.ctaText}>{isLast ? "Let's Begin" : 'Next'}</Text>
               </LinearGradient>
             </Pressable>
           </Animated.View>
@@ -307,15 +288,16 @@ const Onboarding = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.brandSurface },
-  aura: {
-    position: 'absolute',
-    top: -height * 0.28,
-    alignSelf: 'center',
-    width: width * 1.5,
-    height: width * 1.5,
-    borderRadius: width * 0.75,
-    opacity: 0.18,
-  },
+  // aura: {
+  //   position: 'absolute',
+  //   top: -height * 0.28,
+  //   alignSelf: 'center',
+  //   width: width * 1.5,
+  //   height: width * 1.5,
+  //   borderRadius: width * 0.75,
+  //   backgroundColor: 'rgba(252,211,77,0.10)',
+  //   opacity: 1,
+  // },
   orb: { position: 'absolute', borderRadius: Radius.full },
 
   content: { flex: 1 },
@@ -328,56 +310,53 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.md,
   },
   stepBadge: {
-    backgroundColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: O.faint,
     borderRadius: Radius.sm,
     paddingVertical: 5,
     paddingHorizontal: Spacing.md,
   },
-  stepText: { ...textStyles.caption, fontFamily: 'Baloo2_800ExtraBold', color: 'rgba(255,255,255,0.9)' },
-  skipBtn: { backgroundColor: 'rgba(255,255,255,0.14)', borderRadius: Radius.sm, paddingVertical: 5, paddingHorizontal: Spacing.lg },
-  skipText: { ...textStyles.bodyStrong, fontSize: 13, color: 'rgba(255,255,255,0.92)' },
+  stepText: { ...textStyles.caption, fontFamily: 'Baloo2_800ExtraBold', color: O.text },
+  skipBtn: { backgroundColor: O.faint, borderRadius: Radius.sm, paddingVertical: 5, paddingHorizontal: Spacing.lg },
+  skipText: { ...textStyles.bodyStrong, fontSize: 13, color: O.textStrong },
 
   progressTrack: {
     height: 6,
     width: TRACK_W,
     alignSelf: 'center',
     borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: O.faint,
     overflow: 'hidden',
     marginBottom: Spacing.sm,
   },
-  progressFill: { height: 6, borderRadius: 3 },
+  progressFill: { height: 6, borderRadius: 3, backgroundColor: THEME_ACCENT },
 
   scroller: { flex: 1 },
   slide: { width, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.xl },
 
   artWrap: { width: ART, height: ART, alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.huge },
-  halo: {
-    position: 'absolute',
-    width: ART * 1.15,
-    height: ART * 1.15,
-    borderRadius: ART,
-  },
   artCard: {
     width: ART,
     height: ART,
     borderRadius: Radius.xl,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    // backgroundColor: 'rgba(255,255,255,0.06)',
+    // borderWidth: 1,
+    // borderColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden',
+    // No `overflow: 'hidden'` here: on Android, clipping a transparent
+    // (no background/border) view blanks the LottieView inside it — the
+    // clip mask needs a real layer to composite against. The Lottie is
+    // sized to 90% of this box anyway, so nothing needs clipping.
   },
   lottie: { width: '90%', height: '90%' },
 
   textWrap: { alignItems: 'center', paddingHorizontal: Spacing.sm },
   title: { ...textStyles.h1, fontSize: 27, color: C.onBrand, textAlign: 'center', marginBottom: Spacing.md },
-  description: { ...textStyles.body, color: 'rgba(255,255,255,0.78)', textAlign: 'center', lineHeight: 23 },
+  description: { ...textStyles.body, color: O.textMuted, textAlign: 'center', lineHeight: 23 },
 
   footer: { paddingHorizontal: Spacing.xl, paddingTop: Spacing.lg },
   dots: { flexDirection: 'row', height: 10, justifyContent: 'center', alignItems: 'center', gap: Spacing.xs, marginBottom: Spacing.xl },
-  dot: { height: 8, borderRadius: 4, backgroundColor: '#FFFFFF' },
+  dot: { height: 8, borderRadius: 4, backgroundColor: C.onBrand },
 
   ctaWrap: { width: '100%' },
   ctaPress: { width: '100%', borderRadius: Radius.lg },
@@ -388,7 +367,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaText: { ...textStyles.button, fontSize: 17, color: '#FFFFFF' },
+  ctaText: { ...textStyles.button, fontSize: 17, color: C.brandSurfaceAlt },
 });
 
 export default Onboarding;

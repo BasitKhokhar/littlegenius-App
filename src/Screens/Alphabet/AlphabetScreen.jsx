@@ -13,6 +13,7 @@ import { Header } from '../../Components/UI';
 import AlphabetCard, { COLUMN_GAP } from '../../Components/Educational/AlphabetCard';
 import { VocabularyTile, SketchCanvas } from '../../Components/Educational';
 import SpeakButton from '../../Components/Common/SpeakButton';
+import SpeedMiniPicker from '../../Components/Common/SpeedMiniPicker';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 import SpeechEngine from '../../Utils/speechEngine';
 import { useTabBarClearance } from '../../Hooks';
@@ -93,12 +94,15 @@ const AlphabetScreen = ({ navigation, route }) => {
 
             <View style={styles.heroActions}>
               <View style={styles.heroAction}>
-                {/* The letter clip is baked already slowed and enunciated
-                    (generateAudio.mjs LETTER_RATE), so it plays essentially as
-                    recorded — stretching half a second of "ay" any further
+                {/* Speaks the letter's SOUND ("æ" as in Apple), not its NAME
+                    ("ay") — a child tapping the alphabet card wants the phonics
+                    sound. See collect.mjs `alphabetPhonics` / generateAudio.mjs
+                    LETTER_PHONICS_IPA. The clip is baked already slowed and
+                    enunciated (LETTER_RATE), so it plays essentially as
+                    recorded — stretching half a second of vowel any further
                     distorts it. The floor keeps that true at any global speed. */}
                 <SpeakButton
-                  text={upper}
+                  text={`sound of ${upper}`}
                   language="en-US"
                   color="rgba(0,0,0,0.22)"
                   label={`🔊 Hear "${upper}"`}
@@ -122,9 +126,12 @@ const AlphabetScreen = ({ navigation, route }) => {
 
           {/* Six words — 3 per row, 2 rows, sized to fill the leftover height */}
           <View style={styles.wordsSection}>
-            <Text style={styles.wordsTitle}>
-              📚 Words with <Text style={{ color: letter.color }}>"{upper}"</Text>
-            </Text>
+            <View style={styles.wordsTitleRow}>
+              <Text style={styles.wordsTitle}>
+                📚 Words with <Text style={{ color: letter.color }}>"{upper}"</Text>
+              </Text>
+              <SpeedMiniPicker accentColor={letter.color} />
+            </View>
             <View style={styles.wordsGrid}>
               {wordRows.map((row, rowIdx) => (
                 <View key={`row-${rowIdx}`} style={styles.wordsRow}>
@@ -136,6 +143,8 @@ const AlphabetScreen = ({ navigation, route }) => {
                       word={vocab.word}
                       category={vocab.category}
                       categoryColor={letter.color}
+                      // Teaches the letter-sound link: "A for Apple", not just "Apple".
+                      speakText={`${upper} for ${vocab.word}`}
                     />
                   ))}
                 </View>
@@ -353,11 +362,18 @@ const makeStyles = (colors, s) => StyleSheet.create({
   wordsSection: {
     flex: 2,
   },
-  wordsTitle: {
-    fontSize: 14,
-    fontWeight: '900',
+  wordsTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
     marginTop: 4,
     marginBottom: 12,
+    gap: 8,
+  },
+  wordsTitle: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '900',
     color: colors.textPrimary,
     letterSpacing: -0.3,
   },

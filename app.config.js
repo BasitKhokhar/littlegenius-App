@@ -1,6 +1,10 @@
 import 'dotenv/config';
 
-const projectId = process.env.EXPO_ID;
+// The EAS project id. NOT a secret — it is already baked into the built
+// AndroidManifest — so it must have a literal default: `.env` is gitignored, and
+// on an EAS cloud build (or any clone) `process.env.EXPO_ID` is undefined, which
+// silently produced `https://u.expo.dev/undefined` and broke OTA updates.
+const projectId = process.env.EXPO_ID || '8a38e79f-271e-42be-8650-c6d4e92e626b';
 
 export default () => ({
   expo: {
@@ -10,7 +14,14 @@ export default () => ({
     // comeback reminders). A new native module cannot ship over OTA — it needs
     // a fresh build + store release, and the appVersion runtime policy ties this
     // build's OTA channel to this version. (1.3.0 added expo-audio.)
-    version: '1.4.1',
+    // 1.4.2: audio-recovery + OTA-channel fix. Bumped so this build's OTA
+    // runtime version is distinct from the silent 1.4.1 release on Play.
+    // KEEP IN SYNC BY HAND — this project does not run `expo prebuild`, so
+    // android/app/build.gradle (versionName) and
+    // android/app/src/main/res/values/strings.xml (expo_runtime_version)
+    // must be edited to match, or the binary reports the wrong runtime version
+    // and no OTA update can ever target it.
+    version: '1.4.2',
     orientation: 'portrait',
     icon: './assets/logo.png',
     owner: 'talhabasit7016',
@@ -28,6 +39,17 @@ export default () => ({
       // 0 = launch instantly from cache, fetch the new bundle in the
       // background and apply it on next app open (best UX for kids app).
       fallbackToCacheTimeout: 0,
+      // The channel has to be declared HERE for locally-built binaries: the
+      // `channel` key in eas.json is injected by EAS Build only. Store AABs for
+      // this app are built locally with `gradlew bundleRelease`, which produced
+      // a binary carrying NO channel — so EAS Update could never resolve a
+      // branch and every published update silently failed to reach a single
+      // store user. Skipped on EAS, where the eas.json profile owns the channel
+      // and setting both would conflict. Override locally with UPDATE_CHANNEL
+      // when building for the preview/development track.
+      ...(process.env.EAS_BUILD === 'true'
+        ? {}
+        : { requestHeaders: { 'expo-channel-name': process.env.UPDATE_CHANNEL || 'production' } }),
     },
     splash: {
       image: './assets/logo.png',

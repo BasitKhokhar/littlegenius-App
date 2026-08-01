@@ -13,6 +13,7 @@ import { urduData } from '../../Data/urduData';
 import { Header } from '../../Components/UI';
 import { VocabularyTile, SketchCanvas } from '../../Components/Educational';
 import SpeakButton from '../../Components/Common/SpeakButton';
+import SpeedMiniPicker from '../../Components/Common/SpeedMiniPicker';
 import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 import SpeechEngine from '../../Utils/speechEngine';
 import { useTabBarClearance } from '../../Hooks';
@@ -95,8 +96,9 @@ const UrduScreen = ({ navigation, route }) => {
                   color="rgba(0,0,0,0.22)"
                   label="🔊 Hear letter"
                   size="sm"
-                  clipRate={0.7}
-                  rate={0.75}
+                  clipRate={1}
+                  minClipRate={0.85}
+                  rate={0.85}
                 />
               </View>
               <TouchableOpacity
@@ -113,13 +115,16 @@ const UrduScreen = ({ navigation, route }) => {
 
           {/* Six words — 3 per row, 2 rows, sized to fill the leftover height */}
           <View style={styles.wordsSection}>
-            <Text style={styles.wordsTitle}>
-              📚 Words with{' '}
-              <Text style={[styles.wordsTitleGlyph, { color: letter.color }]}>
-                {letter.letter}
-              </Text>{' '}
-              • ذخیرہ الفاظ
-            </Text>
+            <View style={styles.wordsTitleRow}>
+              <Text style={styles.wordsTitle}>
+                📚 Words with{' '}
+                <Text style={[styles.wordsTitleGlyph, { color: letter.color }]}>
+                  {letter.letter}
+                </Text>{' '}
+                • ذخیرہ الفاظ
+              </Text>
+              <SpeedMiniPicker accentColor={letter.color} />
+            </View>
             <View style={styles.wordsGrid}>
               {wordRows.map((row, rowIdx) => (
                 <View key={`row-${rowIdx}`} style={styles.wordsRow}>
@@ -139,6 +144,11 @@ const UrduScreen = ({ navigation, route }) => {
                       language="ur-PK"
                       fallbackText={vocab.speak}
                       wordStyle={styles.tileWord}
+                      // Qaida-style "Alif se Anaar" — teaches the letter-sound link,
+                      // not just the bare word. Fallback is the romanized approximation
+                      // for devices with no Urdu voice pack, spoken in English.
+                      speakText={`${letter.letter} سے ${vocab.word}`}
+                      speakFallbackText={`${letter.name} se ${vocab.speak}`}
                     />
                   ))}
                 </View>
@@ -405,11 +415,18 @@ const makeStyles = (colors, s) => StyleSheet.create({
   wordsSection: {
     flex: 2,
   },
-  wordsTitle: {
-    fontSize: 14,
-    fontWeight: '900',
+  wordsTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
     marginTop: 4,
     marginBottom: 12,
+    gap: 8,
+  },
+  wordsTitle: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '900',
     color: colors.textPrimary,
     letterSpacing: -0.3,
   },

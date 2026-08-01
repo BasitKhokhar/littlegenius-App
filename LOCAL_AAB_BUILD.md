@@ -51,7 +51,24 @@ MYAPP_UPLOAD_KEY_PASSWORD=<key password from step 1>
 
 (`upload.jks` is resolved relative to `android/app/`, which is where you placed it.)
 
-## 4. Build the AAB
+## 4. Sync the version by hand (this project does NOT run `expo prebuild`)
+
+Because `android/` is hand-maintained, **nothing propagates `app.config.js` into the native
+project.** Three files must state the same version or the build ships with the wrong OTA runtime
+version and no update can ever target it (this silently drifted to `1.3.0` while the app was
+shipping as `1.4.1`):
+
+| File | Field |
+|---|---|
+| `app.config.js` | `version` |
+| `android/app/build.gradle` | `versionName` |
+| `android/app/src/main/res/values/strings.xml` | `expo_runtime_version` |
+
+The same applies to anything else driven by app config — permissions, `blockedPermissions`, and
+the EAS Update channel meta-data in `android/app/src/main/AndroidManifest.xml`. Change it in
+`app.config.js` **and** mirror it into `android/`.
+
+## 5. Build the AAB
 
 From the **project root**:
 
@@ -64,9 +81,36 @@ cd android
 Gradle automatically runs Metro to bundle the JS **and all the audio MP3s** (Quran + Islamic
 Arabic) into the bundle — no extra step needed.
 
+> **`clean` is not optional, and it must be its OWN command.** Running
+> `gradlew clean assembleRelease` in a single invocation gives Gradle no ordering guarantee between
+> `clean` and the build tasks — it silently fails to clean (and breaks New Architecture codegen).
+> Run `gradlew clean`, wait for it to finish, *then* run the build.
+
+### Why this matters more than it looks: the stale `app.manifest` bug
+
+Because `updates.enabled: true`, **`expo-asset` resolves every bundled clip through expo-updates'
+embedded manifest**, `android/app/build/generated/assets/createReleaseUpdatesResources/app.manifest`
+— NOT through `res/raw`. Any asset missing from that manifest resolves to an empty URI, and
+expo-audio then tries to open `/`, failing with `EACCES`.
+
+`createReleaseUpdatesResources` does **not** reliably re-run when you add audio. In the 1.4.1
+release it was still the 13 July copy listing only 574 mp3s, so the Quran/Islamic clips played
+while all 4,123 teacher clips silently fell back to the robotic device voice.
+
+**Always verify the manifest before uploading:**
+
+```powershell
+# should print roughly 4209, not 574
+unzip -p app-release.aab base/assets/app.manifest | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).assets.filter(a=>a.type==='mp3').length))"
+```
+
+If that number is wrong, delete
+`android/app/build/generated/assets/createReleaseUpdatesResources` and
+`android/app/build/intermediates/assets/release`, then rebuild.
+
 **Output:** `android/app/build/outputs/bundle/release/app-release.aab`
 
-## 5. Confirm the signature, then upload
+## 6. Confirm the signature, then upload
 
 ```powershell
 keytool -printcert -jarfile android/app/build/outputs/bundle/release/app-release.aab
@@ -84,7 +128,14 @@ upload `app-release.aab` → add release notes → **Save → Review → Roll ou
 - Don't commit `android/app/upload.jks` or the passwords. Add `android/app/upload.jks` to
   `.gitignore`.
 - Don't run `npx expo prebuild --clean` — it would regenerate `android/` and wipe the signing
-  edits in `build.gradle`. (You don't need prebuild; `android/` is already set up.)
+  edits in `build.gradle`. (You don't need prebuild; `android/` is already set up.) The cost of
+  that choice is step 4: **every app-config change must be mirrored into `android/` by hand.**
+- **Verify the AAB before uploading.** `unzip -l app-release.aab | grep -c "res/raw/.*\.mp3"`
+  should report ~4,209 audio files. Then install exactly what Play will deliver — split APKs, not
+  the local APK — with
+  `bundletool build-apks --bundle=app-release.aab --output=lg.apks --connected-device` followed by
+  `bundletool install-apks --apks=lg.apks`. Open **Settings → Voice → Audio check** on the device:
+  `Played` must equal `Attempts` and `Source` must start with `assets_audio_teacher_`.
 - `appVersionSource: remote` in `eas.json` only affects EAS cloud builds, not this local one —
   that's why you pass `-PappVersionCode` here.
 - Everything else (audio, screens) is already verified: `expo export` bundles cleanly and

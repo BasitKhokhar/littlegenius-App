@@ -53,6 +53,18 @@ export function collectPairs() {
   // AlphabetScreen.jsx (hero SpeakButton).
   for (const l of pick(alphabetMod, 'alphabetData') || []) add('en-US', l.letter, 'alphabetLetters');
 
+  // English alphabet PHONICS — the letter's SOUND ("A" -> /æ/ as in Apple), not
+  // its NAME ("A" -> "ay", the alphabetLetters entry above). AlphabetScreen hero
+  // "Hear" button speaks `sound of ${letter}`, matched by generateAudio.mjs's
+  // PHONIC_MARKER_RE and rendered through LETTER_PHONICS_IPA.
+  for (const l of pick(alphabetMod, 'alphabetData') || []) add('en-US', `sound of ${l.letter}`, 'alphabetPhonics');
+
+  // English alphabet vocabulary PHRASES — VocabularyTile speaks "{Letter} for {Word}" on
+  // the Alphabet screen word grid (teaches the letter-sound link, not just the bare word).
+  // AlphabetScreen.jsx wordRows -> VocabularyTile speakText.
+  for (const l of pick(alphabetMod, 'alphabetData') || [])
+    for (const v of l.vocabulary || []) add('en-US', `${l.letter} for ${v.word}`, 'alphabetVocabPhrase');
+
   // Urdu haroof vocabulary — UrduScreen speaks the Urdu word itself under ur.
   // (NOT v.speak: that romanization is only the no-voice-pack fallback, and an
   // Urdu neural voice mispronounces Latin text.) UrduScreen.jsx:66
@@ -62,6 +74,12 @@ export function collectPairs() {
   // Urdu LETTERS — UrduScreen letter card speaks the letter glyph under ur.
   // (romanized name is only the no-voice-pack fallbackText.) UrduScreen.jsx.
   for (const l of pick(urduMod, 'urduData') || []) add('ur-PK', l.letter, 'urduLetters');
+
+  // Urdu haroof vocabulary PHRASES — UrduScreen speaks "{letter} سے {word}" on the word
+  // grid, the qaida-style "Alif se Anaar" pattern (teaches the letter-sound link).
+  // UrduScreen.jsx wordRows -> VocabularyTile speakText.
+  for (const l of pick(urduMod, 'urduData') || [])
+    for (const v of l.vocabulary || []) add('ur-PK', `${l.letter} سے ${v.word}`, 'urduVocabPhrase');
 
   // Duas / Kalmas — IslamicCard now carries TWO speakers per card: the Arabic
   // panel (ar) and the Urdu translation block (ur). IslamicScreen.jsx duas/kalmas tabs.
@@ -188,7 +206,7 @@ export function collectPairs() {
   // ModuleQuizScreen.jsx handleAnswer.
   for (const bank of BASE_BANKS)
     for (const q of getQuizBank(bank))
-      add('en-US', `${q.answer ?? ''}`, 'quizAnswers');
+      add(q.answerLanguage || 'en-US', `${q.answer ?? ''}`, 'quizAnswers');
 
   return out;
 }

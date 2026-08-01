@@ -108,7 +108,10 @@ const ModuleQuizScreen = ({ navigation, route }) => {
       // Two pre-baked clips so the whole thing stays in the teacher voice:
       // "Not quite! The correct answer is" → the answer word (baked separately).
       const sayAnswer = () =>
-        SpeechEngine.speak(`${currentQuestion.answer}`, 'en-US', { onDone: then, onError: then });
+        SpeechEngine.speak(`${currentQuestion.answer}`, currentQuestion.answerLanguage || 'en-US', {
+          onDone: then,
+          onError: then,
+        });
       SpeechEngine.speak(SPEECH_PHRASES.INCORRECT_LEAD, 'en-US', {
         onDone: sayAnswer,
         onError: sayAnswer,
