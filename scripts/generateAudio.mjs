@@ -101,10 +101,21 @@ const xmlEscape = (s) =>
 // for A/E/G/I/Z. So the letter name is stated outright in IPA instead, which
 // leaves Azure nothing to guess.
 //
-// The rate is baked in at -25% too. A letter is ~0.45s of a single diphthong, and
-// slowing THAT for a young learner has to happen at synthesis (the neural voice
-// really articulates the glide) — doing it at playback time-stretches half a
-// second of vowel into a warble. The app plays these at ~1x; see speechEngine.js.
+// English letters render at NORMAL rate (0%), same as everywhere else — NOT
+// LETTER_RATE below. A -25% bake was tried (to slow articulation for young
+// learners) and reverted 2026-08-01: baking a slowdown into an isolated
+// single-syllable render hyperarticulates it (measured: standalone letters and
+// the phonics experiment that preceded this both came back distorted, e.g.
+// "B" -> "ba"/"baa"), while the SAME letter embedded in a phrase at 0% rate
+// ("B for Ball") always rendered correctly. Slow-for-kids on the AlphabetScreen
+// "Hear" button still happens, just at PLAYBACK time (clipRate/minClipRate in
+// AlphabetScreen.jsx + globalSpeed in speechEngine.js) — the floor there
+// (minClipRate 0.85) is mild enough not to reintroduce the old playback-stretch
+// warble that LETTER_RATE was originally baked in to avoid.
+//
+// LETTER_RATE itself is kept only for Urdu standalone letters (see `urduLetter`
+// in ssml() below) — a different failure mode (Azure truncating/mangling a tiny
+// Urdu token), not the hyperarticulation this English letters comment is about.
 const LETTER_RATE = '-25%';
 
 // General American letter names.
@@ -119,42 +130,14 @@ const LETTER_IPA = {
 const isSingleEnglishLetter = (text, voice) =>
   voice.locale.startsWith('en') && /^[A-Za-z]$/.test(text.trim());
 
-// ── Letter PHONICS (the sound, not the name) ───────────────────────────────
-// The AlphabetScreen hero "Hear A" button used to speak the letter NAME via
-// LETTER_IPA above ("ay"), which is correct when teaching the alphabet song
-// but is NOT what a child expects when a card is teaching "A for Apple" — they
-// expect the phonics sound (/æ/), not "ay for Apple". This is a second, distinct
-// table read through the SAME IPA-phoneme mechanism, just with the standard
-// General-American phonics sound per letter instead of its name.
-//
-// CONSONANTS carry a light trailing schwa (b->'bə' "buh", not bare 'b'). A bare
-// stop/glide consonant has NO vowel nucleus at all, and that is out-of-
-// distribution for Azure's neural vocoder — measured (2026-08-01) as garbled/
-// glitchy audio for exactly the consonants that were left bare, while the SAME
-// sound embedded in real speech (e.g. the "B" in "B for Ball") rendered clean.
-// LETTER_IPA above never hit this because every letter NAME already ends in a
-// vowel ("bee", "dee", "kay", …) — the schwa release here gives phonics clips
-// the same vowel-bearing-syllable shape that has always rendered reliably.
-// Vowels stay bare — they ARE the nucleus, nothing to release.
-//
-// These clips render at NORMAL rate (0%), not LETTER_RATE — see the `phonic`
-// branch of `ssml()` below for why: baking a slowdown into an isolated
-// phoneme hyperarticulates it (measured 2026-08-01: B/C/D/… came back as
-// "ba"/"caa"/"daa", a fuller vowel than the light schwa this table asks for).
-const LETTER_PHONICS_IPA = {
-  A: 'æ', B: 'bə', C: 'kə', D: 'də', E: 'ɛ', F: 'fə', G: 'gə', H: 'hə', I: 'ɪ', J: 'dʒə',
-  K: 'kə', L: 'lə', M: 'mə', N: 'nə', O: 'ɑ', P: 'pə', Q: 'kwə', R: 'rə', S: 'sə', T: 'tə',
-  U: 'ʌ', V: 'və', W: 'wə', X: 'ksə', Y: 'jə', Z: 'zə',
-};
-
-// Text marker for a phonics request — a real spoken phrase ("sound of B"), not
-// gibberish, so a device-TTS fallback (before this is baked, or if the clip is
-// ever missing) still says something sensible instead of reading a hyphenated
-// key literally. Distinct from the bare letter text used by LETTER_IPA above,
-// so the two get different speechKeys and can't collide.
-const PHONIC_MARKER_RE = /^sound of ([A-Za-z])$/i;
-const matchPhonicMarker = (text, voice) =>
-  voice.locale.startsWith('en') ? text.trim().match(PHONIC_MARKER_RE) : null;
+// A separate PHONICS table (the sound, not the name — /æ/ for "A" rather than
+// "ay") was tried 2026-08-01 for the AlphabetScreen "Hear" button and reverted
+// the same day: the user expected the letter NAME ("A, Be, Ce, De…", matching
+// what they already hear in "B for Ball"-style phrases), not the phonics
+// sound. Removed: the LETTER_PHONICS_IPA table, its 'sound of X' text marker,
+// and the ssml() branch that rendered it. The button speaks the bare letter
+// again (LETTER_IPA above) — see AlphabetScreen.jsx and collect.mjs's
+// `alphabetLetters` source.
 
 // "A for Apple" style teaching phrases (VocabularyTile on the Alphabet screen) hit the
 // SAME article-vs-letter-name ambiguity as a lone letter: left bare, Azure reads a
@@ -181,20 +164,13 @@ const clipSeconds = (buf) => (buf.length * 8) / 48000;
 // SOME clips and not others — every phrase in the app is spoken identically.
 const ssml = (text, voice, source) => {
   const letter = isSingleEnglishLetter(text, voice);
-  const phonic = !letter ? matchPhonicMarker(text, voice) : null;
-  const forMatch = !letter && !phonic ? matchLetterForPhrase(text, voice) : null;
+  const forMatch = !letter ? matchLetterForPhrase(text, voice) : null;
   let inner;
   if (letter) {
     const ipa = LETTER_IPA[text.trim().toUpperCase()];
     inner = ipa
       ? `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(text.trim())}</phoneme>`
       : xmlEscape(text);
-  } else if (phonic) {
-    const L = phonic[1].toUpperCase();
-    const ipa = LETTER_PHONICS_IPA[L];
-    inner = ipa
-      ? `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(L)}</phoneme>`
-      : xmlEscape(L);
   } else if (forMatch) {
     const ipa = LETTER_IPA[forMatch[1].toUpperCase()];
     const rest = text.trim().slice(forMatch[0].length);
@@ -204,23 +180,18 @@ const ssml = (text, voice, source) => {
   } else {
     inner = xmlEscape(applyUrduHomographFix(text, voice, source));
   }
-  // Only bare letter NAMES (LETTER_IPA, "ay"/"bee"/"kay") get the baked -25%
-  // slowdown. `phonic` clips ("sound of B") deliberately do NOT — measured
-  // 2026-08-01: at LETTER_RATE the isolated schwa/vowel hyperarticulates into
-  // the wrong sound ("bə" -> "baa"), while the identical phoneme embedded in
-  // the `forMatch` phrase path ("B for Ball", always 0%) renders correctly.
-  // Slow-for-kids on this button still happens, just at PLAYBACK time
-  // (AlphabetScreen's clipRate/minClipRate + speechEngine's globalSpeed),
-  // same mechanism every other clip in the app already uses.
+  // English letters (bare or embedded via forMatch) render at NORMAL rate —
+  // see the big comment above LETTER_RATE's declaration for why the -25%
+  // bake was reverted for English.
   //
-  // Urdu standalone letter clips (source 'urduLetters') get the SAME
-  // treatment for the same reason: a 1-token render ("سے", "شین", "ڑے") is
-  // exactly the short-utterance case Azure clips/truncates unpredictably —
-  // reported 2026-08-01 as "shen" instead of "sheen", "he" instead of "hay".
-  // Urdu vocab words/phrases (multiple syllables) are left at 0% — they were
-  // NOT reported as needing this.
+  // Urdu standalone letter clips (source 'urduLetters') still get LETTER_RATE,
+  // for an unrelated reason: a 1-token render ("سے", "شین", "ڑے") is exactly
+  // the short-utterance case Azure clips/truncates unpredictably — reported
+  // 2026-08-01 as "shen" instead of "sheen", "he" instead of "hay". Urdu vocab
+  // words/phrases (multiple syllables) are left at 0% — not reported as
+  // needing this.
   const urduLetter = source === 'urduLetters' && voice.locale.startsWith('ur');
-  const rate = letter || urduLetter ? LETTER_RATE : '0%';
+  const rate = urduLetter ? LETTER_RATE : '0%';
   return (
     `<speak version='1.0' xml:lang='${voice.locale}'>` +
     `<voice name='${voice.name}'>` +
@@ -338,7 +309,7 @@ async function synthesize(text, voice, key, region, source, attempt = 0) {
   // (سے, شین, ہمزہ, 2-4 chars) that legitimately run 1.6-2.2s at LETTER_RATE.
   // Tried 2026-08-01: all 38 letters "failed" LETTER_MAX_SECONDS every time
   // (5x Azure calls each, zero benefit) because the ceiling is English-tuned.
-  const isLoneLetter = isSingleEnglishLetter(text, voice) || matchPhonicMarker(text, voice);
+  const isLoneLetter = isSingleEnglishLetter(text, voice);
   if (isLoneLetter && attempt === 0) {
     let best = null;
     for (let take = 0; take < LETTER_TAKES; take++) {

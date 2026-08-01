@@ -450,15 +450,6 @@
     "generatedAt": "2026-08-01T13:45:36.606Z"
   },
   {
-    "file": "028b0342b9b61ce4.mp3",
-    "text": "sound of B",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:31.266Z"
-  },
-  {
     "file": "029daf9f7b41b1f1.mp3",
     "text": "حرف غ کا نام کیا ہے؟",
     "lang": "ur-PK",
@@ -877,9 +868,9 @@
     "text": "A",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:44.076Z"
+    "generatedAt": "2026-08-01T14:11:36.633Z"
   },
   {
     "file": "048953c417f83672.mp3",
@@ -2151,15 +2142,6 @@
     "generatedAt": "2026-08-01T13:16:39.940Z"
   },
   {
-    "file": "0c9c5c215bd15f67.mp3",
-    "text": "sound of I",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:34.297Z"
-  },
-  {
     "file": "0ca73aee70c2efa8.mp3",
     "text": "When he returned, his whole town believed in Allah. Dua can change everything!",
     "lang": "en-US",
@@ -2425,9 +2407,9 @@
     "text": "H",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:48.160Z"
+    "generatedAt": "2026-08-01T14:11:39.966Z"
   },
   {
     "file": "0e9f0542f40d82c4.mp3",
@@ -3375,15 +3357,6 @@
     "generatedAt": "2026-07-26T13:30:43.470Z"
   },
   {
-    "file": "146acbedf3db490b.mp3",
-    "text": "sound of U",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:39.746Z"
-  },
-  {
     "file": "147aa12bcb3b2345.mp3",
     "text": "ورق",
     "lang": "en-US",
@@ -3676,9 +3649,9 @@
     "text": "T",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:52.976Z"
+    "generatedAt": "2026-08-01T14:11:49.720Z"
   },
   {
     "file": "166778368078fb20.mp3",
@@ -6669,15 +6642,6 @@
     "generatedAt": "2026-07-16T06:12:11.351Z"
   },
   {
-    "file": "288d7dabdfb8974d.mp3",
-    "text": "sound of C",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:31.663Z"
-  },
-  {
     "file": "2898374b083fb9dd.mp3",
     "text": "آنکھ کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -7006,9 +6970,9 @@
     "text": "F",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:47.426Z"
+    "generatedAt": "2026-08-01T14:11:39.098Z"
   },
   {
     "file": "2a94a82ea929d408.mp3",
@@ -8248,9 +8212,9 @@
     "text": "R",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:52.195Z"
+    "generatedAt": "2026-08-01T14:11:47.478Z"
   },
   {
     "file": "325a2e3427c6d78a.mp3",
@@ -8305,15 +8269,6 @@
     "source": "quiz",
     "chars": 24,
     "generatedAt": "2026-07-16T06:19:26.180Z"
-  },
-  {
-    "file": "329ed68ae9c9f02c.mp3",
-    "text": "sound of J",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:34.683Z"
   },
   {
     "file": "32a1365de2a1d713.mp3",
@@ -8590,9 +8545,9 @@
     "text": "I",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:48.562Z"
+    "generatedAt": "2026-08-01T14:11:40.357Z"
   },
   {
     "file": "349d76a19c833f07.mp3",
@@ -9468,15 +9423,6 @@
     "generatedAt": "2026-07-16T06:15:52.684Z"
   },
   {
-    "file": "3a6d465681d3d9d0.mp3",
-    "text": "sound of V",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:40.110Z"
-  },
-  {
     "file": "3a7644146fc8650a.mp3",
     "text": "صبح",
     "lang": "ur-PK",
@@ -9688,9 +9634,9 @@
     "text": "U",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:53.391Z"
+    "generatedAt": "2026-08-01T14:11:50.330Z"
   },
   {
     "file": "3c7b8f55b1852283.mp3",
@@ -12564,15 +12510,6 @@
     "generatedAt": "2026-07-16T06:15:25.841Z"
   },
   {
-    "file": "4e8ff8146db12812.mp3",
-    "text": "sound of D",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:32.058Z"
-  },
-  {
     "file": "4ea15ec73251d301.mp3",
     "text": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
     "lang": "ar-SA",
@@ -12874,9 +12811,9 @@
     "text": "G",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:47.782Z"
+    "generatedAt": "2026-08-01T14:11:39.519Z"
   },
   {
     "file": "508e979a0882c7fc.mp3",
@@ -13896,15 +13833,6 @@
     "generatedAt": "2026-08-01T13:43:02.262Z"
   },
   {
-    "file": "565e67e065e2b846.mp3",
-    "text": "sound of P",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:37.047Z"
-  },
-  {
     "file": "568433ba0eec00e4.mp3",
     "text": "استاد",
     "lang": "ur-PK",
@@ -14179,9 +14107,9 @@
     "text": "S",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:52.582Z"
+    "generatedAt": "2026-08-01T14:11:49.065Z"
   },
   {
     "file": "5859b99289a2adac.mp3",
@@ -14236,15 +14164,6 @@
     "source": "quizAnswers",
     "chars": 5,
     "generatedAt": "2026-08-01T13:14:07.344Z"
-  },
-  {
-    "file": "58a150f30fcc6a95.mp3",
-    "text": "sound of K",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:35.056Z"
   },
   {
     "file": "58a7a794b69d30ba.mp3",
@@ -14611,9 +14530,9 @@
     "text": "N",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:50.576Z"
+    "generatedAt": "2026-08-01T14:11:43.618Z"
   },
   {
     "file": "5aa2f6c1c4819b47.mp3",
@@ -15570,15 +15489,6 @@
     "generatedAt": "2026-07-16T05:57:09.454Z"
   },
   {
-    "file": "606fc0bfa7d65439.mp3",
-    "text": "sound of W",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:40.486Z"
-  },
-  {
     "file": "607c164b425b6f1d.mp3",
     "text": "100",
     "lang": "en-US",
@@ -16015,9 +15925,9 @@
     "text": "Z",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:55.398Z"
+    "generatedAt": "2026-08-01T14:11:54.962Z"
   },
   {
     "file": "6271844dacbaebc3.mp3",
@@ -18990,15 +18900,6 @@
     "generatedAt": "2026-08-01T13:16:01.866Z"
   },
   {
-    "file": "7492727d93b3a27b.mp3",
-    "text": "sound of E",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:32.451Z"
-  },
-  {
     "file": "74aa72e3c65660b5.mp3",
     "text": "Greed",
     "lang": "en-US",
@@ -19327,9 +19228,9 @@
     "text": "D",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:45.263Z"
+    "generatedAt": "2026-08-01T14:11:38.290Z"
   },
   {
     "file": "769f3ca87172d4ce.mp3",
@@ -20457,15 +20358,6 @@
     "generatedAt": "2026-07-16T06:12:38.830Z"
   },
   {
-    "file": "7c60e2498be532af.mp3",
-    "text": "sound of Q",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:37.412Z"
-  },
-  {
     "file": "7c635bde611d36f8.mp3",
     "text": "What is the National Animal of Pakistan?",
     "lang": "en-US",
@@ -20776,9 +20668,9 @@
     "text": "P",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:51.421Z"
+    "generatedAt": "2026-08-01T14:11:45.210Z"
   },
   {
     "file": "7e5fb3003bd920d6.mp3",
@@ -20815,15 +20707,6 @@
     "source": "quiz",
     "chars": 27,
     "generatedAt": "2026-07-16T06:20:16.865Z"
-  },
-  {
-    "file": "7ea3cb5c9dc4fb5a.mp3",
-    "text": "sound of L",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:35.416Z"
   },
   {
     "file": "7ecb9cedbdf39353.mp3",
@@ -21118,9 +21001,9 @@
     "text": "O",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:51.048Z"
+    "generatedAt": "2026-08-01T14:11:44.302Z"
   },
   {
     "file": "80a04797a3047fd9.mp3",
@@ -22075,15 +21958,6 @@
     "source": "numbers",
     "chars": 5,
     "generatedAt": "2026-07-16T05:57:28.922Z"
-  },
-  {
-    "file": "86723b2895f68b8e.mp3",
-    "text": "sound of X",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:40.860Z"
   },
   {
     "file": "867a78dbccac80ed.mp3",
@@ -23944,9 +23818,9 @@
     "text": "B",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:44.469Z"
+    "generatedAt": "2026-08-01T14:11:37.473Z"
   },
   {
     "file": "928a9c805d14863e.mp3",
@@ -25182,15 +25056,6 @@
     "generatedAt": "2026-07-16T06:07:38.136Z"
   },
   {
-    "file": "9a94ece621ac3340.mp3",
-    "text": "sound of F",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:33.132Z"
-  },
-  {
     "file": "9aa73b68da043d36.mp3",
     "text": "ہدایت دینے والا",
     "lang": "ur-PK",
@@ -25420,9 +25285,9 @@
     "text": "E",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:47.042Z"
+    "generatedAt": "2026-08-01T14:11:38.726Z"
   },
   {
     "file": "9c919fe5bfc14aa3.mp3",
@@ -26316,15 +26181,6 @@
     "generatedAt": "2026-07-16T06:16:11.203Z"
   },
   {
-    "file": "a2635cb219ddc374.mp3",
-    "text": "sound of R",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:37.798Z"
-  },
-  {
     "file": "a264a428617e2eae.mp3",
     "text": "کس حرف سے یقین شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -26635,9 +26491,9 @@
     "text": "Q",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:51.814Z"
+    "generatedAt": "2026-08-01T14:11:46.629Z"
   },
   {
     "file": "a4663ad2dc9665e4.mp3",
@@ -26683,15 +26539,6 @@
     "source": "pakistan",
     "chars": 49,
     "generatedAt": "2026-07-16T06:01:45.727Z"
-  },
-  {
-    "file": "a4a645c5c3c775c3.mp3",
-    "text": "sound of M",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:35.771Z"
   },
   {
     "file": "a4a6bb6fc30bb3a9.mp3",
@@ -27067,9 +26914,9 @@
     "text": "L",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:49.808Z"
+    "generatedAt": "2026-08-01T14:11:41.579Z"
   },
   {
     "file": "a6a67d134019b5dd.mp3",
@@ -27864,15 +27711,6 @@
     "generatedAt": "2026-07-16T06:08:58.869Z"
   },
   {
-    "file": "ac74b591bbf905f7.mp3",
-    "text": "sound of Y",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:41.257Z"
-  },
-  {
     "file": "ac7703d0fe348466.mp3",
     "text": "حرف ھ سے کون سا لفظ شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -28201,9 +28039,9 @@
     "text": "X",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:54.552Z"
+    "generatedAt": "2026-08-01T14:11:52.729Z"
   },
   {
     "file": "ae75732f36d72ce9.mp3",
@@ -29776,9 +29614,9 @@
     "text": "C",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:44.842Z"
+    "generatedAt": "2026-08-01T14:11:37.885Z"
   },
   {
     "file": "b8941cac7f87871a.mp3",
@@ -31230,15 +31068,6 @@
     "generatedAt": "2026-08-01T13:13:48.531Z"
   },
   {
-    "file": "c097674f47aeada9.mp3",
-    "text": "sound of G",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:33.487Z"
-  },
-  {
     "file": "c0a0f3ce6e5c7270.mp3",
     "text": "رَسُولُ الرَّحْمَةِ",
     "lang": "ar-SA",
@@ -31540,9 +31369,9 @@
     "text": "J",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:48.991Z"
+    "generatedAt": "2026-08-01T14:11:40.739Z"
   },
   {
     "file": "c29c7e3bcd80b575.mp3",
@@ -32472,15 +32301,6 @@
     "generatedAt": "2026-07-26T13:00:26.082Z"
   },
   {
-    "file": "c865d71b3fe03ddd.mp3",
-    "text": "sound of S",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:38.202Z"
-  },
-  {
     "file": "c876ea54e9c470a2.mp3",
     "text": "یونیفارم کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -32710,9 +32530,9 @@
     "text": "V",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:53.803Z"
+    "generatedAt": "2026-08-01T14:11:50.960Z"
   },
   {
     "file": "ca6ae4d5152f4cfb.mp3",
@@ -32767,15 +32587,6 @@
     "source": "quiz",
     "chars": 24,
     "generatedAt": "2026-07-16T06:10:15.477Z"
-  },
-  {
-    "file": "caa8c02e51c00688.mp3",
-    "text": "sound of N",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:36.295Z"
   },
   {
     "file": "cac2e0c1368a2f7f.mp3",
@@ -33061,9 +32872,9 @@
     "text": "M",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:50.159Z"
+    "generatedAt": "2026-08-01T14:11:41.973Z"
   },
   {
     "file": "ccb1f14ce6d0dc0a.mp3",
@@ -33885,15 +33696,6 @@
     "generatedAt": "2026-08-01T13:13:02.068Z"
   },
   {
-    "file": "d2772ffa49f196bc.mp3",
-    "text": "sound of Z",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:41.656Z"
-  },
-  {
     "file": "d278b8cfe414a0a1.mp3",
     "text": "چ سے چمچہ",
     "lang": "ur-PK",
@@ -34195,9 +33997,9 @@
     "text": "Y",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:54.942Z"
+    "generatedAt": "2026-08-01T14:11:54.377Z"
   },
   {
     "file": "d473aedca44824da.mp3",
@@ -35449,15 +35251,6 @@
     "source": "learn",
     "chars": 46,
     "generatedAt": "2026-07-16T06:03:18.364Z"
-  },
-  {
-    "file": "dc8888d92bbd8c1f.mp3",
-    "text": "sound of A",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:30.462Z"
   },
   {
     "file": "dcaf38d153de3a37.mp3",
@@ -37125,15 +36918,6 @@
     "generatedAt": "2026-07-16T06:18:18.096Z"
   },
   {
-    "file": "e699e1b835cee4fe.mp3",
-    "text": "sound of H",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:33.894Z"
-  },
-  {
     "file": "e6a6b5001dc5fb06.mp3",
     "text": "Inside the whale",
     "lang": "en-US",
@@ -37426,9 +37210,9 @@
     "text": "K",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:49.427Z"
+    "generatedAt": "2026-08-01T14:11:41.145Z"
   },
   {
     "file": "e8a58a9332d775a5.mp3",
@@ -38358,15 +38142,6 @@
     "generatedAt": "2026-08-01T13:45:22.429Z"
   },
   {
-    "file": "ee685184cdd8cea2.mp3",
-    "text": "sound of T",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:39.356Z"
-  },
-  {
     "file": "ee68f42a991d93c4.mp3",
     "text": "پچہتر",
     "lang": "en-US",
@@ -38578,9 +38353,9 @@
     "text": "W",
     "lang": "en-US",
     "voice": "en-US-AndrewNeural",
-    "source": "quizAnswers",
+    "source": "alphabetLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:12:54.166Z"
+    "generatedAt": "2026-08-01T14:11:51.718Z"
   },
   {
     "file": "f06fdb081540ddee.mp3",
@@ -38635,15 +38410,6 @@
     "source": "quiz",
     "chars": 21,
     "generatedAt": "2026-07-16T06:21:36.524Z"
-  },
-  {
-    "file": "f0ab3a9777c280f1.mp3",
-    "text": "sound of O",
-    "lang": "en-US",
-    "voice": "en-US-AndrewNeural",
-    "source": "alphabetPhonics",
-    "chars": 10,
-    "generatedAt": "2026-08-01T13:31:36.669Z"
   },
   {
     "file": "f0bf0ee176778b3b.mp3",

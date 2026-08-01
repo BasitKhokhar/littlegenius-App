@@ -53,12 +53,6 @@ export function collectPairs() {
   // AlphabetScreen.jsx (hero SpeakButton).
   for (const l of pick(alphabetMod, 'alphabetData') || []) add('en-US', l.letter, 'alphabetLetters');
 
-  // English alphabet PHONICS — the letter's SOUND ("A" -> /æ/ as in Apple), not
-  // its NAME ("A" -> "ay", the alphabetLetters entry above). AlphabetScreen hero
-  // "Hear" button speaks `sound of ${letter}`, matched by generateAudio.mjs's
-  // PHONIC_MARKER_RE and rendered through LETTER_PHONICS_IPA.
-  for (const l of pick(alphabetMod, 'alphabetData') || []) add('en-US', `sound of ${l.letter}`, 'alphabetPhonics');
-
   // English alphabet vocabulary PHRASES — VocabularyTile speaks "{Letter} for {Word}" on
   // the Alphabet screen word grid (teaches the letter-sound link, not just the bare word).
   // AlphabetScreen.jsx wordRows -> VocabularyTile speakText.

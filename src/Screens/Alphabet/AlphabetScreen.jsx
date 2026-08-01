@@ -94,15 +94,17 @@ const AlphabetScreen = ({ navigation, route }) => {
 
             <View style={styles.heroActions}>
               <View style={styles.heroAction}>
-                {/* Speaks the letter's SOUND ("æ" as in Apple), not its NAME
-                    ("ay") — a child tapping the alphabet card wants the phonics
-                    sound. See collect.mjs `alphabetPhonics` / generateAudio.mjs
-                    LETTER_PHONICS_IPA. The clip is baked already slowed and
-                    enunciated (LETTER_RATE), so it plays essentially as
-                    recorded — stretching half a second of vowel any further
-                    distorts it. The floor keeps that true at any global speed. */}
+                {/* Speaks the letter NAME ("Bee", "Cee", "Dee", …) via
+                    LETTER_IPA in generateAudio.mjs — matches how the SAME
+                    letter is pronounced in the "B for Ball" word tiles below.
+                    A phonics-sound variant ("æ" not "ay") was tried 2026-08-01
+                    and reverted the same day: distorted in isolation, and not
+                    what was wanted anyway. Renders at normal rate (0%); the
+                    floor here only cushions playback-time slowdown from the
+                    global speed setting, it isn't compensating for a baked
+                    slow rate anymore. */}
                 <SpeakButton
-                  text={`sound of ${upper}`}
+                  text={upper}
                   language="en-US"
                   color="rgba(0,0,0,0.22)"
                   label={`🔊 Hear "${upper}"`}
