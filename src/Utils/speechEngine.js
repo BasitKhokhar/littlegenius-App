@@ -323,6 +323,18 @@ export const SpeechEngine = {
     } catch {
       // stop() can reject if nothing was playing — harmless.
     }
+    // A newer speak()/stop() call may have superseded us while we were
+    // awaiting Speech.stop() above — its currentSettle hand-off already ran
+    // OUR settle() (settled is now true). Bail out now instead of falling
+    // through: settle() is a one-shot no-op once settled, so a native
+    // AudioPlayer created past this point would never get onDone/onError,
+    // permanently stranding its button's icon in the "speaking" state, AND
+    // it would never be tracked/released (only whatever ends up in
+    // currentPlayer last gets cleaned up). Under rapid tapping this leaks one
+    // orphaned native player per superseded call — enough of them exhausts
+    // the OS's concurrent-decoder limit, after which even fresh taps show
+    // "speaking" with no sound until the app is fully restarted.
+    if (settled) return;
     // Cancel any pre-baked clip still playing from a previous call.
     if (currentPlayer) releasePlayer(currentPlayer);
 

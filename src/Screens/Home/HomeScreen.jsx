@@ -9,6 +9,8 @@ import {
   Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { Header } from '../../Components/UI';
 import { SectionHeader, Badge, TopicCard } from '../../Components/Common';
 import { useAuth } from '../../Context';
@@ -24,6 +26,13 @@ import {
 } from '../../Theme';
 
 const { width } = Dimensions.get('window');
+
+// Shared glossy top-highlight, reused (at different heights) on the hero,
+// module and quick-play gradient cards — same idiom as PremiumTabBar's
+// circleSheen, just white since these cards already sit on saturated colour.
+const SHEEN_COLORS = ['rgba(255,255,255,0.16)', 'rgba(255,255,255,0)'];
+
+const tap = () => Haptics.selectionAsync().catch(() => {});
 
 const MODULES = [
   { id: 1, name: 'English ABC', icon: '🔤', description: '26 Letters • 130 Words', mod: 'alphabet', screen: 'Alphabet', badge: 'LEARN' },
@@ -96,16 +105,19 @@ const ModuleCard = ({ module, onPress, delay }) => {
         style={coloredShadow(m.solid, 'md')}
       >
         <LinearGradient colors={[m.from, m.to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.moduleCard}>
+          <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.moduleSheen} />
           <View style={styles.moduleTopRow}>
-            <Badge label={module.badge} tone="glass" />
+            <Badge label={module.badge} tone="glass" style={styles.glassBorder} />
           </View>
-          <Text style={styles.moduleIcon}>{module.icon}</Text>
+          <View style={styles.moduleIconBadge}>
+            <Text style={styles.moduleIcon}>{module.icon}</Text>
+          </View>
           <View style={styles.moduleInfo}>
             <Text style={styles.moduleName}>{module.name}</Text>
             <Text style={styles.moduleDescription}>{module.description}</Text>
           </View>
           <View style={styles.moduleArrow}>
-            <Text style={styles.moduleArrowText}>→</Text>
+            <Ionicons name="chevron-forward" size={16} color="#FFFFFF" />
           </View>
         </LinearGradient>
       </TouchableOpacity>
@@ -137,18 +149,27 @@ const HomeScreen = ({ navigation }) => {
             colors={colors.gradients.hero}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[styles.heroCard, coloredShadow(colors.brandSurface, 'lg')]}
+            style={[styles.heroCard, coloredShadow(colors.brandSurface, 'xl')]}
           >
+            <View style={styles.heroBlobTopRight} pointerEvents="none" />
+            <View style={styles.heroBlobBottomLeft} pointerEvents="none" />
+            <LinearGradient
+              colors={['rgba(255,255,255,0.12)', 'rgba(255,255,255,0)']}
+              pointerEvents="none"
+              style={styles.heroSheen}
+            />
             <View style={styles.heroLeft}>
               <Text style={s.heroGreeting}>{getTimeGreeting()}, 👋</Text>
               <Text style={styles.heroName}>{userProfile.name} 🎓</Text>
-              <Badge label="PG • Nursery • Class 1" tone="glass" style={styles.heroBadge} />
+              <Badge label="PG • Nursery • Class 1" tone="glass" style={[styles.heroBadge, styles.glassBorder]} />
             </View>
             <View style={styles.heroRight}>
-              <View style={styles.heroAvatarCircle}>
-                <Text style={styles.heroAvatar}>{userProfile.avatar}</Text>
+              <View style={styles.heroAvatarRing}>
+                <View style={styles.heroAvatarCircle}>
+                  <Text style={styles.heroAvatar}>{userProfile.avatar}</Text>
+                </View>
               </View>
-              <Badge label={String(stars || 0)} icon="⭐" tone="glass" />
+              <Badge label={String(stars || 0)} icon="⭐" tone="glass" style={styles.glassBorder} />
             </View>
           </LinearGradient>
         </Animated.View>
@@ -161,13 +182,18 @@ const HomeScreen = ({ navigation }) => {
               key={module.id}
               module={module}
               delay={index * Motion.stagger}
-              onPress={() => navigation.navigate(module.screen, module.params)}
+              onPress={() => { tap(); navigation.navigate(module.screen, module.params); }}
             />
           ))}
         </View>
 
         {/* Explore My World */}
-        <SectionHeader emoji="🌍" title="Explore My World" />
+        <SectionHeader
+          emoji="🌍"
+          title="Explore My World"
+          actionLabel="See all"
+          onActionPress={() => navigation.navigate('Learn', { moduleKey: 'world' })}
+        />
         <View style={styles.catGrid}>
           {chunk(WORLD_CATEGORIES, CAT_COLUMNS).map((row, rowIndex) => (
             <View key={`cat-row-${rowIndex}`} style={styles.catRow}>
@@ -181,7 +207,7 @@ const HomeScreen = ({ navigation }) => {
                   color={cat.color}
                   title={cat.name}
                   badge={cat.count}
-                  onPress={() => navigation.navigate('Learn', { moduleKey: 'world', initialTab: cat.key })}
+                  onPress={() => { tap(); navigation.navigate('Learn', { moduleKey: 'world', initialTab: cat.key }); }}
                 />
               ))}
               {/* Keep a short last row left-aligned at the same column width */}
@@ -201,11 +227,14 @@ const HomeScreen = ({ navigation }) => {
               <TouchableOpacity
                 key={action.name}
                 style={[styles.quickWrap, coloredShadow(m.solid, 'md')]}
-                onPress={() => navigation.navigate(action.screen)}
+                onPress={() => { tap(); navigation.navigate(action.screen); }}
                 activeOpacity={0.9}
               >
                 <LinearGradient colors={[m.from, m.to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.quickCard}>
-                  <Text style={styles.quickIcon}>{action.icon}</Text>
+                  <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.quickSheen} />
+                  <View style={styles.quickIconBadge}>
+                    <Text style={styles.quickIcon}>{action.icon}</Text>
+                  </View>
                   <Text style={styles.quickLabel}>{action.name}</Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -229,6 +258,9 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   scrollContent: { paddingHorizontal: 16, paddingTop: Spacing.md },
 
+  // Shared hairline rim for glass badges on brand-coloured surfaces
+  glassBorder: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
+
   // Hero
   heroCard: {
     borderRadius: Radius.xl,
@@ -239,11 +271,41 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
   },
+  heroBlobTopRight: {
+    position: 'absolute',
+    top: -60,
+    right: -40,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  heroBlobBottomLeft: {
+    position: 'absolute',
+    bottom: -40,
+    left: -30,
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    backgroundColor: 'rgba(252,211,77,0.10)',
+  },
+  heroSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%' },
   heroLeft: { flex: 1 },
   heroName: { ...textStyles.h1, color: '#FFFFFF', marginBottom: Spacing.md },
   heroBadge: { alignSelf: 'flex-start' },
   heroRight: { alignItems: 'center', marginLeft: Spacing.lg, gap: Spacing.sm },
+  heroAvatarRing: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 1.5,
+    borderColor: 'rgba(252,211,77,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   heroAvatarCircle: {
     width: 72,
     height: 72,
@@ -263,12 +325,26 @@ const styles = StyleSheet.create({
     borderRadius: Radius.lg,
     paddingVertical: Spacing.lg,
     paddingHorizontal: Spacing.lg,
-    minHeight: 168,
+    minHeight: 178,
     justifyContent: 'space-between',
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
   },
+  moduleSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '42%' },
   moduleTopRow: { flexDirection: 'row' },
-  moduleIcon: { fontSize: 38, marginTop: Spacing.sm },
+  moduleIconBadge: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Spacing.sm,
+  },
+  moduleIcon: { fontSize: 30, lineHeight: 36, textAlign: 'center' },
   moduleInfo: { marginTop: Spacing.sm },
   moduleName: { ...textStyles.title, color: '#FFFFFF', marginBottom: 2 },
   moduleDescription: { ...textStyles.caption, color: 'rgba(255,255,255,0.85)' },
@@ -280,24 +356,44 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     backgroundColor: 'rgba(255,255,255,0.25)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  moduleArrowText: { fontSize: 15, color: '#FFFFFF', fontFamily: 'Baloo2_800ExtraBold' },
 
   // Category grid — 3 up on every screen size. TopicCard owns the tile's
   // look; the screen only owns the columns. Cells flex instead of carrying a
   // computed pixel width so the row always divides the available space
   // exactly, whatever the device width or orientation.
-  catGrid: { gap: Spacing.sm, marginBottom: Spacing.xxl },
-  catRow: { flexDirection: 'row', gap: Spacing.sm },
+  catGrid: { gap: Spacing.md, marginBottom: Spacing.xxl },
+  catRow: { flexDirection: 'row', gap: Spacing.md },
   catCell: { flex: 1 },
 
   // Quick play
   quickActions: { flexDirection: 'row', gap: 12 },
   quickWrap: { flex: 1, borderRadius: Radius.lg },
-  quickCard: { borderRadius: Radius.lg, paddingVertical: Spacing.xl, alignItems: 'center', overflow: 'hidden' },
-  quickIcon: { fontSize: 28, marginBottom: Spacing.sm },
+  quickCard: {
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.xxl,
+    alignItems: 'center',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+  },
+  quickSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '45%' },
+  quickIconBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.sm,
+  },
+  quickIcon: { fontSize: 26, lineHeight: 32, textAlign: 'center' },
   quickLabel: { ...textStyles.overline, color: '#FFFFFF', fontSize: 12 },
 });
 

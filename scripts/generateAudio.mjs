@@ -149,6 +149,35 @@ const LETTER_FOR_RE = /^([A-Za-z])\s+for\s+/;
 const matchLetterForPhrase = (text, voice) =>
   voice.locale.startsWith('en') ? text.trim().match(LETTER_FOR_RE) : null;
 
+// A handful of ordinary English words come back slurred/garbled from Azure no
+// matter how they're spelled (reported 2026-08-04: "Kangaroo" rendered as
+// something close to "Kagroroo", the medial /ŋg/ cluster collapsing). Same
+// fix as LETTER_IPA above — state the pronunciation outright in IPA so Azure
+// has nothing to guess — but scoped to individual WORDS instead of letters,
+// so it applies wherever the word appears (vocab phrase, quiz question, bare
+// answer, …), not just the Alphabet-screen "X for Word" phrase it was first
+// noticed in. Matched case-insensitively on a word boundary; only the
+// matched word gets wrapped, the rest of the sentence is untouched.
+const ENGLISH_WORD_IPA = {
+  kangaroo: 'ˈkæŋɡəˌruː',
+};
+const applyEnglishWordIpaFix = (text) => {
+  const words = Object.keys(ENGLISH_WORD_IPA);
+  if (!words.length) return xmlEscape(text);
+  const re = new RegExp(`\\b(${words.join('|')})\\b`, 'gi');
+  let out = '';
+  let last = 0;
+  let m;
+  while ((m = re.exec(text))) {
+    out += xmlEscape(text.slice(last, m.index));
+    const ipa = ENGLISH_WORD_IPA[m[0].toLowerCase()];
+    out += `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(m[0])}</phoneme>`;
+    last = re.lastIndex;
+  }
+  out += xmlEscape(text.slice(last));
+  return out;
+};
+
 // Azure occasionally returns a single-letter clip with ~0.9s of trailing silence
 // stapled on — the SAME request rendered 1.78s, 1.78s, then 0.98s on three
 // consecutive tries. A padded clip leaves dead air after the sound and delays the
@@ -175,8 +204,10 @@ const ssml = (text, voice, source) => {
     const ipa = LETTER_IPA[forMatch[1].toUpperCase()];
     const rest = text.trim().slice(forMatch[0].length);
     inner = ipa
-      ? `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(forMatch[1])}</phoneme> for ${xmlEscape(rest)}`
+      ? `<phoneme alphabet="ipa" ph="${ipa}">${xmlEscape(forMatch[1])}</phoneme> for ${applyEnglishWordIpaFix(rest)}`
       : xmlEscape(text);
+  } else if (voice.locale.startsWith('en')) {
+    inner = applyEnglishWordIpaFix(text);
   } else {
     inner = xmlEscape(applyUrduHomographFix(text, voice, source));
   }
@@ -205,6 +236,8 @@ const ssml = (text, voice, source) => {
 // reader fills in from context but leaves Azure's ur-PK voice to guess — and
 // for a few words in the Haroof vocabulary it guesses the WRONG common word:
 //   بکری bare -> "bikri" (sale), not "bakri" (goat), the word being taught.
+//   بلی  bare -> "bali" (no medial gemination read in), not "billi" (cat) — the
+//                doubled ل needs an explicit shadda or Azure drops it.
 //   شکر  bare -> "shukr" (thanks/gratitude — very common across the app's
 //                Islamic content), not "shakar" (sugar), the word being taught.
 // The fix is a diacritized form used ONLY for synthesis; urduData.js, the
@@ -220,6 +253,7 @@ const ssml = (text, voice, source) => {
 // "thanks" in free-form sentences and must NOT be rewritten.
 const URDU_HOMOGRAPH_FIX = {
   'بکری': 'بَکری',
+  'بلی': 'بِلّی',
   'شکر': 'شَکَر',
   // Jeem — vowel homograph (بغیر اعراب "جگ" easily reads as "jag", not "jug")
   'جگ': 'جُگ',
@@ -227,16 +261,61 @@ const URDU_HOMOGRAPH_FIX = {
   'ہوا': 'ہَوا',
   // Say (ث) — light vowel diacritics
   'ثعلب': 'ثَعْلَب', 'ثمر': 'ثَمَر', 'ثواب': 'ثَواب',
-  'ثقیل': 'ثَقِیل', 'ثقافت': 'ثَقافَت', 'ثابت': 'ثابِت',
-  // Chay (چ) — light vowel diacritics
-  'چائے': 'چَائے', 'چمچہ': 'چَمچَہ', 'چڑیا': 'چِڑیا', 'چہل پہل': 'چَہَل پَہَل',
-  // Hay (ح) — light vowel diacritics
-  'حلوا': 'حَلوا', 'حجام': 'حَجّام', 'حل': 'حَل',
-  'حوصلہ': 'حَوصَلہ', 'حلقہ': 'حَلقَہ', 'حرف': 'حَرف',
+  // These three still mispronounced (reported 2026-08-04: "Saqeel" -> "saqmiyal",
+  // "Saqafat" -> "saqafiyat", "Saabit" -> "saabanat") even after diacritics —
+  // ثابت was additionally missing the fatha every other ث entry here has, and
+  // for the other two the diacritics alone weren't enough. Same fix as
+  // URDU_LETTER_NAME_FIX below: substitute the far more common, more reliably
+  // rendered س for the rare ث grapheme (they are pronounced IDENTICALLY in
+  // standard Urdu), keeping the same vowel marks.
+  'ثقیل': 'سَقِیل', 'ثقافت': 'سَقافَت', 'ثابت': 'سَابِت',
+  // Chay (چ) — light vowel diacritics. چائے keeps its fatha (confirmed correct
+  // 2026-08-04). چڑیا and چہل پہل are deliberately NOT here any more: they had
+  // the same speculative fatha/kasra treatment, but it was never validated and
+  // reported 2026-08-04 as having made things WORSE — چہل پہل in particular
+  // renders as "Chahal Pehal" (the cricketer's name) with a forced fatha where
+  // the word actually needs an unmarked short "e" Urdu has no diacritic for.
+  // چابی and چاند, which never got a fix entry, are reported fine, so these
+  // two are reverted to bare and left to the voice's own dictionary reading
+  // rather than guessed-at diacritics.
+  'چائے': 'چَائے',
+  // چمچہ (spoon) — reported 2026-08-04 mispronounced even with full diacritics
+  // (چَمچَہ). Trailing چہ (chay + silent chhoti-he for the "-a" ending, as in
+  // بچہ "bacha") is ambiguous: nothing stops the voice reading the ہ as a live
+  // "ha" instead of silent, yielding an extra syllable. چمچا is the same word's
+  // equally standard alternate spelling, ending in الف instead — unambiguous
+  // "-aa", no silent-letter guesswork. Synthesis-only, per this dict's contract:
+  // urduData.js and the clip lookup key still use چمچہ.
+  'چمچہ': 'چَمچا',
+  // Hay (ح) — reported 2026-08-04: still rendering as Khay (خ) even with
+  // diacritics on ح itself. Same fix as ث→س above: ح and ہ are pronounced
+  // IDENTICALLY in standard Urdu, so substitute the far more common, far more
+  // reliably rendered ہ grapheme instead of the rarer ح (mirrors
+  // URDU_LETTER_NAME_FIX's 'ح': 'ہے' for the bare letter, extended here to
+  // every word that spells with ح). حرف ("letter") is also the generic word
+  // used across most Urdu quiz question templates ("کس حرف سے..."), so this
+  // fix lands far beyond just the Hay vocabulary list.
+  'حلوا': 'ہَلوا', 'حجام': 'ہَجّام', 'حل': 'ہَل',
+  'حوصلہ': 'ہَوصَلہ', 'حلقہ': 'ہَلقَہ', 'حرف': 'ہَرف',
   // Daal (د) — light vowel diacritics
   'درخت': 'دَرَخت', 'دل': 'دِل', 'دستک': 'دَستَک', 'دروازہ': 'دَروازَہ',
+  // Wao (و) — reported 2026-08-04: ورق ("waraq", page) rendering as something
+  // close to English "work", and وعدہ ("waada", promise) also mispronounced.
+  // Same bare-consonant-skeleton vowel-guessing issue as the other CVC/CVCC
+  // entries above — light fatha diacritics to force the "wa-" reading.
+  'ورق': 'وَرَق', 'وعدہ': 'وَعدہ',
 };
 const URDU_HOMOGRAPH_SOURCES = new Set(['urdu', 'urduVocabPhrase', 'quiz']);
+
+// Namaz Urdu instructions quote "اللہ اکبر" verbatim at steps 2/6/8 (Takbeer,
+// Ruku, Sajdah) but with none of the diacritics the Arabic recitation itself
+// has ('اَللَّهُ أَكْبَرُ') — so Azure's ur-PK voice drops the connecting "u" and
+// reads it as "Allah Akbar" instead of "Allahu Akbar" (reported 2026-08-04).
+// A damma on the ہ supplies the missing vowel. Synthesis-only — namazGuideData.js
+// display text is untouched. Plain substring replace, not the whitespace-bounded
+// URDU_HOMOGRAPH_FIX regex above, because the phrase always sits inside
+// "…" quotes with no surrounding whitespace.
+const NAMAZ_PHRASE_FIX = [['اللہ اکبر', 'اللہُ اکبر']];
 
 // Bare isolated Urdu letter glyphs (e.g. a lone 'ث') have no vowel to voice,
 // so Azure's ur-PK guesses — and often lands on a different letter entirely
@@ -259,6 +338,9 @@ const URDU_LETTER_NAME_SOURCES = new Set(['urduLetters', 'urduVocabPhrase']);
 const applyUrduHomographFix = (text, voice, source) => {
   if (!voice.locale.startsWith('ur')) return text;
   let out = text;
+  if (source === 'namaz') {
+    for (const [bare, fixed] of NAMAZ_PHRASE_FIX) out = out.split(bare).join(fixed);
+  }
   if (URDU_HOMOGRAPH_SOURCES.has(source)) {
     for (const [bare, fixed] of Object.entries(URDU_HOMOGRAPH_FIX)) {
       // Urdu has no case; match the bare word flanked by non-letter boundaries
