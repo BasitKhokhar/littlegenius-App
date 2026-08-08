@@ -4,16 +4,31 @@ import {
   ScrollView,
   TouchableOpacity,
   Text,
+  Image,
   StyleSheet,
 } from 'react-native';
-import { storiesData, islamicStoriesData } from '../../Data';
+import { LinearGradient } from 'expo-linear-gradient';
+import { storiesData, islamicStoriesData, storyImages } from '../../Data';
 import { Header } from '../../Components/UI';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useHideTabBar } from '../../Context/TabBarContext';
 import { useTabBarClearance } from '../../Hooks';
+import { Radius, coloredShadow } from '../../Theme';
 import SpeakButton from '../../Components/Common/SpeakButton';
 
 const STORY_COLORS = ['#F59E0B', '#EF4444', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+// One shade darker per accent above, for the card's gradient body.
+const STORY_COLORS_DARK = ['#D97706', '#DC2626', '#059669', '#2563EB', '#7C3AED', '#DB2777'];
+
+// storyImages holds 20 banner illustrations; storiesData only has 18 entries,
+// so every moral story gets one (idx 0-17). The 2 leftover banners (idx
+// 18-19) go to the first two Islamic stories — the rest fall back to the
+// emoji tile since there's no artwork left for them.
+const getStoryImage = (isIslamicList, idx) => {
+  if (!isIslamicList) return idx < storyImages.length ? storyImages[idx] : null;
+  const offset = storiesData.length + idx;
+  return offset < storyImages.length ? storyImages[offset] : null;
+};
 
 const StoriesScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
@@ -32,6 +47,8 @@ const StoriesScreen = ({ navigation, route }) => {
   // ─── Story Detail ──────────────────────────────────────────
   if (selectedStory !== null && story) {
     const accentColor = STORY_COLORS[selectedStory % STORY_COLORS.length];
+    const accentDark = STORY_COLORS_DARK[selectedStory % STORY_COLORS_DARK.length];
+    const heroImage = getStoryImage(isIslamic, selectedStory);
     return (
       <View style={styles.container}>
         <Header
@@ -44,21 +61,48 @@ const StoriesScreen = ({ navigation, route }) => {
           showsVerticalScrollIndicator={false}
         >
           {/* Hero */}
-          <View style={[styles.storyHero, { backgroundColor: accentColor }]}>
-            <View style={styles.storyHeroDecor} />
-            <Text style={styles.storyHeroEmoji}>{story.emoji}</Text>
-            <Text style={styles.storyHeroTitle}>{story.title}</Text>
-            {story.urduTitle ? (
-              <Text style={styles.storyHeroUrduTitle}>{story.urduTitle}</Text>
-            ) : null}
-            <View style={styles.moralBadge}>
-              <Text style={styles.moralBadgeLabel}>💡 Moral / سبق</Text>
+          {heroImage ? (
+            <View style={[styles.heroImageWrap, coloredShadow(accentColor, 'lg')]}>
+              <Image source={heroImage} style={styles.heroImage} resizeMode="cover" />
+              <LinearGradient
+                colors={['transparent', accentColor + 'B3', accentDark]}
+                locations={[0, 0.5, 1]}
+                style={styles.heroImageOverlay}
+              />
+              <View style={styles.heroImageBadge}>
+                <Text style={styles.heroImageBadgeText}>{story.emoji} {isIslamic ? 'Islamic Story' : 'Moral Story'}</Text>
+              </View>
+              <View style={styles.heroImageContent}>
+                <Text style={styles.storyHeroTitle}>{story.title}</Text>
+                {story.urduTitle ? (
+                  <Text style={styles.storyHeroUrduTitle}>{story.urduTitle}</Text>
+                ) : null}
+                <View style={styles.moralBadge}>
+                  <Text style={styles.moralBadgeLabel}>💡 Moral / سبق</Text>
+                </View>
+                <Text style={styles.moralText}>{story.moral}</Text>
+                {story.urduMoral ? (
+                  <Text style={styles.moralUrduText}>{story.urduMoral}</Text>
+                ) : null}
+              </View>
             </View>
-            <Text style={styles.moralText}>{story.moral}</Text>
-            {story.urduMoral ? (
-              <Text style={styles.moralUrduText}>{story.urduMoral}</Text>
-            ) : null}
-          </View>
+          ) : (
+            <View style={[styles.storyHero, { backgroundColor: accentColor }]}>
+              <View style={styles.storyHeroDecor} />
+              <Text style={styles.storyHeroEmoji}>{story.emoji}</Text>
+              <Text style={styles.storyHeroTitle}>{story.title}</Text>
+              {story.urduTitle ? (
+                <Text style={styles.storyHeroUrduTitle}>{story.urduTitle}</Text>
+              ) : null}
+              <View style={styles.moralBadge}>
+                <Text style={styles.moralBadgeLabel}>💡 Moral / سبق</Text>
+              </View>
+              <Text style={styles.moralText}>{story.moral}</Text>
+              {story.urduMoral ? (
+                <Text style={styles.moralUrduText}>{story.urduMoral}</Text>
+              ) : null}
+            </View>
+          )}
 
           {/* Pages */}
           {story.pages.map((page, idx) => (
@@ -110,30 +154,73 @@ const StoriesScreen = ({ navigation, route }) => {
         </Text>
         {stories.map((s, idx) => {
           const cardColor = STORY_COLORS[idx % STORY_COLORS.length];
+          const cardColorDark = STORY_COLORS_DARK[idx % STORY_COLORS_DARK.length];
+          const image = getStoryImage(isIslamic, idx);
           return (
             <TouchableOpacity
               key={s.id}
-              style={[styles.storyCard, { backgroundColor: cardColor }]}
+              style={[styles.storyCardWrap, coloredShadow(cardColor, 'md')]}
               onPress={() => setSelectedStory(idx)}
-              activeOpacity={0.88}
+              activeOpacity={0.92}
             >
-              <View style={styles.storyCardDecor} />
-              <View style={styles.storyEmojiBubble}>
-                <Text style={styles.storyCardEmoji}>{s.emoji}</Text>
-              </View>
-              <View style={styles.storyInfo}>
-                <Text style={styles.storyCardTitle}>{s.title}</Text>
-                {s.urduTitle ? (
-                  <Text style={styles.storyCardUrduTitle}>{s.urduTitle}</Text>
-                ) : null}
-                <Text style={styles.storyCardMoral} numberOfLines={2}>💡 {s.moral}</Text>
-                <View style={styles.readTimeBadge}>
-                  <Text style={styles.readTimeText}>{s.readTime}</Text>
+                <LinearGradient
+                  colors={[cardColor, cardColorDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                 style={[styles.storyCardWrap, coloredShadow(cardColor, 'md')]}
+                >
+              <View style={styles.storyCard}>
+                {/* Banner art / emoji fallback */}
+                <View style={styles.storyImageBox}>
+                  {image ? (
+                    <Image source={image} style={styles.storyImage} resizeMode="cover" />
+                  ) : (
+                    <LinearGradient
+                      colors={[cardColor, cardColorDark]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.storyImageFallback}
+                    >
+                      <Text style={styles.storyCardEmoji}>{s.emoji}</Text>
+                    </LinearGradient>
+                  )}
+                  {idx === 0 ? (
+                    <View style={styles.featuredBadge}>
+                      <Text style={styles.featuredBadgeText}>⭐ Featured</Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {/* Colour body */}
+                <LinearGradient
+                  colors={[cardColor, cardColorDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.storyCardBody}
+                >
+                  {/* Anchored to the body's own two rounded corners (top-right,
+                      bottom-right) so they're always clipped in place instead of
+                      floating off the card at arbitrary text heights. */}
+                  <View style={styles.storyCardBodyDecorTop} pointerEvents="none" />
+                  <View style={styles.storyCardBodyDecorBottom} pointerEvents="none" />
+
+                  <View style={styles.storyInfo}>
+                    <Text style={styles.storyCardTitle} numberOfLines={1}>{s.title}</Text>
+                    {s.urduTitle ? (
+                      <Text style={styles.storyCardUrduTitle} numberOfLines={1}>{s.urduTitle}</Text>
+                    ) : null}
+                    <Text style={styles.storyCardMoral} numberOfLines={2}>💡 {s.moral}</Text>
+                    <View style={styles.readTimeBadge}>
+                      <Text style={styles.readTimeText}>🕐 {s.readTime}</Text>
+                    </View>
+                  </View>
+                </LinearGradient>
+
+                <View style={styles.storyPlayBtn}>
+                  <Text style={[styles.storyPlayIcon, { color: cardColor }]}>▶</Text>
                 </View>
               </View>
-              <View style={styles.storyArrow}>
-                <Text style={styles.storyArrowText}>→</Text>
-              </View>
+              </LinearGradient>
             </TouchableOpacity>
           );
         })}
@@ -162,59 +249,97 @@ const makeStyles = (colors) => StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: 14,
   },
+  storyCardWrap: {
+    borderRadius: Radius.xl,
+    marginBottom: 18,
+  },
   storyCard: {
     flexDirection: 'row',
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: 'center',
+    height: 132,
+    borderRadius: Radius.xl,
+    backgroundColor: colors.surface,
     overflow: 'hidden',
-    elevation: 6,
-    shadowColor: '#1E1B4B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 16,
   },
-  storyCardDecor: {
+  storyImageBox: {
+    width: 132,
+    height: '100%',
+  },
+  storyImage: {
+    width: '100%',
+    height: '100%',
+  },
+  storyImageFallback: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  featuredBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    borderRadius: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  featuredBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#FFF',
+    letterSpacing: 0.2,
+  },
+  storyCardBody: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    overflow: 'hidden',
+  },
+  // Soft translucent bubbles tucked in the body's own two corners — the
+  // "light colour bubble" accent. Sized/placed to sit fully inside the
+  // card's rounded top-right / bottom-right corners rather than floating
+  // off the edge or landing mid-card.
+  storyCardBodyDecorTop: {
     position: 'absolute',
     top: -30,
     right: -30,
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255,255,255,0.14)',
   },
-  storyEmojiBubble: {
-    width: 58,
-    height: 58,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
+  storyCardBodyDecorBottom: {
+    position: 'absolute',
+    bottom: -26,
+    right: -10,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.10)',
   },
-  storyCardEmoji: { fontSize: 30 },
-  storyInfo: { flex: 1 },
+  storyCardEmoji: { fontSize: 34 },
+  storyInfo: { flex: 1, paddingRight: 44 },
   storyCardTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '900',
     color: '#FFFFFF',
-    marginBottom: 2,
+    marginBottom: 3,
     letterSpacing: -0.3,
   },
   storyCardUrduTitle: {
-    fontSize: 12,
+    fontSize: 12.5,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
-    marginBottom: 4,
+    color: 'rgba(255,255,255,0.92)',
+    marginBottom: 6,
     textAlign: 'left',
   },
   storyCardMoral: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.85)',
-    marginBottom: 8,
-    lineHeight: 15,
+    color: 'rgba(255,255,255,0.92)',
+    marginBottom: 10,
+    lineHeight: 16,
   },
   readTimeBadge: {
     backgroundColor: 'rgba(255,255,255,0.25)',
@@ -230,21 +355,77 @@ const makeStyles = (colors) => StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  storyArrow: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.25)',
+  storyPlayBtn: {
+    position: 'absolute',
+    right: 14,
+    top: '50%',
+    marginTop: -22,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
+    elevation: 4,
+    shadowColor: '#1E1B4B',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
   },
-  storyArrowText: { fontSize: 14, color: '#FFF', fontWeight: '900' },
+  storyPlayIcon: {
+    fontSize: 15,
+    fontWeight: '900',
+    marginLeft: 2,
+  },
 
   // Story detail
   storyContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
+  },
+  heroImageWrap: {
+    height: 300,
+    borderRadius: 28,
+    marginBottom: 20,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  heroImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    borderRadius: 28,
+  },
+  heroImageOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 28,
+  },
+  heroImageBadge: {
+    position: 'absolute',
+    top: 14,
+    left: 14,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  heroImageBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  heroImageContent: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 22,
   },
   storyHero: {
     borderRadius: 28,

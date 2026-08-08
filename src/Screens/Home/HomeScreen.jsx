@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Header } from '../../Components/UI';
 import { SectionHeader, Badge, TopicCard } from '../../Components/Common';
+import { ColoringPreview } from '../../Components/Games';
 import { gamesList } from '../../Data/gamesData';
 import { MODULES } from '../../Data/modulesData';
 import { useAuth, useProgress } from '../../Context';
@@ -29,6 +30,8 @@ import {
 
 // Learning-module card — fixed width for the horizontal scroll row.
 const MODULE_CARD_WIDTH = 158;
+// Quick-play card — fixed width for its horizontal slider.
+const QUICK_CARD_WIDTH = 300;
 // Streak card floats half-over the hero card's bottom edge, half below it.
 const STREAK_CARD_OVERLAP = 34;
 
@@ -53,12 +56,16 @@ const WORLD_CATEGORIES = [
   { key: 'colors', name: 'Colors', icon: '🎨', count: 20, color: '#8B5CF6' },
 ];
 
-// Quick Play surfaces the two most kid-friendly creative games straight
+// Quick Play surfaces four of the most kid-friendly activity games straight
 // from the real games catalog (not a hand-duplicated list), so the copy,
-// icon and route stay in sync with the Games screen automatically.
-const QUICK_ACTIONS = ['ColoringBook', 'DrawingBoard']
+// icon and route stay in sync with the Games screen automatically. Coloring
+// Book leads as the "featured" card — same treatment as GamesScreen's
+// showcase — with the real pre-coloured T-Rex art instead of a flat emoji,
+// so a pre-reading child recognises it as a picture to tap, not just a tile.
+const QUICK_ACTIONS = ['ColoringBook', 'DrawingBoard', 'TracingWorksheet', 'LetterPuzzle']
   .map((route) => gamesList.find((g) => g.route === route))
   .filter(Boolean);
+const FEATURED_QUICK_ROUTE = 'ColoringBook';
 
 // Learning-module tile — a soft tint of the module's own accent colour
 // (icon badge, tag, chevron) on a near-white card, the same "premium
@@ -108,6 +115,67 @@ const ModuleCard = ({ module, onPress, delay }) => {
           <View style={styles.moduleInfo}>
             <Text style={s.moduleName}>{module.name}</Text>
             <Text style={s.moduleDescription}>{module.description}</Text>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
+// Quick Play card — Games screen's "Featured Activity" showcase layout,
+// shrunk to slider width: a large square preview on the left (a big emoji
+// badge, or for the featured card the real pre-coloured T-Rex art — the
+// target player can't yet read the tag text, so the picture is the primary
+// "what kind of game is this" signal), with tag/title/description/Play Now
+// all stacked in a column to its right.
+const QuickPlayCard = ({ action, isFeatured, onPress, delay }) => {
+  const scale = useRef(new Animated.Value(0.92)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+  const press = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.delay(delay),
+      Animated.parallel([
+        Animated.spring(scale, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }),
+        Animated.timing(opacity, { toValue: 1, ...Motion.timing.base, useNativeDriver: true }),
+      ]),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View style={[styles.quickCardWrapper, { opacity, transform: [{ scale }, { scale: press }] }]}>
+      <TouchableOpacity
+        activeOpacity={0.92}
+        onPress={onPress}
+        onPressIn={() => Animated.spring(press, { toValue: Motion.pressScale, useNativeDriver: true, ...Motion.spring.soft }).start()}
+        onPressOut={() => Animated.spring(press, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }).start()}
+        style={coloredShadow(action.gradEnd, 'md')}
+      >
+        <LinearGradient colors={[action.gradStart, action.gradEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.quickCard}>
+          <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.quickSheen} />
+          <View style={styles.quickBlobDecor} pointerEvents="none" />
+
+          <View style={[styles.quickPreviewBox, isFeatured && styles.quickPreviewBoxFeatured]}>
+            {isFeatured ? (
+              <ColoringPreview size={62} />
+            ) : (
+              <Text style={styles.quickEmoji}>{action.icon}</Text>
+            )}
+          </View>
+
+          <View style={styles.quickBody}>
+            <Badge
+              label={isFeatured ? '⭐ FEATURED' : action.tag}
+              tone="glass"
+              style={styles.quickTag}
+            />
+            <Text style={styles.quickCardTitle} numberOfLines={1}>{action.name}</Text>
+            <Text style={styles.quickDesc} numberOfLines={2}>{action.desc}</Text>
+            <View style={styles.quickPlayPill}>
+              <Ionicons name="play" size={11} color="#1E1B4B" />
+              <Text style={styles.quickPlayPillText}>Play Now</Text>
+            </View>
           </View>
         </LinearGradient>
       </TouchableOpacity>
@@ -373,33 +441,25 @@ const HomeScreen = ({ navigation }) => {
           actionLabel="View all"
           onActionPress={() => { tap(); navigation.navigate('Games'); }}
         />
-        <View style={styles.quickActions}>
-          {QUICK_ACTIONS.map((action) => (
-            <TouchableOpacity
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          snapToInterval={QUICK_CARD_WIDTH + Spacing.md}
+          snapToAlignment="start"
+          style={styles.quickScroll}
+          contentContainerStyle={styles.quickScrollContent}
+        >
+          {QUICK_ACTIONS.map((action, index) => (
+            <QuickPlayCard
               key={action.route}
-              style={[styles.quickWrap, coloredShadow(action.gradEnd, 'md')]}
+              action={action}
+              isFeatured={action.route === FEATURED_QUICK_ROUTE}
+              delay={index * Motion.stagger}
               onPress={() => { tap(); navigation.navigate(action.route); }}
-              activeOpacity={0.9}
-            >
-              <LinearGradient colors={[action.gradStart, action.gradEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.quickCard}>
-                <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.quickSheen} />
-                <View style={styles.quickBlobDecor} pointerEvents="none" />
-                {!!action.tag && (
-                  <Badge label={action.tag} tone="glass" style={styles.quickTag} />
-                )}
-                <View style={styles.quickIconBadge}>
-                  <Text style={styles.quickIcon}>{action.icon}</Text>
-                </View>
-                <Text style={styles.quickLabel}>{action.name}</Text>
-                <Text style={styles.quickDesc} numberOfLines={2}>{action.desc}</Text>
-                <View style={styles.quickPlayPill}>
-                  <Ionicons name="play" size={11} color="#1E1B4B" />
-                  <Text style={styles.quickPlayPillText}>Play Now</Text>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+            />
           ))}
-        </View>
+        </ScrollView>
 
         {/* Daily Progress */}
         <SectionHeader emoji="📊" title="Daily Progress" />
@@ -652,14 +712,18 @@ const styles = StyleSheet.create({
   // as the hero/quick-play gradient cards.
   continueIconSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '55%' },
 
-  // Quick play
-  quickActions: { flexDirection: 'row', gap: 12, marginBottom: Spacing.xxl },
-  quickWrap: { flex: 1, borderRadius: Radius.xl },
+  // Quick Play — horizontally-scrolling slider of fixed-width rectangular
+  // cards (see QuickPlayCard). paddingBottom/Top clear room for the card's
+  // own shadow + press-scale, which would otherwise clip against the
+  // ScrollView's bounds.
+  quickScroll: { marginBottom: Spacing.xxl },
+  quickScrollContent: { gap: Spacing.md, paddingRight: Spacing.lg, paddingBottom: Spacing.sm, paddingTop: 2 },
+  quickCardWrapper: { width: QUICK_CARD_WIDTH },
   quickCard: {
-    borderRadius: Radius.xl,
-    paddingVertical: Spacing.xl,
-    paddingHorizontal: Spacing.lg,
+    flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: Radius.xl,
+    padding: Spacing.lg,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
@@ -674,37 +738,40 @@ const styles = StyleSheet.create({
     borderRadius: 55,
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
-  quickTag: {
-    position: 'absolute',
-    top: Spacing.md,
-    right: Spacing.md,
-  },
-  quickIconBadge: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+  quickPreviewBox: {
+    width: 92,
+    height: 92,
+    borderRadius: Radius.lg,
     backgroundColor: 'rgba(255,255,255,0.18)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Spacing.sm,
-    marginBottom: Spacing.sm,
+    overflow: 'hidden',
+    marginRight: Spacing.md,
   },
-  quickIcon: { fontSize: 28, lineHeight: 34, textAlign: 'center' },
-  quickLabel: { ...textStyles.overline, color: '#FFFFFF', fontSize: 12, marginBottom: 4 },
+  // Featured card swaps the translucent emoji badge for an opaque white
+  // tile so the real coloured art (not the gradient behind it) reads clean.
+  quickPreviewBoxFeatured: {
+    backgroundColor: '#FFFFFF',
+    borderColor: 'rgba(255,255,255,0.6)',
+  },
+  quickEmoji: { fontSize: 32, lineHeight: 38, textAlign: 'center' },
+  quickBody: { flex: 1 },
+  quickTag: { alignSelf: 'flex-start', marginBottom: Spacing.xs },
+  quickCardTitle: { ...textStyles.title, fontSize: 16, color: '#FFFFFF', marginBottom: 3 },
   quickDesc: {
     ...textStyles.caption,
-    color: 'rgba(255,255,255,0.85)',
-    textAlign: 'center',
+    color: 'rgba(255,255,255,0.88)',
     fontSize: 11,
     lineHeight: 15,
-    marginBottom: Spacing.md,
-    minHeight: 30,
+    marginBottom: Spacing.sm,
   },
   quickPlayPill: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
     gap: 5,
     backgroundColor: 'rgba(255,255,255,0.94)',
     borderRadius: Radius.full,

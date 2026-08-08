@@ -4,3 +4,4 @@ export { default as MarksBadge } from './MarksBadge';
 export { default as GameStage } from './GameStage';
 export { default as Mascot } from './Mascot';
 export { default as CelebrationOverlay } from './CelebrationOverlay';
+export { default as ColoringPreview } from './ColoringPreview';

@@ -143,7 +143,7 @@ const TopicCard = ({
     return (
       <Animated.View style={[enterStyle, style]}>
         <TouchableOpacity
-          style={coloredShadow(accent, 'sm')}
+          style={coloredShadow(accent, 'md')}
           onPress={handlePress}
           onPressIn={pressIn}
           onPressOut={pressOut}
@@ -151,28 +151,41 @@ const TopicCard = ({
           accessibilityRole="button"
           accessibilityLabel={title}
         >
-          <View style={[styles.tileShell, { borderColor: accent + '24' }]}>
-            <View style={[staticStyles.tileBlobDecor, { backgroundColor: accent + '14' }]} pointerEvents="none" />
+          {/* Gradient ring — a hairline of colour standing in for the old flat
+              border, the cheapest way to make a plain-bg card read as "premium". */}
+          <LinearGradient
+            colors={[accent + 'B0', accent + '30', accent + '60']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.tileBorder}
+          >
+            <View style={styles.tileShell}>
+              <View style={[staticStyles.tileBlobDecor, { backgroundColor: accent + '1E' }]} pointerEvents="none" />
+              <View style={[staticStyles.tileBlobDecorSm, { backgroundColor: accent + '16' }]} pointerEvents="none" />
 
-            <LinearGradient
-              colors={[accent + '40', accent + '18']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[styles.tileIcon, { borderColor: accent + '30' }]}
-            >
-              <Text style={staticStyles.tileGlyph}>{emoji}</Text>
-            </LinearGradient>
-
-            <Text style={styles.tileName} numberOfLines={1}>
-              {title}
-            </Text>
-
-            {badge != null && (
-              <View style={[staticStyles.tilePill, { backgroundColor: accent }]}>
-                <Text style={staticStyles.tilePillText}>{badge}</Text>
+              <View style={[staticStyles.tileIconGlow, { backgroundColor: accent + '20' }]}>
+                <LinearGradient
+                  colors={[accent, accent + 'D9', accent + 'B0']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.tileIcon}
+                >
+                  <View style={staticStyles.tileIconShine} pointerEvents="none" />
+                  <Text style={staticStyles.tileGlyph}>{emoji}</Text>
+                </LinearGradient>
               </View>
-            )}
-          </View>
+
+              <Text style={styles.tileName} numberOfLines={1}>
+                {title}
+              </Text>
+
+              {badge != null && (
+                <View style={[staticStyles.tilePill, { backgroundColor: accent }]}>
+                  <Text style={staticStyles.tilePillText}>{badge}</Text>
+                </View>
+              )}
+            </View>
+          </LinearGradient>
         </TouchableOpacity>
       </Animated.View>
     );
@@ -300,10 +313,12 @@ const staticStyles = StyleSheet.create({
     borderRadius: Radius.full,
     paddingVertical: 3,
     paddingHorizontal: Spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
   },
   tilePillText: { fontSize: 11, color: '#FFFFFF', fontFamily: Fonts.extraBold },
-  // Soft decorative circle tucked behind the icon for depth — same idiom
-  // as Home's module/quick-play cards.
+  // Soft decorative circles tucked behind the icon for depth — same idiom
+  // as Home's module/quick-play cards, doubled up for a richer backdrop.
   tileBlobDecor: {
     position: 'absolute',
     top: -18,
@@ -311,6 +326,36 @@ const staticStyles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
+  },
+  tileBlobDecorSm: {
+    position: 'absolute',
+    bottom: -16,
+    left: -16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+  },
+  // Halo behind the icon gradient — widens the glow so the badge feels
+  // lit rather than pasted on.
+  tileIconGlow: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.md,
+  },
+  // Small glossy streak — reads as a light reflection on the icon's
+  // gradient, the detail that sells "premium" over "flat colour circle".
+  tileIconShine: {
+    position: 'absolute',
+    top: 7,
+    left: 11,
+    width: 20,
+    height: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    transform: [{ rotate: '-20deg' }],
   },
 });
 
@@ -354,11 +399,15 @@ const makeStyles = (colors) =>
       marginTop: 3,
     },
 
+    // The gradient ring's outer shell — its padding is the ring's
+    // thickness, with `tileShell` sitting inside as the flat surface.
+    tileBorder: {
+      borderRadius: Radius.xl,
+      padding: 1.5,
+    },
     tileShell: {
       backgroundColor: colors.surface,
-      borderRadius: Radius.lg,
-      borderWidth: 1,
-      borderColor: colors.border,
+      borderRadius: Radius.xl - 1.5,
       paddingVertical: Spacing.lg,
       paddingHorizontal: Spacing.sm,
       alignItems: 'center',
@@ -368,15 +417,16 @@ const makeStyles = (colors) =>
       width: TILE_ICON,
       height: TILE_ICON,
       borderRadius: TILE_ICON / 2,
-      borderWidth: 1.5,
+      borderWidth: 2,
+      borderColor: 'rgba(255,255,255,0.45)',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: Spacing.md,
     },
     tileName: {
-      fontFamily: Fonts.bold,
+      fontFamily: Fonts.extraBold,
       fontSize: 13,
       lineHeight: 18,
+      letterSpacing: -0.1,
       color: colors.textPrimary,
       textAlign: 'center',
       marginBottom: Spacing.sm,

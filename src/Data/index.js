@@ -8,6 +8,7 @@ export { default as kalmasData } from './kalmasData';
 export { default as pillarsData } from './pillarsData';
 export { default as storiesData } from './storiesData';
 export { default as islamicStoriesData } from './islamicStoriesData';
+export { default as storyImages } from './storyImages';
 export { default as juzAmmaData } from './juzAmmaData';
 export { patternData, memoryCardsList, oddOneOutData, gamesList, colorMatchData, shapeQuizData } from './gamesData';
 export { quizPacksByModule } from './quizPacksData';

@@ -8,11 +8,10 @@ import {
   Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { gamesList } from '../../Data/gamesData';
-import coloringData from '../../Data/coloringData';
 import { Header } from '../../Components/UI';
+import { ColoringPreview } from '../../Components/Games';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
 
@@ -51,43 +50,6 @@ const tap = (fn, game) => {
   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
   fn(game);
 };
-
-// A pre-coloured dino so the Coloring Book card previews the real art
-// a child fills in — not a flat emoji. Colours come straight from the
-// scene's own `preview` map (same source the in-game "original" uses).
-const PREVIEW_SCENE = coloringData.find((s) => s.id === 'trex') || coloringData[0];
-const PREVIEW_FILLS = PREVIEW_SCENE.preview || {};
-
-// Thumbnails are small, so the art's own stroke weights get scaled up a
-// little — otherwise the hairline texture lines vanish on the card.
-const PREVIEW_INK = 1.5;
-
-const ColoringPreview = ({ size }) => (
-  <Svg width={size} height={size} viewBox={PREVIEW_SCENE.viewBox}>
-    {PREVIEW_SCENE.regions.map((r) => (
-      <Path
-        key={r.id}
-        d={r.d}
-        fill={PREVIEW_FILLS[r.id] || '#FFFFFF'}
-        stroke="#2B2B3A"
-        strokeWidth={(r.w ?? 2.8) * PREVIEW_INK}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-    ))}
-    {PREVIEW_SCENE.outlines.map((o, i) => (
-      <Path
-        key={`o${i}`}
-        d={o.d}
-        fill={o.fill ? '#2B2B3A' : 'none'}
-        stroke="#2B2B3A"
-        strokeWidth={(o.w ?? 1.6) * PREVIEW_INK}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    ))}
-  </Svg>
-);
 
 // Explicit "what's new" order for the grid. Anything not listed keeps its
 // natural gamesList order behind these (offset well past the listed ranks).
