@@ -15,6 +15,7 @@ import * as SecureStore from 'expo-secure-store';
 const USERS_KEY = 'registeredUsers';
 const TOKEN_KEY = 'accessToken';
 const USER_DATA_KEY = 'userData';
+const ONBOARDING_KEY = 'onboardingComplete';
 
 // ── Hashing ───────────────────────────────────────────────────
 const toHex = (bytes) =>
@@ -56,6 +57,39 @@ export const clearToken = async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
   } catch (e) {
     console.warn('[secureAuth.clearToken]', e);
+  }
+};
+
+// ── First-run flag (Keystore, not AsyncStorage) ────────────────
+// Deliberately lives in SecureStore rather than AsyncStorage: Keystore
+// entries are tied to the app's uid and are wiped on uninstall, while
+// AsyncStorage's SQLite file can be restored from Android Auto Backup on
+// reinstall — which would make a fresh install skip straight past
+// Onboarding into ProfileSetup. This keeps "have I completed onboarding +
+// profile setup" tied to something that genuinely resets on uninstall,
+// with no native manifest change required.
+export const setOnboardingComplete = async () => {
+  try {
+    await SecureStore.setItemAsync(ONBOARDING_KEY, 'true');
+  } catch (e) {
+    console.warn('[secureAuth.setOnboardingComplete]', e);
+  }
+};
+
+export const getOnboardingComplete = async () => {
+  try {
+    return (await SecureStore.getItemAsync(ONBOARDING_KEY)) === 'true';
+  } catch (e) {
+    console.warn('[secureAuth.getOnboardingComplete]', e);
+    return false;
+  }
+};
+
+export const clearOnboardingComplete = async () => {
+  try {
+    await SecureStore.deleteItemAsync(ONBOARDING_KEY);
+  } catch (e) {
+    console.warn('[secureAuth.clearOnboardingComplete]', e);
   }
 };
 
@@ -159,9 +193,12 @@ export const deleteUserAccount = async (userId) => {
     `gamesPlayed_${userId}`,
     `badges_${userId}`,
     `lastLesson_${userId}`,
+    `lastLessons_${userId}`,
+    `lastPositions_${userId}`,
   ]);
   await clearSessionUser();
   await clearToken();
+  await clearOnboardingComplete();
 };
 
 export const makeToken = (userId) => `token_${userId}_${Date.now()}`;

@@ -66,6 +66,12 @@ export default () => ({
         backgroundColor: '#1E1B4B'
       },
       package: 'com.basitkhokhar.littlegenius.app',
+      // Off — Android's Auto Backup was restoring AsyncStorage (onboarding_complete,
+      // registeredUsers) from Google Drive on reinstall, making a fresh install look
+      // like a returning user and skipping straight to ProfileSetup instead of
+      // Onboarding. This must stay false, and be mirrored into
+      // android/app/src/main/AndroidManifest.xml (that project is hand-maintained).
+      allowBackup: false,
       // Offline kids app — request only what's used (VIBRATE via expo-haptics,
       // INTERNET for opening legal links, POST_NOTIFICATIONS for the local
       // daily/comeback reminders, RECEIVE_BOOT_COMPLETED so scheduled reminders

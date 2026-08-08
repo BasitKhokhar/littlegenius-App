@@ -9,10 +9,9 @@ import {
   StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth, useDialog } from '../../Context';
 import { useThemeColors } from '../../Context/ThemeContext';
-import { makeToken } from '../../Utils/secureAuth';
+import { makeToken, setOnboardingComplete } from '../../Utils/secureAuth';
 import { Input, Button, BottomSheet } from '../../Components/Common';
 import { lightColors as C, gradients } from '../../Theme/colors';
 import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
@@ -47,7 +46,7 @@ const ProfileSetup = () => {
     try {
       setLoading(true);
       const profile = { id: `user_${Date.now()}`, name: name.trim(), age, avatar: selectedAvatar };
-      await AsyncStorage.setItem('onboarding_complete', 'true');
+      await setOnboardingComplete();
       await loginSuccess(profile, makeToken(profile.id));
     } catch (e) {
       showAlert({ title: 'Oops!', message: 'Could not create the profile. Please try again.', variant: 'error' });

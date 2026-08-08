@@ -15,122 +15,96 @@ import Animated, {
   interpolate,
   interpolateColor,
   Extrapolation,
-  withRepeat,
   withTiming,
   withDelay,
   runOnJS,
   Easing,
 } from 'react-native-reanimated';
-import LottieView from 'lottie-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ROUTES } from '../../Constants';
+import { setOnboardingComplete } from '../../Utils/secureAuth';
 import SpeechEngine from '../../Utils/speechEngine';
 import { lightColors as C, gradients, onBrandOverlay as O } from '../../Theme/colors';
 import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
 
 const { width, height } = Dimensions.get('window');
-const TRACK_W = width - Spacing.xl * 2;
-const ART = Math.min(width * 0.72, 300);
+// Hero art fills the top ~65%; the content sheet below overlaps it by
+// SHEET_OVERLAP so its rounded top corners peek in front of the image —
+// matching the bottom-sheet-over-hero layout from the design reference.
+const HERO_HEIGHT = height * 0.68;
+const SHEET_RADIUS = 32;
+const SHEET_OVERLAP = 24;
 
 // ── Slides ──────────────────────────────────────────────────────
-// One premium brand theme carries the whole flow — only the copy and
-// the Lottie art change as you swipe, never the palette.
+// Each slide pairs a full-bleed illustration with its copy — one
+// consistent indigo accent carries the CTA & dots throughout the flow.
 const SLIDES = [
   {
     id: '1',
     title: 'Learn Languages Offline',
     description:
       'Bilingual English phonics, vocabulary & beautiful Nastaliq script — perfect for Playgroup, Nursery & Class One.',
-    lottie: require('../../../assets/lottie/learn-languages.json'),
+    image: require('../../../assets/onboarding1.png'),
   },
   {
     id: '2',
     title: 'Solve Brain & IQ Games',
     description:
       'Memory pairs, logic patterns, rapid math races & odd-one-out puzzles curated to grow young, curious minds.',
-    lottie: require('../../../assets/lottie/brain-games.json'),
+    image: require('../../../assets/onboarding2.png'),
   },
   {
     id: '3',
     title: 'Islamic Values & Stories',
     description:
       'Gentle manners with everyday Duas, the 6 Kalmas and audio moral stories — calm, beautiful & 100% offline.',
-    lottie: require('../../../assets/lottie/islamic.json'),
+    image: require('../../../assets/onboarding3.png'),
   },
   {
     id: '4',
     title: 'Writing & Tracing Practice',
     description:
       'Trace every letter & number with guided strokes and playful worksheets that build confident little hands.',
-    lottie: require('../../../assets/lottie/writing-tracing.json'),
+    image: require('../../../assets/onboarding4.png'),
   },
 ];
 
 const LAST = SLIDES.length - 1;
+const THEME_ACCENT = C.primary;
+const THEME_GRADIENT = gradients.cta;
 
-// Single brand accent used everywhere (CTA, progress, glow) — never swaps
-// per slide, so the theme reads as one cohesive premium app, not four.
-const THEME_ACCENT = C.primaryLight;
-const THEME_GRADIENT = gradients.onboarding;
-
-// ── A single floating decor orb (ambient premium motion) ────────
-const Orb = ({ style, delay = 0, drift = 26, dur = 3200 }) => {
-  const t = useSharedValue(0);
-  useEffect(() => {
-    t.value = withDelay(
-      delay,
-      withRepeat(withTiming(1, { duration: dur, easing: Easing.inOut(Easing.quad) }), -1, true)
-    );
-  }, [t, delay, dur]);
-  const aStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: interpolate(t.value, [0, 1], [0, -drift]) },
-      { scale: interpolate(t.value, [0, 1], [1, 1.12]) },
-    ],
-    opacity: interpolate(t.value, [0, 1], [0.5, 0.85]),
+// ── Full-bleed hero image (gentle Ken Burns zoom + crossfade) ───
+const Hero = ({ item, index, scrollX }) => {
+  const input = [(index - 1) * width, index * width, (index + 1) * width];
+  const imgStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollX.value, input, [0.35, 1, 0.35], Extrapolation.CLAMP),
+    transform: [{ scale: interpolate(scrollX.value, input, [1.14, 1, 1.14], Extrapolation.CLAMP) }],
   }));
-  return <Animated.View style={[style, aStyle]} pointerEvents="none" />;
+  return (
+    <View style={styles.heroSlide}>
+      <Animated.Image source={item.image} resizeMode="cover" style={[styles.heroImage, imgStyle]} />
+    </View>
+  );
 };
 
-// ── One onboarding slide (art parallax + text rise, scroll-linked) ──
-const Slide = ({ item, index, scrollX }) => {
+// ── Slide copy (rises + fades in as its page centers) ───────────
+const Copy = ({ item, index, scrollX }) => {
   const input = [(index - 1) * width, index * width, (index + 1) * width];
-
-  const artStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollX.value, input, [0, 1, 0], Extrapolation.CLAMP),
-    transform: [
-      { perspective: 800 },
-      { scale: interpolate(scrollX.value, input, [0.72, 1, 0.72], Extrapolation.CLAMP) },
-      { translateX: interpolate(scrollX.value, input, [width * 0.18, 0, -width * 0.18], Extrapolation.CLAMP) },
-    ],
-  }));
-
   const textStyle = useAnimatedStyle(() => ({
     opacity: interpolate(scrollX.value, input, [0, 1, 0], Extrapolation.CLAMP),
-    transform: [
-      { translateY: interpolate(scrollX.value, input, [46, 0, 46], Extrapolation.CLAMP) },
-    ],
+    transform: [{ translateY: interpolate(scrollX.value, input, [22, 0, 22], Extrapolation.CLAMP) }],
   }));
-
   return (
-    <View style={styles.slide}>
-      <View style={styles.artWrap}>
-        <Animated.View style={[styles.artCard, artStyle]}>
-          <LottieView source={item.lottie} autoPlay loop resizeMode="contain" style={styles.lottie} />
-        </Animated.View>
-      </View>
-
-      <Animated.View style={[styles.textWrap, textStyle]}>
-        <Text style={styles.title} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.7}>
-          {item.title}
-        </Text>
-        <Text style={styles.description}>{item.description}</Text>
-      </Animated.View>
-    </View>
+    <Animated.View style={[styles.copySlide, textStyle]}>
+      <Text style={styles.title} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.75}>
+        {item.title}
+      </Text>
+      <Text style={styles.description}>{item.description}</Text>
+    </Animated.View>
   );
 };
 
@@ -138,9 +112,9 @@ const Slide = ({ item, index, scrollX }) => {
 const Dot = ({ index, scrollX }) => {
   const input = [(index - 1) * width, index * width, (index + 1) * width];
   const aStyle = useAnimatedStyle(() => ({
-    width: interpolate(scrollX.value, input, [8, 26, 8], Extrapolation.CLAMP),
-    opacity: interpolate(scrollX.value, input, [0.35, 1, 0.35], Extrapolation.CLAMP),
-    backgroundColor: interpolateColor(scrollX.value, input, [C.onBrand, THEME_ACCENT, C.onBrand]),
+    width: interpolate(scrollX.value, input, [8, 24, 8], Extrapolation.CLAMP),
+    opacity: interpolate(scrollX.value, input, [0.4, 1, 0.4], Extrapolation.CLAMP),
+    backgroundColor: interpolateColor(scrollX.value, input, [C.borderStrong, THEME_ACCENT, C.borderStrong]),
   }));
   return <Animated.View style={[styles.dot, aStyle]} />;
 };
@@ -183,11 +157,6 @@ const Onboarding = ({ navigation }) => {
     }
   );
 
-  // Progress fill grows across the four slides — same accent throughout.
-  const fillStyle = useAnimatedStyle(() => ({
-    width: interpolate(scrollX.value, [0, LAST * width], [TRACK_W / SLIDES.length, TRACK_W], Extrapolation.CLAMP),
-  }));
-
   // CTA press feedback.
   const press = useSharedValue(0);
   const ctaStyle = useAnimatedStyle(() => ({
@@ -195,9 +164,15 @@ const Onboarding = ({ navigation }) => {
   }));
 
   const goToProfile = useCallback(async () => {
-    await AsyncStorage.setItem('onboarding_complete', 'true');
+    await setOnboardingComplete();
     navigation.replace(ROUTES.AUTH.PROFILE);
   }, [navigation]);
+
+  const handlePrev = useCallback(() => {
+    if (activeIndex > 0) {
+      scrollRef.current?.scrollTo({ x: (activeIndex - 1) * width, animated: true });
+    }
+  }, [activeIndex]);
 
   const handleNext = useCallback(() => {
     if (activeIndex < LAST) {
@@ -208,38 +183,24 @@ const Onboarding = ({ navigation }) => {
     }
   }, [activeIndex, goToProfile]);
 
+  const isFirst = activeIndex === 0;
   const isLast = activeIndex === LAST;
 
   return (
     <View style={styles.container}>
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
-      {/* Base deep-indigo gradient + one static premium glow (never re-tints) */}
-      <LinearGradient colors={gradients.splash} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
-      <View style={styles.aura} pointerEvents="none" />
-
-      {/* Ambient floating orbs */}
-      {/* <Orb style={[styles.orb, { top: height * 0.14, left: -50, width: 150, height: 150, backgroundColor: 'rgba(255,255,255,0.06)' }]} delay={0} />
-      <Orb style={[styles.orb, { top: height * 0.30, right: -40, width: 110, height: 110, backgroundColor: 'rgba(252,211,77,0.10)' }]} delay={600} drift={20} dur={3800} />
-      <Orb style={[styles.orb, { bottom: height * 0.20, left: width * 0.16, width: 70, height: 70, backgroundColor: 'rgba(165,180,252,0.12)' }]} delay={1200} drift={16} dur={2800} /> */}
-
-      <Animated.View style={[styles.content, { paddingTop: insets.top + Spacing.md, paddingBottom: insets.bottom + Spacing.xl }, enterStyle]}>
-        {/* Header: step badge + Skip */}
-        <View style={styles.header}>
-          <View style={styles.stepBadge}>
-            <Text style={styles.stepText}>{activeIndex + 1} / {SLIDES.length}</Text>
-          </View>
-          <Pressable onPress={goToProfile} hitSlop={10} style={({ pressed }) => [styles.skipBtn, pressed && { opacity: 0.6 }]}>
-            <Text style={styles.skipText}>Skip</Text>
-          </Pressable>
+      <Animated.View style={[styles.content, enterStyle]}>
+        {/* Skip — floats over the hero art */}
+        <View style={[styles.header, { top: insets.top + Spacing.sm }]}>
+          {!isLast && (
+            <Pressable onPress={goToProfile} hitSlop={10} style={({ pressed }) => [styles.skipBtn, pressed && { opacity: 0.6 }]}>
+              <Text style={styles.skipText}>Skip</Text>
+            </Pressable>
+          )}
         </View>
 
-        {/* Progress track */}
-        <View style={styles.progressTrack}>
-          <Animated.View style={[styles.progressFill, fillStyle]} />
-        </View>
-
-        {/* Swipeable slides */}
+        {/* Swipeable hero + copy */}
         <Animated.ScrollView
           ref={scrollRef}
           horizontal
@@ -251,19 +212,40 @@ const Onboarding = ({ navigation }) => {
           style={styles.scroller}
         >
           {SLIDES.map((item, i) => (
-            <Slide key={item.id} item={item} index={i} scrollX={scrollX} />
+            <View key={item.id} style={styles.page}>
+              <Hero item={item} index={i} scrollX={scrollX} />
+              <View style={styles.copyArea}>
+                <Copy item={item} index={i} scrollX={scrollX} />
+              </View>
+            </View>
           ))}
         </Animated.ScrollView>
 
-        {/* Footer: dots + CTA */}
-        <View style={styles.footer}>
-          <View style={styles.dots}>
-            {SLIDES.map((_, i) => (
-              <Dot key={i} index={i} scrollX={scrollX} />
-            ))}
-          </View>
+        {/* Pagination dots — fixed just inside the sheet's rounded top edge */}
+        <View
+          style={[styles.dotsRow, { top: HERO_HEIGHT - SHEET_OVERLAP + Spacing.lg }]}
+          pointerEvents="none"
+        >
+          {SLIDES.map((_, i) => (
+            <Dot key={i} index={i} scrollX={scrollX} />
+          ))}
+        </View>
 
-          <Animated.View style={[styles.ctaWrap, ctaStyle]}>
+        {/* Navigation: Previous + primary CTA — both size to their own
+            content and sit at opposite ends of the row (space-between),
+            neither one stretching to fill it. Previous always shows so the
+            first slide reads as the true start of the flow, it just no-ops
+            there since there is no earlier slide to return to. */}
+        <View style={[styles.navRow, { paddingBottom: insets.bottom/2 }]}>
+          <Pressable
+            onPress={handlePrev}
+            disabled={isFirst}
+            style={({ pressed }) => [styles.prevBtn, isFirst && styles.prevBtnDisabled, pressed && !isFirst && { opacity: 0.7 }]}
+          >
+            <Text style={styles.prevText}>Previous</Text>
+          </Pressable>
+
+          <Animated.View style={ctaStyle}>
             <Pressable
               onPress={handleNext}
               onPressIn={() => { press.value = withTiming(1, { duration: 90 }); }}
@@ -276,7 +258,8 @@ const Onboarding = ({ navigation }) => {
                 end={{ x: 1, y: 1 }}
                 style={[styles.cta, coloredShadow(THEME_ACCENT, 'lg')]}
               >
-                <Text style={styles.ctaText}>{isLast ? "Let's Begin" : 'Next'}</Text>
+                <Text style={styles.ctaText}>{isLast ? "Let's Start" : 'Next'}</Text>
+                <Ionicons name="arrow-forward" size={18} color={C.onPrimary} style={styles.ctaIcon} />
               </LinearGradient>
             </Pressable>
           </Animated.View>
@@ -287,87 +270,97 @@ const Onboarding = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.brandSurface },
-  // aura: {
-  //   position: 'absolute',
-  //   top: -height * 0.28,
-  //   alignSelf: 'center',
-  //   width: width * 1.5,
-  //   height: width * 1.5,
-  //   borderRadius: width * 0.75,
-  //   backgroundColor: 'rgba(252,211,77,0.10)',
-  //   opacity: 1,
-  // },
-  orb: { position: 'absolute', borderRadius: Radius.full },
-
+  container: { flex: 1, backgroundColor: C.surface },
   content: { flex: 1 },
 
   header: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 10,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
     paddingHorizontal: Spacing.xl,
-    paddingBottom: Spacing.md,
   },
-  stepBadge: {
-    backgroundColor: O.faint,
-    borderRadius: Radius.sm,
-    paddingVertical: 5,
-    paddingHorizontal: Spacing.md,
-  },
-  stepText: { ...textStyles.caption, fontFamily: 'Baloo2_800ExtraBold', color: O.text },
-  skipBtn: { backgroundColor: O.faint, borderRadius: Radius.sm, paddingVertical: 5, paddingHorizontal: Spacing.lg },
+  skipBtn: { backgroundColor: O.faint, borderRadius: Radius.sm, paddingVertical: 6, paddingHorizontal: Spacing.lg },
   skipText: { ...textStyles.bodyStrong, fontSize: 13, color: O.textStrong },
 
-  progressTrack: {
-    height: 6,
-    width: TRACK_W,
-    alignSelf: 'center',
-    borderRadius: 3,
-    backgroundColor: O.faint,
-    overflow: 'hidden',
-    marginBottom: Spacing.sm,
-  },
-  progressFill: { height: 6, borderRadius: 3, backgroundColor: THEME_ACCENT },
-
   scroller: { flex: 1 },
-  slide: { width, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.xl },
+  page: { width, height: '100%' },
 
-  artWrap: { width: ART, height: ART, alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.huge },
-  artCard: {
-    width: ART,
-    height: ART,
-    borderRadius: Radius.xl,
-    // backgroundColor: 'rgba(255,255,255,0.06)',
-    // borderWidth: 1,
-    // borderColor: 'rgba(255,255,255,0.12)',
+  heroSlide: {
+    width,
+    height: HERO_HEIGHT,
+    overflow: 'hidden',
+    backgroundColor: C.brandSurface,
+  },
+  heroImage: { width: '100%', height: '100%' },
+
+  // The white sheet rides up over the hero image by SHEET_OVERLAP so its
+  // rounded top corners reveal a sliver of image behind them, then fills
+  // the remaining ~30-35% of the screen — matching the reference layout.
+  copyArea: {
+    flex: 1,
+    marginTop: -SHEET_OVERLAP,
+    backgroundColor: C.surface,
+    borderTopLeftRadius: SHEET_RADIUS,
+    borderTopRightRadius: SHEET_RADIUS,
+    paddingTop: SHEET_OVERLAP + Spacing.xxxl,
+    paddingHorizontal: Spacing.xl,
+    alignItems: 'center',
+    shadowColor: '#1E1B4B',
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+  },
+  copySlide: { alignItems: 'center',marginTop:20 },
+  title: { ...textStyles.h1, fontSize: 26, color: C.textPrimary, textAlign: 'center', marginBottom: Spacing.sm },
+  description: { ...textStyles.body, color: C.textSecondary, textAlign: 'center', lineHeight: 22 },
+
+  dotsRow: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    height: 10,
+  },
+  dot: { height: 8, borderRadius: 4 },
+
+  navRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.lg,
+  },
+  // Same pill shape & vertical padding as the primary CTA below, just in a
+  // quieter tint — the two read as one matched button pair, sized to their
+  // own text rather than stretching to fill the row.
+  prevBtn: {
+    paddingVertical: 14,
+    paddingHorizontal: Spacing.xxl,
+    borderRadius: 50,
+    backgroundColor: C.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    // No `overflow: 'hidden'` here: on Android, clipping a transparent
-    // (no background/border) view blanks the LottieView inside it — the
-    // clip mask needs a real layer to composite against. The Lottie is
-    // sized to 90% of this box anyway, so nothing needs clipping.
   },
-  lottie: { width: '90%', height: '90%' },
+  prevBtnDisabled: { opacity: 0.35 },
+  prevText: { ...textStyles.button, fontSize: 17, color: C.primary },
 
-  textWrap: { alignItems: 'center', paddingHorizontal: Spacing.sm },
-  title: { ...textStyles.h1, fontSize: 27, color: C.onBrand, textAlign: 'center', marginBottom: Spacing.md },
-  description: { ...textStyles.body, color: O.textMuted, textAlign: 'center', lineHeight: 23 },
-
-  footer: { paddingHorizontal: Spacing.xl, paddingTop: Spacing.lg },
-  dots: { flexDirection: 'row', height: 10, justifyContent: 'center', alignItems: 'center', gap: Spacing.xs, marginBottom: Spacing.xl },
-  dot: { height: 8, borderRadius: 4, backgroundColor: C.onBrand },
-
-  ctaWrap: { width: '100%' },
-  ctaPress: { width: '100%', borderRadius: Radius.lg },
+  ctaPress: { borderRadius: Radius.lg },
   cta: {
-    width: '100%',
-    paddingVertical: 18,
-    borderRadius: Radius.lg,
+    flexDirection: 'row',
+    paddingVertical: 14,
+    paddingHorizontal: Spacing.xxl,
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaText: { ...textStyles.button, fontSize: 17, color: C.brandSurfaceAlt },
+  ctaText: { ...textStyles.button, fontSize: 17, color: C.onPrimary },
+  ctaIcon: { marginLeft: Spacing.sm },
 });
 
 export default Onboarding;

@@ -5,16 +5,21 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { storiesData } from '../../Data/storiesData';
 import islamicStoriesData from '../../Data/islamicStoriesData';
+import { getStoryHeroImage } from '../../Data/storyImages';
 import { Header } from '../../Components/UI';
 import { GameStage, CelebrationOverlay } from '../../Components/Games';
 import SpeakButton from '../../Components/Common/SpeakButton';
 import QuizOptionButton from '../../Components/Common/QuizOptionButton';
 import { useAuth, useProgress } from '../../Context';
 import { useTheme } from '../../Context/ThemeContext';
+import { coloredShadow } from '../../Theme';
+import { getStoryAccent } from '../../Utils/storyColors';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { calculateStarReward, shuffleArray } from '../../Utils/dataHelpers';
@@ -27,14 +32,19 @@ const StoryQuizScreen = ({ navigation, route }) => {
   const { colors, isDark } = useTheme();
   const styles = makeStyles(colors);
 
-  const story =
-    storiesData.find((s) => s.id === storyId) ||
-    islamicStoriesData.find((s) => s.id === storyId);
+  const moralIdx = storiesData.findIndex((s) => s.id === storyId);
+  const isIslamicStory = moralIdx === -1;
+  const storyIdx = isIslamicStory ? islamicStoriesData.findIndex((s) => s.id === storyId) : moralIdx;
+  const story = storyIdx === -1 ? null : (isIslamicStory ? islamicStoriesData[storyIdx] : storiesData[storyIdx]);
+  // Same banner artwork the story's own detail screen shows, so the quiz
+  // still feels like a continuation of the story instead of a bare form.
+  const heroImage = storyIdx === -1 ? null : getStoryHeroImage(storiesData.length, isIslamicStory, storyIdx);
 
-  // Themed gradient stage built from the story's own accent colour — same
-  // full-bleed "cartoon premium" treatment as the mini-games, so the quiz
-  // still feels like part of the story instead of a plain form screen.
-  const accent = story?.color || colors.primary;
+  // Themed gradient stage built from the same per-story accent colour the
+  // detail screen's hero/card use (cycled by list position, not the data
+  // file's own `color` field) — so the quiz stays visually the same story
+  // instead of switching palettes.
+  const accent = storyIdx !== -1 ? getStoryAccent(storyIdx).color : colors.primary;
   const stage = useMemo(
     () => ({ bg: gradientStageFromAccent(accent, isDark), accent, deco: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.16)' }),
     [accent, isDark]
@@ -102,7 +112,7 @@ const StoryQuizScreen = ({ navigation, route }) => {
       const finalCorrect = isCorrect ? correctCount + 1 : correctCount;
       const reward = calculateStarReward(finalCorrect, questions.length, 5);
       addStars(reward);
-      recordLessonComplete({ xpAmount: reward });
+      recordLessonComplete({ xpAmount: reward, mod: 'stories', packId: story.id, packTitle: story.title });
       setGameState('finished');
       // Fixed praise phrase (pre-baked teacher voice); the score/stars show on
       // the results screen instead of being read as dynamic numbers.
@@ -165,15 +175,44 @@ const StoryQuizScreen = ({ navigation, route }) => {
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.quizContent}>
-            <Text style={styles.progText}>Question {currentIdx + 1} of {questions.length}</Text>
-
-            {!!story.emoji && (
-              <View style={styles.emojiBubble}>
-                <Text style={styles.emojiGlyph}>{story.emoji}</Text>
+            {heroImage ? (
+              <View style={[styles.heroSquareWrap, coloredShadow(stage.accent, 'lg')]}>
+                <Image source={heroImage} style={styles.heroSquareImage} resizeMode="cover" />
+                <LinearGradient
+                  colors={['transparent', 'rgba(0,0,0,0.05)', 'rgba(0,0,0,0.68)']}
+                  locations={[0, 0.55, 1]}
+                  style={styles.heroSquareOverlay}
+                />
+                <View style={styles.heroSquareRing} pointerEvents="none" />
+                <View style={styles.heroSquareBadge}>
+                  <Text style={styles.heroSquareBadgeText} numberOfLines={2}>{story.emoji} {story.title}</Text>
+                </View>
               </View>
+            ) : (
+              !!story.emoji && (
+                <View style={styles.emojiBubble}>
+                  <Text style={styles.emojiGlyph}>{story.emoji}</Text>
+                </View>
+              )
             )}
 
-            <View style={styles.questionCard}>
+            <View style={styles.progressRow}>
+              <Text style={styles.progText}>Question {currentIdx + 1} of {questions.length}</Text>
+              <View style={styles.progressTrack}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    { width: `${Math.max(((currentIdx + (picked ? 1 : 0)) / questions.length) * 100, 6)}%` },
+                  ]}
+                />
+              </View>
+            </View>
+
+            <View style={[styles.questionCard, coloredShadow(stage.accent, 'md')]}>
+              <View style={[styles.questionCardDecor, { backgroundColor: stage.accent + '14' }]} pointerEvents="none" />
+              <View style={[styles.questionBadge, { backgroundColor: stage.accent }]}>
+                <Text style={styles.questionBadgeText}>Q{currentIdx + 1}</Text>
+              </View>
               <Text style={styles.questionText}>{currentQuestion.q}</Text>
               <View style={styles.questionAudio}>
                 <SpeakButton
@@ -186,7 +225,7 @@ const StoryQuizScreen = ({ navigation, route }) => {
               </View>
             </View>
 
-            <View style={styles.optionsContainer}>
+            <View style={styles.optionsGrid}>
               {currentQuestion.options.map((option, idx) => {
                 let state = 'idle';
                 if (picked) {
@@ -195,14 +234,16 @@ const StoryQuizScreen = ({ navigation, route }) => {
                   else state = 'dim';
                 }
                 return (
-                  <QuizOptionButton
-                    key={`${round}-${currentIdx}-${idx}`}
-                    label={option.text}
-                    state={state}
-                    disabled={!!picked}
-                    onPress={() => handleAnswer(option)}
-                    colors={colors}
-                  />
+                  <View key={`${round}-${currentIdx}-${idx}`} style={styles.optionCell}>
+                    <QuizOptionButton
+                      label={option.text}
+                      state={state}
+                      disabled={!!picked}
+                      onPress={() => handleAnswer(option)}
+                      colors={colors}
+                      compact
+                    />
+                  </View>
                 );
               })}
             </View>
@@ -228,19 +269,56 @@ const makeStyles = (colors) => StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  progText: {
-    fontSize: 12,
+  // Same banner artwork as the story detail screen — the source art is
+  // square, so it's framed as a squared, medallion-style hero (not
+  // stretched into a wide banner) with a plain dark fade for the caption.
+  heroSquareWrap: {
+    width: 178,
+    height: 178,
+    borderRadius: 32,
+    overflow: 'hidden',
+    marginBottom: 18,
+    justifyContent: 'flex-end',
+  },
+  heroSquareImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  heroSquareOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  heroSquareRing: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 32,
+    borderWidth: 4,
+    borderColor: 'rgba(255,255,255,0.85)',
+  },
+  heroSquareBadge: {
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+  },
+  heroSquareBadgeText: {
+    fontSize: 13,
     fontWeight: '900',
     color: '#FFFFFF',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-    marginBottom: 14,
-    textShadowColor: 'rgba(0,0,0,0.2)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textAlign: 'center',
+    lineHeight: 17,
   },
-  // The story's own emoji, shown big — a friendly anchor for the quiz that
-  // doubles as a reminder of which story this is.
+  // The story's own emoji, shown big — fallback anchor for stories with no
+  // banner artwork left to assign.
   emojiBubble: {
     width: 112,
     height: 112,
@@ -256,6 +334,34 @@ const makeStyles = (colors) => StyleSheet.create({
     shadowRadius: 12,
   },
   emojiGlyph: { fontSize: 64, lineHeight: 76, textAlign: 'center' },
+  progressRow: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 18,
+  },
+  progText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginBottom: 8,
+    textShadowColor: 'rgba(0,0,0,0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  progressTrack: {
+    width: '100%',
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.28)',
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+  },
   questionCard: {
     backgroundColor: colors.surface,
     borderRadius: 24,
@@ -264,11 +370,32 @@ const makeStyles = (colors) => StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     marginBottom: 26,
+    overflow: 'hidden',
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
     shadowRadius: 10,
+  },
+  questionCardDecor: {
+    position: 'absolute',
+    top: -30,
+    right: -30,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  questionBadge: {
+    borderRadius: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+  questionBadgeText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 0.4,
   },
   questionText: {
     fontSize: 19,
@@ -281,9 +408,17 @@ const makeStyles = (colors) => StyleSheet.create({
     marginTop: 14,
     alignItems: 'center',
   },
-  optionsContainer: {
+  // 2x2 grid instead of a tall stack — keeps all four options on screen
+  // together (and readable at a glance) instead of forcing a scroll.
+  optionsGrid: {
     width: '100%',
-    gap: 12,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 12,
+  },
+  optionCell: {
+    width: '48%',
   },
   btnRow: {
     width: '100%',

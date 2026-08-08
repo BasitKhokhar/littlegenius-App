@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors } from '../../Context/ThemeContext';
+import { useProgress } from '../../Context';
 import { Fonts } from '../../Theme/fonts';
 import { moduleColors } from '../../Theme/colors';
 import { urduData } from '../../Data/urduData';
@@ -31,7 +32,8 @@ const UrduScreen = ({ navigation, route }) => {
   // everything else is flex, so the detail view always fits without scrolling.
   const scale = Math.min(1.1, Math.max(0.8, winHeight / 800));
   const styles = makeStyles(colors, scale);
-  const [selectedLetter, setSelectedLetter] = useState(null);
+  const { updateLastPosition } = useProgress();
+  const [selectedLetter, setSelectedLetter] = useState(route?.params?.initialIndex ?? null);
   const [sketchOpen, setSketchOpen] = useState(false);
   const letter = selectedLetter !== null ? urduData[selectedLetter] : null;
 
@@ -40,6 +42,12 @@ const UrduScreen = ({ navigation, route }) => {
     return () => {
       SpeechEngine.stop();
     };
+  }, [selectedLetter]);
+
+  // Remember wherever the child stops, so Home's Continue Learning can
+  // resume straight into this letter later.
+  useEffect(() => {
+    if (selectedLetter !== null) updateLastPosition('urdu', selectedLetter);
   }, [selectedLetter]);
 
   // ─── Detail view ──────────────────────────────────────────
@@ -63,6 +71,13 @@ const UrduScreen = ({ navigation, route }) => {
           title={`Haroof - ${letter.name}`}
           showBack={true}
           onBackPress={() => setSelectedLetter(null)}
+          rightAction={
+            <QuizEntryBar
+              compact
+              color={moduleColors.urdu.solid}
+              onPress={() => navigation.navigate('QuizList', { module: 'urdu' })}
+            />
+          }
         />
 
         <View style={styles.stage}>

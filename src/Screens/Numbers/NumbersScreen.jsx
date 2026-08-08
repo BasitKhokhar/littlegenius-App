@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors } from '../../Context/ThemeContext';
+import { useProgress } from '../../Context';
 import { numbersData } from '../../Data/numbersData';
 import { Header } from '../../Components/UI';
 import SpeakButton from '../../Components/Common/SpeakButton';
@@ -16,7 +17,7 @@ import QuizEntryBar from '../../Components/Common/QuizEntryBar';
 import { SketchButton, SketchCanvas } from '../../Components/Educational';
 import SpeechEngine from '../../Utils/speechEngine';
 import { useTabBarClearance } from '../../Hooks';
-import { Radius, Elevation, coloredShadow } from '../../Theme';
+import { Radius, Elevation, coloredShadow, moduleColors } from '../../Theme';
 
 const NumbersScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
@@ -25,7 +26,8 @@ const NumbersScreen = ({ navigation, route }) => {
   // alphabet detail screen's footer nav.
   const detailBottomPad = useTabBarClearance(10);
   const styles = makeStyles(colors);
-  const [selectedIndex, setSelectedIndex] = useState(null);
+  const { updateLastPosition } = useProgress();
+  const [selectedIndex, setSelectedIndex] = useState(route?.params?.initialIndex ?? null);
   const [sketchOpen, setSketchOpen] = useState(false);
   const selectedNum = selectedIndex !== null ? numbersData[selectedIndex] : null;
 
@@ -34,6 +36,12 @@ const NumbersScreen = ({ navigation, route }) => {
     return () => {
       SpeechEngine.stop();
     };
+  }, [selectedIndex]);
+
+  // Remember wherever the child stops, so Home's Continue Learning can
+  // resume straight into this number later.
+  useEffect(() => {
+    if (selectedIndex !== null) updateLastPosition('numbers', selectedIndex);
   }, [selectedIndex]);
 
   const closeDetail = () => {
@@ -59,6 +67,13 @@ const NumbersScreen = ({ navigation, route }) => {
           title={`Number ${selectedNum.number}`}
           showBack={true}
           onBackPress={closeDetail}
+          rightAction={
+            <QuizEntryBar
+              compact
+              color={moduleColors.numbers.solid}
+              onPress={() => navigation.navigate('QuizList', { module: 'numbers' })}
+            />
+          }
         />
 
         <ScrollView

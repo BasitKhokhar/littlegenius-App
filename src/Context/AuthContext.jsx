@@ -7,6 +7,7 @@ import {
   getSessionUser,
   saveSessionUser,
   clearSessionUser,
+  clearOnboardingComplete,
   deleteUserAccount,
 } from '../Utils/secureAuth';
 
@@ -61,6 +62,10 @@ export const AuthProvider = ({ children }) => {
     setStars(0);
     await clearToken();
     await clearSessionUser();
+    // Send the user back through Onboarding + ProfileSetup on next boot,
+    // same as a fresh install — this app has no separate login screen to
+    // return to, so a cleared session must start from the top.
+    await clearOnboardingComplete();
   }, []);
 
   // Permanently removes the account + all associated on-device data.
@@ -75,6 +80,7 @@ export const AuthProvider = ({ children }) => {
     } else {
       await clearToken();
       await clearSessionUser();
+      await clearOnboardingComplete();
     }
   }, [user]);
 

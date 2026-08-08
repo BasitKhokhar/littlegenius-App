@@ -37,7 +37,8 @@ export const ProgressProvider = ({ children }) => {
   const [lessonsCompleted, setLessonsCompleted] = useState(0);
   const [gamesPlayed, setGamesPlayed] = useState(0);
   const [badges, setBadges] = useState([]);
-  const [lastLesson, setLastLesson] = useState(null);
+  const [lastLessons, setLastLessons] = useState({});
+  const [lastPositions, setLastPositions] = useState({});
   const [loading, setLoading] = useState(true);
 
   // Badge evaluation reads the latest counters via a ref so the effect
@@ -52,7 +53,8 @@ export const ProgressProvider = ({ children }) => {
     setLessonsCompleted(0);
     setGamesPlayed(0);
     setBadges([]);
-    setLastLesson(null);
+    setLastLessons({});
+    setLastPositions({});
   };
 
   useEffect(() => {
@@ -69,21 +71,24 @@ export const ProgressProvider = ({ children }) => {
           storedLessons,
           storedGames,
           storedBadges,
-          storedLastLesson,
+          storedLastLessons,
+          storedLastPositions,
         ] = await Promise.all([
           AsyncStorage.getItem(`streak_${user.id}`),
           AsyncStorage.getItem(`xp_${user.id}`),
           AsyncStorage.getItem(`lessonsCompleted_${user.id}`),
           AsyncStorage.getItem(`gamesPlayed_${user.id}`),
           AsyncStorage.getItem(`badges_${user.id}`),
-          AsyncStorage.getItem(`lastLesson_${user.id}`),
+          AsyncStorage.getItem(`lastLessons_${user.id}`),
+          AsyncStorage.getItem(`lastPositions_${user.id}`),
         ]);
         setStreak(storedStreak ? JSON.parse(storedStreak) : DEFAULT_STREAK);
         setXp(storedXp ? parseInt(storedXp, 10) : 0);
         setLessonsCompleted(storedLessons ? parseInt(storedLessons, 10) : 0);
         setGamesPlayed(storedGames ? parseInt(storedGames, 10) : 0);
         setBadges(storedBadges ? JSON.parse(storedBadges) : []);
-        setLastLesson(storedLastLesson ? JSON.parse(storedLastLesson) : null);
+        setLastLessons(storedLastLessons ? JSON.parse(storedLastLessons) : {});
+        setLastPositions(storedLastPositions ? JSON.parse(storedLastPositions) : {});
       } catch (error) {
         console.error('Failed to load progress state:', error);
       } finally {
@@ -127,10 +132,12 @@ export const ProgressProvider = ({ children }) => {
       return next;
     });
     if (mod) {
-      const pointer = { mod, packId, packTitle, ts: Date.now() };
-      setLastLesson(pointer);
-      AsyncStorage.setItem(`lastLesson_${user.id}`, JSON.stringify(pointer)).catch((error) => {
-        console.warn('Failed to save lastLesson:', error);
+      setLastLessons((prev) => {
+        const next = { ...prev, [mod]: { packId, packTitle, ts: Date.now() } };
+        AsyncStorage.setItem(`lastLessons_${user.id}`, JSON.stringify(next)).catch((error) => {
+          console.warn('Failed to save lastLessons:', error);
+        });
+        return next;
       });
     }
   }, [user, touchActivity]);
@@ -146,6 +153,20 @@ export const ProgressProvider = ({ children }) => {
       return next;
     });
   }, [user, touchActivity]);
+
+  // Tracks the last letter/number a child viewed per module (distinct from
+  // lastLessons, which only tracks completed quiz packs), so Home's
+  // Continue Learning can resume browsing exactly where they left off.
+  const updateLastPosition = useCallback((mod, index) => {
+    if (!user || index == null) return;
+    setLastPositions((prev) => {
+      const next = { ...prev, [mod]: { index, ts: Date.now() } };
+      AsyncStorage.setItem(`lastPositions_${user.id}`, JSON.stringify(next)).catch((error) => {
+        console.warn('Failed to save lastPositions:', error);
+      });
+      return next;
+    });
+  }, [user]);
 
   // Badge unlocks are a pure function of the latest stats — re-evaluate
   // whenever any of them change and persist only if something new unlocked.
@@ -170,10 +191,12 @@ export const ProgressProvider = ({ children }) => {
     lessonsCompleted,
     gamesPlayed,
     badges,
-    lastLesson,
+    lastLessons,
+    lastPositions,
     loading,
     recordLessonComplete,
     recordGameComplete,
+    updateLastPosition,
   };
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;

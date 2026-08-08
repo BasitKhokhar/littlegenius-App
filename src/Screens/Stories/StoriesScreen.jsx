@@ -8,27 +8,16 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { storiesData, islamicStoriesData, storyImages } from '../../Data';
+import { storiesData, islamicStoriesData, getStoryHeroImage } from '../../Data';
 import { Header } from '../../Components/UI';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useHideTabBar } from '../../Context/TabBarContext';
 import { useTabBarClearance } from '../../Hooks';
 import { Radius, coloredShadow } from '../../Theme';
 import SpeakButton from '../../Components/Common/SpeakButton';
+import { getStoryAccent } from '../../Utils/storyColors';
 
-const STORY_COLORS = ['#F59E0B', '#EF4444', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
-// One shade darker per accent above, for the card's gradient body.
-const STORY_COLORS_DARK = ['#D97706', '#DC2626', '#059669', '#2563EB', '#7C3AED', '#DB2777'];
-
-// storyImages holds 20 banner illustrations; storiesData only has 18 entries,
-// so every moral story gets one (idx 0-17). The 2 leftover banners (idx
-// 18-19) go to the first two Islamic stories — the rest fall back to the
-// emoji tile since there's no artwork left for them.
-const getStoryImage = (isIslamicList, idx) => {
-  if (!isIslamicList) return idx < storyImages.length ? storyImages[idx] : null;
-  const offset = storiesData.length + idx;
-  return offset < storyImages.length ? storyImages[offset] : null;
-};
+const getStoryImage = (isIslamicList, idx) => getStoryHeroImage(storiesData.length, isIslamicList, idx);
 
 const StoriesScreen = ({ navigation, route }) => {
   const colors = useThemeColors();
@@ -46,8 +35,7 @@ const StoriesScreen = ({ navigation, route }) => {
 
   // ─── Story Detail ──────────────────────────────────────────
   if (selectedStory !== null && story) {
-    const accentColor = STORY_COLORS[selectedStory % STORY_COLORS.length];
-    const accentDark = STORY_COLORS_DARK[selectedStory % STORY_COLORS_DARK.length];
+    const { color: accentColor, dark: accentDark } = getStoryAccent(selectedStory);
     const heroImage = getStoryImage(isIslamic, selectedStory);
     return (
       <View style={styles.container}>
@@ -64,9 +52,14 @@ const StoriesScreen = ({ navigation, route }) => {
           {heroImage ? (
             <View style={[styles.heroImageWrap, coloredShadow(accentColor, 'lg')]}>
               <Image source={heroImage} style={styles.heroImage} resizeMode="cover" />
+              {/* Plain black fade instead of an accent tint — the accent
+                  colour rarely matches the artwork's own palette, so tinting
+                  it just muddies the image. A simple dark gradient keeps the
+                  top of the illustration fully clear and only darkens near
+                  the bottom, enough for the title/moral text to read. */}
               <LinearGradient
-                colors={['transparent', accentColor + 'B3', accentDark]}
-                locations={[0, 0.5, 1]}
+                colors={['transparent', 'rgba(0,0,0,0.05)', 'rgba(0,0,0,0.55)', 'rgba(0,0,0,0.88)']}
+                locations={[0, 0.4, 0.72, 1]}
                 style={styles.heroImageOverlay}
               />
               <View style={styles.heroImageBadge}>
@@ -106,16 +99,23 @@ const StoriesScreen = ({ navigation, route }) => {
 
           {/* Pages */}
           {story.pages.map((page, idx) => (
-            <View key={idx} style={styles.pageCard}>
-              <View style={[styles.pageNumBadge, { backgroundColor: accentColor }]}>
-                <Text style={styles.pageNum}>{idx + 1}</Text>
-              </View>
-              <Text style={styles.pageEmoji}>{page.emoji}</Text>
-              <Text style={styles.pageText}>{page.text}</Text>
-              {page.urduText ? (
-                <Text style={styles.pageUrduText}>{page.urduText}</Text>
-              ) : null}
-              <SpeakButton text={page.text} language="en-US" label="🔊 Read Aloud" color={accentColor} />
+            <View key={idx} style={[styles.pageCardWrap, coloredShadow(accentColor, 'md')]}>
+              <LinearGradient
+                colors={[accentColor + '17', colors.surface, colors.surface]}
+                locations={[0, 0.32, 1]}
+                style={[styles.pageCard, { borderColor: accentColor + '33' }]}
+              >
+                <View style={[styles.pageCardDecor, { backgroundColor: accentColor + '15' }]} pointerEvents="none" />
+                <View style={[styles.pageNumBadge, { backgroundColor: accentColor }, coloredShadow(accentColor, 'sm')]}>
+                  <Text style={styles.pageNum}>{idx + 1}</Text>
+                </View>
+                <Text style={styles.pageEmoji}>{page.emoji}</Text>
+                <Text style={styles.pageText}>{page.text}</Text>
+                {page.urduText ? (
+                  <Text style={[styles.pageUrduText, { borderTopColor: accentColor + '2A' }]}>{page.urduText}</Text>
+                ) : null}
+                <SpeakButton text={page.text} language="en-US" label="🔊 Read Aloud" color={accentColor} />
+              </LinearGradient>
             </View>
           ))}
 
@@ -153,8 +153,7 @@ const StoriesScreen = ({ navigation, route }) => {
             : 'Simple stories for Class 1 • جماعت اول کے لیے آسان کہانیاں'}
         </Text>
         {stories.map((s, idx) => {
-          const cardColor = STORY_COLORS[idx % STORY_COLORS.length];
-          const cardColorDark = STORY_COLORS_DARK[idx % STORY_COLORS_DARK.length];
+          const { color: cardColor, dark: cardColorDark } = getStoryAccent(idx);
           const image = getStoryImage(isIslamic, idx);
           return (
             <TouchableOpacity
@@ -163,63 +162,45 @@ const StoriesScreen = ({ navigation, route }) => {
               onPress={() => setSelectedStory(idx)}
               activeOpacity={0.92}
             >
-                <LinearGradient
-                  colors={[cardColor, cardColorDark]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                 style={[styles.storyCardWrap, coloredShadow(cardColor, 'md')]}
-                >
-              <View style={styles.storyCard}>
-                {/* Banner art / emoji fallback */}
+              <LinearGradient
+                colors={[cardColor, cardColorDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.storyCard}
+              >
+                {/* Anchored to the card's own two rounded corners (top-right,
+                    bottom-right) so they're always clipped in place instead of
+                    floating off the card at arbitrary content heights. */}
+                <View style={styles.storyCardBodyDecorTop} pointerEvents="none" />
+                <View style={styles.storyCardBodyDecorBottom} pointerEvents="none" />
+
+                {/* Left: banner art / emoji fallback */}
                 <View style={styles.storyImageBox}>
                   {image ? (
                     <Image source={image} style={styles.storyImage} resizeMode="cover" />
                   ) : (
-                    <LinearGradient
-                      colors={[cardColor, cardColorDark]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={styles.storyImageFallback}
-                    >
+                    <View style={styles.storyImageFallback}>
                       <Text style={styles.storyCardEmoji}>{s.emoji}</Text>
-                    </LinearGradient>
+                    </View>
                   )}
                   {idx === 0 ? (
                     <View style={styles.featuredBadge}>
-                      <Text style={styles.featuredBadgeText}>⭐ Featured</Text>
+                      <Text style={styles.featuredBadgeText}>⭐</Text>
                     </View>
                   ) : null}
                 </View>
 
-                {/* Colour body */}
-                <LinearGradient
-                  colors={[cardColor, cardColorDark]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.storyCardBody}
-                >
-                  {/* Anchored to the body's own two rounded corners (top-right,
-                      bottom-right) so they're always clipped in place instead of
-                      floating off the card at arbitrary text heights. */}
-                  <View style={styles.storyCardBodyDecorTop} pointerEvents="none" />
-                  <View style={styles.storyCardBodyDecorBottom} pointerEvents="none" />
-
-                  <View style={styles.storyInfo}>
-                    <Text style={styles.storyCardTitle} numberOfLines={1}>{s.title}</Text>
-                    {s.urduTitle ? (
-                      <Text style={styles.storyCardUrduTitle} numberOfLines={1}>{s.urduTitle}</Text>
-                    ) : null}
-                    <Text style={styles.storyCardMoral} numberOfLines={2}>💡 {s.moral}</Text>
-                    <View style={styles.readTimeBadge}>
-                      <Text style={styles.readTimeText}>🕐 {s.readTime}</Text>
-                    </View>
+                {/* Right: title (EN + UR), moral, timer */}
+                <View style={styles.storyInfo}>
+                  <Text style={styles.storyCardTitle} numberOfLines={1}>{s.title}</Text>
+                  {s.urduTitle ? (
+                    <Text style={styles.storyCardUrduTitle} numberOfLines={1}>{s.urduTitle}</Text>
+                  ) : null}
+                  <Text style={styles.storyCardMoral} numberOfLines={2}>💡 {s.moral}</Text>
+                  <View style={styles.readTimeBadge}>
+                    <Text style={styles.readTimeText}>🕐 {s.readTime}</Text>
                   </View>
-                </LinearGradient>
-
-                <View style={styles.storyPlayBtn}>
-                  <Text style={[styles.storyPlayIcon, { color: cardColor }]}>▶</Text>
                 </View>
-              </View>
               </LinearGradient>
             </TouchableOpacity>
           );
@@ -253,16 +234,21 @@ const makeStyles = (colors) => StyleSheet.create({
     borderRadius: Radius.xl,
     marginBottom: 18,
   },
+  // Outer wrapper = the gradient itself, padded 12 on every side, with the
+  // image on the left and title/moral/timer content on the right.
   storyCard: {
     flexDirection: 'row',
-    height: 132,
+    alignItems: 'center',
     borderRadius: Radius.xl,
-    backgroundColor: colors.surface,
+    padding: 12,
     overflow: 'hidden',
   },
   storyImageBox: {
-    width: 132,
-    height: '100%',
+    width: 110,
+    height: 110,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginRight: 12,
   },
   storyImage: {
     width: '100%',
@@ -273,30 +259,21 @@ const makeStyles = (colors) => StyleSheet.create({
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.18)',
   },
   featuredBadge: {
     position: 'absolute',
-    top: 10,
-    left: 10,
+    top: 6,
+    left: 6,
     backgroundColor: 'rgba(0,0,0,0.55)',
     borderRadius: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingVertical: 2,
+    paddingHorizontal: 5,
   },
   featuredBadgeText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#FFF',
-    letterSpacing: 0.2,
+    fontSize: 11,
   },
-  storyCardBody: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    overflow: 'hidden',
-  },
-  // Soft translucent bubbles tucked in the body's own two corners — the
+  // Soft translucent bubbles tucked in the card's own two corners — the
   // "light colour bubble" accent. Sized/placed to sit fully inside the
   // card's rounded top-right / bottom-right corners rather than floating
   // off the edge or landing mid-card.
@@ -318,8 +295,8 @@ const makeStyles = (colors) => StyleSheet.create({
     borderRadius: 28,
     backgroundColor: 'rgba(255,255,255,0.10)',
   },
-  storyCardEmoji: { fontSize: 34 },
-  storyInfo: { flex: 1, paddingRight: 44 },
+  storyCardEmoji: { fontSize: 30 },
+  storyInfo: { flex: 1 },
   storyCardTitle: {
     fontSize: 16,
     fontWeight: '900',
@@ -355,28 +332,6 @@ const makeStyles = (colors) => StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  storyPlayBtn: {
-    position: 'absolute',
-    right: 14,
-    top: '50%',
-    marginTop: -22,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 4,
-    shadowColor: '#1E1B4B',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-  },
-  storyPlayIcon: {
-    fontSize: 15,
-    fontWeight: '900',
-    marginLeft: 2,
-  },
 
   // Story detail
   storyContent: {
@@ -384,7 +339,7 @@ const makeStyles = (colors) => StyleSheet.create({
     paddingTop: 16,
   },
   heroImageWrap: {
-    height: 300,
+    height: 360,
     borderRadius: 28,
     marginBottom: 20,
     overflow: 'hidden',
@@ -488,24 +443,29 @@ const makeStyles = (colors) => StyleSheet.create({
     lineHeight: 22,
     marginTop: 6,
   },
+  pageCardWrap: {
+    borderRadius: 22,
+    marginBottom: 14,
+  },
   pageCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    padding: 18,
     alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#1E1B4B',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
+    overflow: 'hidden',
+  },
+  pageCardDecor: {
+    position: 'absolute',
+    top: -26,
+    right: -26,
+    width: 92,
+    height: 92,
+    borderRadius: 46,
   },
   pageNumBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,

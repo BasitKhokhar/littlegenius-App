@@ -16,6 +16,9 @@ import { SectionHeader, Badge, TopicCard } from '../../Components/Common';
 import { ColoringPreview } from '../../Components/Games';
 import { gamesList } from '../../Data/gamesData';
 import { MODULES } from '../../Data/modulesData';
+import { alphabetData } from '../../Data/alphabetData';
+import { urduData } from '../../Data/urduData';
+import { numbersData } from '../../Data/numbersData';
 import { useAuth, useProgress } from '../../Context';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
@@ -32,6 +35,8 @@ import {
 const MODULE_CARD_WIDTH = 158;
 // Quick-play card — fixed width for its horizontal slider.
 const QUICK_CARD_WIDTH = 300;
+// Continue-learning card — fixed width for its horizontal slider.
+const CONTINUE_CARD_WIDTH = 300;
 // Streak card floats half-over the hero card's bottom edge, half below it.
 const STREAK_CARD_OVERLAP = 34;
 
@@ -45,6 +50,12 @@ const tap = () => Haptics.selectionAsync().catch(() => {});
 // A streak day target is a display goal, not persisted user data — it stays
 // a local UI constant. Real streak count comes from ProgressContext.
 const STREAK_GOAL = 7;
+
+// Stories isn't one of the MODULES entries (it's a separate top-level nav
+// destination), so it needs its own display descriptor to appear in the
+// Continue Learning row. `moduleColors.stories` already exists in Theme, so
+// ContinueLearningCard's existing colour lookup resolves it for free.
+const STORY_TRACK = { mod: 'stories', icon: '📚', name: 'Story Time' };
 
 const WORLD_CATEGORIES = [
   { key: 'animals', name: 'Animals', icon: '🦁', count: 26, color: '#F59E0B' },
@@ -67,19 +78,19 @@ const QUICK_ACTIONS = ['ColoringBook', 'DrawingBoard', 'TracingWorksheet', 'Lett
   .filter(Boolean);
 const FEATURED_QUICK_ROUTE = 'ColoringBook';
 
-// Learning-module tile — a soft tint of the module's own accent colour
-// (icon badge, tag, chevron) on a near-white card, the same "premium
-// pastel" idiom TopicCard's tile variant already uses for Explore My
-// World. Replaces the old fully-saturated gradient block, which read as
-// a single loud colour (red for English ABC) rather than in-theme.
+// Learning-module tile — a deep, saturated gradient in the module's own
+// hue (icon badge, tag, chevron all sit on it in light/glass treatments),
+// same "premium dark card" idiom as the hero/quick-play gradient cards.
+// Every card shares one fixed height (see makeModuleStyles) regardless of
+// how much its name/description text wraps, so the row reads as one
+// consistent set of tiles rather than a ragged skyline.
 const ModuleCard = ({ module, onPress, delay }) => {
-  const colors = useThemeColors();
   const scale = useRef(new Animated.Value(0.92)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const press = useRef(new Animated.Value(1)).current;
   const m = moduleColors[module.mod];
   const accent = m.solid;
-  const s = makeModuleStyles(colors, accent);
+  const s = makeModuleStyles(accent);
 
   useEffect(() => {
     Animated.sequence([
@@ -100,21 +111,22 @@ const ModuleCard = ({ module, onPress, delay }) => {
         onPressOut={() => Animated.spring(press, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }).start()}
         style={coloredShadow(accent, 'md')}
       >
-        <LinearGradient colors={[accent + '2A', accent + '0A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.moduleCard}>
-          <View style={[styles.moduleBlobDecor, { backgroundColor: accent + '16' }]} pointerEvents="none" />
+        <LinearGradient colors={[m.from, m.to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.moduleCard}>
+          <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.moduleSheen} />
+          <View style={styles.moduleBlobDecor} pointerEvents="none" />
 
           <View style={styles.moduleTopRow}>
-            <Badge label={module.badge} tone="solid" color={accent + '1C'} textColor={accent} />
-            <View style={s.moduleArrow}>
-              <Ionicons name="chevron-forward" size={14} color={accent} />
+            <Badge label={module.badge} tone="glass" />
+            <View style={styles.moduleArrow}>
+              <Ionicons name="chevron-forward" size={14} color="#FFFFFF" />
             </View>
           </View>
-          <LinearGradient colors={[accent + '3D', accent + '1A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.moduleIconBadge}>
+          <View style={styles.moduleIconBadge}>
             <Text style={styles.moduleIcon}>{module.icon}</Text>
-          </LinearGradient>
+          </View>
           <View style={styles.moduleInfo}>
-            <Text style={s.moduleName}>{module.name}</Text>
-            <Text style={s.moduleDescription}>{module.description}</Text>
+            <Text style={styles.moduleName} numberOfLines={1}>{module.name}</Text>
+            <Text style={styles.moduleDescription} numberOfLines={2}>{module.description}</Text>
           </View>
         </LinearGradient>
       </TouchableOpacity>
@@ -275,7 +287,7 @@ const StatTile = ({ stat, delay }) => {
 
 const HomeScreen = ({ navigation }) => {
   const { user, stars } = useAuth();
-  const { streak, xp, lessonsCompleted, gamesPlayed, badges, lastLesson } = useProgress();
+  const { streak, xp, lessonsCompleted, gamesPlayed, badges, lastLessons, lastPositions } = useProgress();
   const colors = useThemeColors();
   const bottomPad = useTabBarClearance();
   const userProfile = user || { name: 'Superstar', avatar: '🦁' };
@@ -287,18 +299,87 @@ const HomeScreen = ({ navigation }) => {
 
   const s = makeStyles(colors);
 
-  // Continue Learning — resolve the real last-completed-quiz pointer against
-  // MODULES for display; a brand-new player (no completions yet) gets a
-  // "start here" prompt instead of a fabricated in-progress lesson.
-  const lastModule = lastLesson && MODULES.find((m) => m.mod === lastLesson.mod);
+  // Continue Learning — one resume card per section the player has either
+  // completed a quiz in or been browsing letters/numbers in (module quizzes,
+  // story quizzes, and alphabet/urdu/numbers browsing progress), most-recent
+  // signal wins per module, most-recent-first overall — so Home can offer a
+  // way back into every in-progress section instead of just whichever one
+  // happened to be touched last. A brand-new player (no activity yet) gets a
+  // single "start here" prompt instead.
   const firstModule = MODULES[0];
-  const continueLesson = lastModule
-    ? { title: lastModule.name, subtitle: `Last played: ${lastLesson.packTitle}`, mod: lastModule.mod, icon: lastModule.icon }
-    : { title: 'Start your first lesson!', subtitle: `Begin with ${firstModule.name}`, mod: firstModule.mod, icon: firstModule.icon };
-  const goToContinueLesson = () => {
+
+  const positionLabel = (mod, index) => {
+    if (mod === 'alphabet') return alphabetData[index]?.letter;
+    if (mod === 'urdu') return urduData[index]?.name;
+    if (mod === 'numbers') return numbersData[index] ? String(numbersData[index].number) : null;
+    return null;
+  };
+
+  const lessonEntries = Object.entries(lastLessons)
+    .map(([mod, entry]) => {
+      const track = mod === STORY_TRACK.mod ? STORY_TRACK : MODULES.find((m) => m.mod === mod);
+      if (!track) return null;
+      return {
+        key: mod,
+        mod,
+        icon: track.icon,
+        title: track.name,
+        subtitle: `Last played: ${entry.packTitle}`,
+        packId: entry.packId,
+        ts: entry.ts,
+      };
+    })
+    .filter(Boolean);
+
+  // Browsing progress replaces the quiz-based entry for a module whenever
+  // the child viewed a letter/number more recently than they last completed
+  // a quiz pack there — resolved below by comparing timestamps per module.
+  const positionEntries = Object.entries(lastPositions)
+    .map(([mod, entry]) => {
+      const track = MODULES.find((m) => m.mod === mod);
+      if (!track) return null;
+      return {
+        key: mod,
+        mod,
+        icon: track.icon,
+        title: track.name,
+        subtitle: `Continue from ${positionLabel(mod, entry.index) || 'where you left off'}`,
+        resumeIndex: entry.index,
+        ts: entry.ts,
+      };
+    })
+    .filter(Boolean);
+
+  const latestPerMod = new Map();
+  [...lessonEntries, ...positionEntries].forEach((entry) => {
+    const existing = latestPerMod.get(entry.mod);
+    if (!existing || entry.ts > existing.ts) latestPerMod.set(entry.mod, entry);
+  });
+  const continueEntries = Array.from(latestPerMod.values()).sort((a, b) => b.ts - a.ts);
+
+  if (continueEntries.length === 0) {
+    continueEntries.push({
+      key: firstModule.mod,
+      mod: firstModule.mod,
+      icon: firstModule.icon,
+      title: 'Start your first lesson!',
+      subtitle: `Begin with ${firstModule.name}`,
+      packId: null,
+    });
+  }
+
+  const goToContinueEntry = (entry) => {
     tap();
-    if (lastModule) navigation.navigate('ModuleQuiz', { module: lastLesson.mod, packId: lastLesson.packId });
-    else navigation.navigate(firstModule.screen, firstModule.params);
+    if (entry.resumeIndex != null) {
+      const track = MODULES.find((m) => m.mod === entry.mod);
+      navigation.navigate(track.screen, { initialIndex: entry.resumeIndex });
+    } else if (entry.packId == null) {
+      navigation.navigate(firstModule.screen, firstModule.params);
+    } else if (entry.mod === STORY_TRACK.mod) {
+      navigation.navigate('StoryQuiz', { story: entry.packId });
+    } else {
+      navigation.navigate('ModuleQuiz', { module: entry.mod, packId: entry.packId });
+    }
   };
 
   const stats = [
@@ -402,9 +483,24 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        {/* Continue Learning */}
+        {/* Continue Learning — horizontally scrolling row, one card per
+            in-progress section, same idiom as Learning Modules/Quick Play. */}
         <SectionHeader emoji="▶️" title="Continue Learning" />
-        <ContinueLearningCard lesson={continueLesson} onPress={goToContinueLesson} />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          snapToInterval={CONTINUE_CARD_WIDTH + Spacing.md}
+          snapToAlignment="start"
+          style={styles.continueScroll}
+          contentContainerStyle={styles.continueScrollContent}
+        >
+          {continueEntries.map((entry) => (
+            <View key={entry.key} style={styles.continueCardWrapper}>
+              <ContinueLearningCard lesson={entry} onPress={() => goToContinueEntry(entry)} />
+            </View>
+          ))}
+        </ScrollView>
 
         {/* Explore My World */}
         <SectionHeader
@@ -489,43 +585,22 @@ const makeStyles = (colors) =>
     heroStreakCount: { ...textStyles.caption, color: colors.textMuted },
   });
 
-// Theme + per-module-accent styles — a light tint of the module's own
-// colour rather than a solid saturated block (see ModuleCard above).
-const makeModuleStyles = (colors, accent) =>
+// Per-module-accent styles — just the card's own glow border, sized off
+// its accent colour. Everything else about the dark-gradient card is
+// theme-independent (see static `styles` below) since the gradient itself
+// already sets the whole colour story.
+const makeModuleStyles = (accent) =>
   StyleSheet.create({
     moduleCard: {
-      backgroundColor: colors.surface,
       borderRadius: Radius.xl,
       paddingVertical: Spacing.lg,
       paddingHorizontal: Spacing.lg,
-      minHeight: 174,
+      height: 186,
       justifyContent: 'space-between',
       overflow: 'hidden',
       borderWidth: 1,
-      borderColor: accent + '28',
+      borderColor: accent + '4A',
     },
-    moduleArrow: {
-      width: 26,
-      height: 26,
-      borderRadius: 13,
-      backgroundColor: accent + '1A',
-      borderWidth: 1,
-      borderColor: accent + '2E',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    moduleIconBadge: {
-      width: 56,
-      height: 56,
-      borderRadius: Radius.md,
-      borderWidth: 1,
-      borderColor: accent + '3A',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: Spacing.sm,
-    },
-    moduleName: { ...textStyles.title, color: colors.textPrimary, marginBottom: 2 },
-    moduleDescription: { ...textStyles.caption, color: colors.textSecondary },
   });
 
 const makeContinueStyles = (colors, accent) =>
@@ -539,7 +614,6 @@ const makeContinueStyles = (colors, accent) =>
       borderColor: accent + '26',
       padding: Spacing.lg,
       gap: Spacing.md,
-      marginBottom: Spacing.xxl,
       overflow: 'hidden',
     },
     iconTile: {
@@ -688,9 +762,33 @@ const styles = StyleSheet.create({
   modulesScroll: { marginBottom: Spacing.xxl },
   modulesScrollContent: { gap: Spacing.md, paddingRight: Spacing.lg, paddingBottom: Spacing.sm, paddingTop: 2 },
   moduleCardWrapper: { width: MODULE_CARD_WIDTH },
+  moduleSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%' },
   moduleTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  moduleArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.22)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  moduleIconBadge: {
+    width: 56,
+    height: 56,
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Spacing.sm,
+  },
   moduleIcon: { fontSize: 28, lineHeight: 34, textAlign: 'center' },
   moduleInfo: { marginTop: Spacing.sm },
+  moduleName: { ...textStyles.title, color: '#FFFFFF', marginBottom: 2 },
+  moduleDescription: { ...textStyles.caption, color: 'rgba(255,255,255,0.76)', lineHeight: 15 },
   // Soft decorative circle for depth, tucked behind the card content.
   moduleBlobDecor: {
     position: 'absolute',
@@ -699,6 +797,7 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
 
   // Explore My World — single horizontally-scrolling row. TopicCard owns
@@ -711,6 +810,12 @@ const styles = StyleSheet.create({
   // Continue Learning — glossy highlight on the icon tile, same idiom
   // as the hero/quick-play gradient cards.
   continueIconSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '55%' },
+
+  // Continue Learning — horizontally-scrolling row of fixed-width cards,
+  // same pattern as modulesScroll/quickScroll.
+  continueScroll: { marginBottom: Spacing.xxl },
+  continueScrollContent: { gap: Spacing.md, paddingRight: Spacing.lg, paddingBottom: Spacing.sm, paddingTop: 2 },
+  continueCardWrapper: { width: CONTINUE_CARD_WIDTH },
 
   // Quick Play — horizontally-scrolling slider of fixed-width rectangular
   // cards (see QuickPlayCard). paddingBottom/Top clear room for the card's

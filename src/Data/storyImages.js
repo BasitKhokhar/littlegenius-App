@@ -24,4 +24,15 @@ const storyImages = [
   require('../../assets/stories/story20.png'),
 ];
 
+// storyImages holds 20 banner illustrations; the moral-stories list only has
+// `storiesLength` entries, so every moral story gets one banner (idx 0 up to
+// storiesLength-1). Leftover banners after that go to the first few Islamic
+// stories in order — the rest fall back to the emoji tile since there's no
+// artwork left for them.
+export const getStoryHeroImage = (storiesLength, isIslamic, idx) => {
+  if (!isIslamic) return idx < storyImages.length ? storyImages[idx] : null;
+  const offset = storiesLength + idx;
+  return offset < storyImages.length ? storyImages[offset] : null;
+};
+
 export default storyImages;

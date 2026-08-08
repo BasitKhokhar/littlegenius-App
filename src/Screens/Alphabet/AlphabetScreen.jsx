@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useThemeColors } from '../../Context/ThemeContext';
+import { useProgress } from '../../Context';
 import { moduleColors } from '../../Theme/colors';
 import { alphabetData } from '../../Data/alphabetData';
 import { Header } from '../../Components/UI';
@@ -31,7 +32,8 @@ const AlphabetScreen = ({ navigation, route }) => {
   // or very tall devices.
   const scale = Math.min(1.1, Math.max(0.8, winHeight / 800));
   const styles = makeStyles(colors, scale);
-  const [selectedLetter, setSelectedLetter] = useState(null);
+  const { updateLastPosition } = useProgress();
+  const [selectedLetter, setSelectedLetter] = useState(route?.params?.initialIndex ?? null);
   const [sketchOpen, setSketchOpen] = useState(false);
   const letter = selectedLetter !== null ? alphabetData[selectedLetter] : null;
 
@@ -40,6 +42,12 @@ const AlphabetScreen = ({ navigation, route }) => {
     return () => {
       SpeechEngine.stop();
     };
+  }, [selectedLetter]);
+
+  // Remember wherever the child stops, so Home's Continue Learning can
+  // resume straight into this letter later.
+  useEffect(() => {
+    if (selectedLetter !== null) updateLastPosition('alphabet', selectedLetter);
   }, [selectedLetter]);
 
   // ─── Detail view ──────────────────────────────────────────
@@ -65,6 +73,13 @@ const AlphabetScreen = ({ navigation, route }) => {
           title={`Letter ${upper}`}
           showBack={true}
           onBackPress={() => setSelectedLetter(null)}
+          rightAction={
+            <QuizEntryBar
+              compact
+              color={moduleColors.alphabet.solid}
+              onPress={() => navigation.navigate('QuizList', { module: 'alphabet' })}
+            />
+          }
         />
 
         <View style={styles.stage}>

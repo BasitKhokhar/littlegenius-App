@@ -11,7 +11,7 @@ import { Animated, Text, TouchableOpacity, StyleSheet } from 'react-native';
 //
 //   state: 'idle' | 'correct' | 'wrong' | 'dim'
 // ──────────────────────────────────────────────────────────────
-const QuizOptionButton = ({ label, state = 'idle', onPress, colors, disabled }) => {
+const QuizOptionButton = ({ label, state = 'idle', onPress, colors, disabled, compact = false }) => {
   const scale = useRef(new Animated.Value(1)).current;
   const shake = useRef(new Animated.Value(0)).current;
 
@@ -57,9 +57,14 @@ const QuizOptionButton = ({ label, state = 'idle', onPress, colors, disabled }) 
         onPressIn={pressIn}
         onPressOut={pressOut}
         onPress={onPress}
-        style={[styles.optionBtn, stateStyle]}
+        style={[styles.optionBtn, compact && styles.optionBtnCompact, stateStyle]}
       >
-        <Text style={[styles.optionText, isFilled && styles.optionTextFilled]}>{label}</Text>
+        <Text
+          style={[styles.optionText, compact && styles.optionTextCompact, isFilled && styles.optionTextFilled]}
+          numberOfLines={compact ? 3 : undefined}
+        >
+          {label}
+        </Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -87,6 +92,18 @@ const makeStyles = (colors) =>
       textAlign: 'center',
     },
     optionTextFilled: { color: '#FFFFFF' },
+    // 2x2 grid tile — shorter and squarer than the full-width bar so four
+    // options fit two-per-row without shrinking the tap target too much.
+    optionBtnCompact: {
+      minHeight: 96,
+      paddingVertical: 14,
+      paddingHorizontal: 12,
+      justifyContent: 'center',
+    },
+    optionTextCompact: {
+      fontSize: 15,
+      lineHeight: 20,
+    },
   });
 
 export default QuizOptionButton;
