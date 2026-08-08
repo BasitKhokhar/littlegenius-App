@@ -4,8 +4,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Text,
+  Image,
   StyleSheet,
-  Dimensions,
   Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,7 +13,9 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Header } from '../../Components/UI';
 import { SectionHeader, Badge, TopicCard } from '../../Components/Common';
-import { useAuth } from '../../Context';
+import { gamesList } from '../../Data/gamesData';
+import { MODULES } from '../../Data/modulesData';
+import { useAuth, useProgress } from '../../Context';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
 import {
@@ -25,24 +27,21 @@ import {
   moduleColors,
 } from '../../Theme';
 
-const { width } = Dimensions.get('window');
+// Learning-module card — fixed width for the horizontal scroll row.
+const MODULE_CARD_WIDTH = 158;
+// Streak card floats half-over the hero card's bottom edge, half below it.
+const STREAK_CARD_OVERLAP = 34;
 
-// Shared glossy top-highlight, reused (at different heights) on the hero,
-// module and quick-play gradient cards — same idiom as PremiumTabBar's
-// circleSheen, just white since these cards already sit on saturated colour.
+// Shared glossy top-highlight, reused on the hero and quick-play gradient
+// cards — same idiom as PremiumTabBar's circleSheen, just white since
+// these cards sit on saturated colour (module cards are tinted-light now).
 const SHEEN_COLORS = ['rgba(255,255,255,0.16)', 'rgba(255,255,255,0)'];
 
 const tap = () => Haptics.selectionAsync().catch(() => {});
 
-const MODULES = [
-  { id: 1, name: 'English ABC', icon: '🔤', description: '26 Letters • 130 Words', mod: 'alphabet', screen: 'Alphabet', badge: 'LEARN' },
-  { id: 2, name: 'Urdu Haroof', icon: 'اب', description: '34 Sound Cards', mod: 'urdu', screen: 'Urdu', badge: 'اردو' },
-  { id: 3, name: 'Numbers 1–100', icon: '🔢', description: 'Count & Shapes', mod: 'numbers', screen: 'Numbers', badge: '123' },
-  { id: 4, name: 'Islamic Studies', icon: '🕌', description: 'Duas • 99 Names • Salah', mod: 'islamic', screen: 'Islamic', badge: 'DEEN' },
-  { id: 5, name: 'My Pakistan', icon: '🇵🇰', description: 'Symbols • Provinces • Heroes', mod: 'pakistan', screen: 'Pakistan', badge: 'GK' },
-  { id: 6, name: 'My World', icon: '🌍', description: 'Animals • Birds • Fruits', mod: 'world', screen: 'Learn', params: { moduleKey: 'world' }, badge: 'GK' },
-  { id: 7, name: 'Good Habits', icon: '🌟', description: 'Manners • Cleanliness • Safety', mod: 'habits', screen: 'Learn', params: { moduleKey: 'habits' }, badge: 'LIFE' },
-];
+// A streak day target is a display goal, not persisted user data — it stays
+// a local UI constant. Real streak count comes from ProgressContext.
+const STREAK_GOAL = 7;
 
 const WORLD_CATEGORIES = [
   { key: 'animals', name: 'Animals', icon: '🦁', count: 26, color: '#F59E0B' },
@@ -54,36 +53,26 @@ const WORLD_CATEGORIES = [
   { key: 'colors', name: 'Colors', icon: '🎨', count: 20, color: '#8B5CF6' },
 ];
 
-// Explore My World is always 3 up. Rows are built explicitly instead of
-// letting flexWrap decide: a computed 1/3 width is fractional, and on some
-// densities each card rounds up just enough that the third one wraps and
-// leaves a dead column on the right.
-const CAT_COLUMNS = 3;
+// Quick Play surfaces the two most kid-friendly creative games straight
+// from the real games catalog (not a hand-duplicated list), so the copy,
+// icon and route stay in sync with the Games screen automatically.
+const QUICK_ACTIONS = ['ColoringBook', 'DrawingBoard']
+  .map((route) => gamesList.find((g) => g.route === route))
+  .filter(Boolean);
 
-const chunk = (arr, size) => {
-  const rows = [];
-  for (let i = 0; i < arr.length; i += size) rows.push(arr.slice(i, i + size));
-  return rows;
-};
-
-const QUICK_ACTIONS = [
-  { name: 'Stories', icon: '📚', mod: 'stories', screen: 'Stories' },
-  { name: 'IQ Games', icon: '🧠', mod: 'games', screen: 'Games' },
-];
-
-const getTimeGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good Morning';
-  if (hour < 17) return 'Good Afternoon';
-  if (hour < 21) return 'Good Evening';
-  return 'Good Night';
-};
-
+// Learning-module tile — a soft tint of the module's own accent colour
+// (icon badge, tag, chevron) on a near-white card, the same "premium
+// pastel" idiom TopicCard's tile variant already uses for Explore My
+// World. Replaces the old fully-saturated gradient block, which read as
+// a single loud colour (red for English ABC) rather than in-theme.
 const ModuleCard = ({ module, onPress, delay }) => {
+  const colors = useThemeColors();
   const scale = useRef(new Animated.Value(0.92)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const press = useRef(new Animated.Value(1)).current;
   const m = moduleColors[module.mod];
+  const accent = m.solid;
+  const s = makeModuleStyles(colors, accent);
 
   useEffect(() => {
     Animated.sequence([
@@ -102,22 +91,23 @@ const ModuleCard = ({ module, onPress, delay }) => {
         onPress={onPress}
         onPressIn={() => Animated.spring(press, { toValue: Motion.pressScale, useNativeDriver: true, ...Motion.spring.soft }).start()}
         onPressOut={() => Animated.spring(press, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }).start()}
-        style={coloredShadow(m.solid, 'md')}
+        style={coloredShadow(accent, 'md')}
       >
-        <LinearGradient colors={[m.from, m.to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.moduleCard}>
-          <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.moduleSheen} />
+        <LinearGradient colors={[accent + '2A', accent + '0A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.moduleCard}>
+          <View style={[styles.moduleBlobDecor, { backgroundColor: accent + '16' }]} pointerEvents="none" />
+
           <View style={styles.moduleTopRow}>
-            <Badge label={module.badge} tone="glass" style={styles.glassBorder} />
+            <Badge label={module.badge} tone="solid" color={accent + '1C'} textColor={accent} />
+            <View style={s.moduleArrow}>
+              <Ionicons name="chevron-forward" size={14} color={accent} />
+            </View>
           </View>
-          <View style={styles.moduleIconBadge}>
+          <LinearGradient colors={[accent + '3D', accent + '1A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.moduleIconBadge}>
             <Text style={styles.moduleIcon}>{module.icon}</Text>
-          </View>
+          </LinearGradient>
           <View style={styles.moduleInfo}>
-            <Text style={styles.moduleName}>{module.name}</Text>
-            <Text style={styles.moduleDescription}>{module.description}</Text>
-          </View>
-          <View style={styles.moduleArrow}>
-            <Ionicons name="chevron-forward" size={16} color="#FFFFFF" />
+            <Text style={s.moduleName}>{module.name}</Text>
+            <Text style={s.moduleDescription}>{module.description}</Text>
           </View>
         </LinearGradient>
       </TouchableOpacity>
@@ -125,8 +115,99 @@ const ModuleCard = ({ module, onPress, delay }) => {
   );
 };
 
+// Plain track+fill progress bar — same idiom as Onboarding.jsx's
+// progressTrack/progressFill (no gradient, just a themed solid fill).
+// Shared by the hero's streak card and the Continue Learning card.
+const ProgressBar = ({ value, max, trackColor, fillColor }) => {
+  const colors = useThemeColors();
+  const pct = Math.max(0, Math.min(100, Math.round((value / max) * 100)));
+  return (
+    <View style={[progressStyles.track, { backgroundColor: trackColor || colors.surfaceSunken }]}>
+      <View style={[progressStyles.fill, { width: `${pct}%`, backgroundColor: fillColor || colors.primary }]} />
+    </View>
+  );
+};
+
+const progressStyles = StyleSheet.create({
+  track: { height: 8, borderRadius: 4, overflow: 'hidden' },
+  fill: { height: 8, borderRadius: 4 },
+});
+
+// No per-lesson-content completion tracking exists anywhere in the app
+// (confirmed: nothing records progress through a topic's letters/items), so
+// this shows what's actually known — the last completed quiz pack, or a
+// "get started" prompt for a brand-new player — never a fabricated percentage.
+const ContinueLearningCard = ({ lesson, onPress }) => {
+  const colors = useThemeColors();
+  const m = moduleColors[lesson.mod];
+  const s = makeContinueStyles(colors, m.solid);
+
+  return (
+    <TouchableOpacity activeOpacity={0.92} onPress={onPress} style={coloredShadow(m.solid, 'md')}>
+      <View style={s.card}>
+        <LinearGradient
+          colors={[m.solid + '14', m.solid + '00']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0.6 }}
+          style={StyleSheet.absoluteFillObject}
+          pointerEvents="none"
+        />
+
+        <LinearGradient colors={[m.from, m.to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.iconTile}>
+          <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.continueIconSheen} />
+          <Text style={s.iconGlyph}>{lesson.icon}</Text>
+        </LinearGradient>
+
+        <View style={s.body}>
+          <Text style={s.kicker}>▶ RESUME</Text>
+          <Text style={s.title} numberOfLines={1}>{lesson.title}</Text>
+          <Text style={s.subtitle} numberOfLines={1}>{lesson.subtitle}</Text>
+        </View>
+
+        <View style={[s.continueBtn, { backgroundColor: m.solid }]}>
+          <Ionicons name="play" size={12} color="#FFFFFF" />
+          <Text style={s.continueBtnText}>Continue</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const StatTile = ({ stat, delay }) => {
+  const colors = useThemeColors();
+  const s = makeStatStyles(colors);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(10)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.delay(delay),
+      Animated.parallel([
+        Animated.timing(opacity, { toValue: 1, ...Motion.timing.base, useNativeDriver: true }),
+        Animated.timing(translateY, { toValue: 0, ...Motion.timing.base, useNativeDriver: true }),
+      ]),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View style={[s.tile, coloredShadow(stat.color, 'sm'), { opacity, transform: [{ translateY }] }]}>
+      <LinearGradient
+        colors={[stat.color + '26', stat.color + '0C']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.statIconBadge, { borderColor: stat.color + '2E' }]}
+      >
+        <Text style={styles.statIcon}>{stat.icon}</Text>
+      </LinearGradient>
+      <Text style={s.value}>{stat.value}</Text>
+      <Text style={s.label}>{stat.label}</Text>
+    </Animated.View>
+  );
+};
+
 const HomeScreen = ({ navigation }) => {
   const { user, stars } = useAuth();
+  const { streak, xp, lessonsCompleted, gamesPlayed, badges, lastLesson } = useProgress();
   const colors = useThemeColors();
   const bottomPad = useTabBarClearance();
   const userProfile = user || { name: 'Superstar', avatar: '🦁' };
@@ -138,45 +219,111 @@ const HomeScreen = ({ navigation }) => {
 
   const s = makeStyles(colors);
 
+  // Continue Learning — resolve the real last-completed-quiz pointer against
+  // MODULES for display; a brand-new player (no completions yet) gets a
+  // "start here" prompt instead of a fabricated in-progress lesson.
+  const lastModule = lastLesson && MODULES.find((m) => m.mod === lastLesson.mod);
+  const firstModule = MODULES[0];
+  const continueLesson = lastModule
+    ? { title: lastModule.name, subtitle: `Last played: ${lastLesson.packTitle}`, mod: lastModule.mod, icon: lastModule.icon }
+    : { title: 'Start your first lesson!', subtitle: `Begin with ${firstModule.name}`, mod: firstModule.mod, icon: firstModule.icon };
+  const goToContinueLesson = () => {
+    tap();
+    if (lastModule) navigation.navigate('ModuleQuiz', { module: lastLesson.mod, packId: lastLesson.packId });
+    else navigation.navigate(firstModule.screen, firstModule.params);
+  };
+
+  const stats = [
+    { icon: '⚡', value: String(xp), label: 'Total XP', color: '#F59E0B' },
+    { icon: '📖', value: String(lessonsCompleted), label: 'Lessons', color: '#6366F1' },
+    { icon: '🎮', value: String(gamesPlayed), label: 'Games', color: '#8B5CF6' },
+    { icon: '🏅', value: String(badges.length), label: 'Badges', color: '#EC4899' },
+  ];
+
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <Header title="Little Genius" avatar={userProfile.avatar} stars={stars} useLogo />
+      <Header
+        title="Little Genius"
+        avatar={userProfile.avatar}
+        stars={stars}
+        useLogo
+        rightAction={<Badge label={String(streak)} icon="🔥" tone="brand" />}
+      />
 
       <ScrollView style={styles.flex} showsVerticalScrollIndicator={false} contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad }]}>
-        {/* Hero Welcome Card */}
-        <Animated.View style={{ transform: [{ scale: heroScale }] }}>
-          <LinearGradient
-            colors={colors.gradients.hero}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.heroCard, coloredShadow(colors.brandSurface, 'xl')]}
-          >
-            <View style={styles.heroBlobTopRight} pointerEvents="none" />
-            <View style={styles.heroBlobBottomLeft} pointerEvents="none" />
+        {/* Hero — one self-contained gradient card (greeting, streak, character).
+            Everything lives inside this single opaque card now — no separate
+            band/wave/negative-margin layering, so there's no sibling that can
+            ever paint over the text again. */}
+        <View style={styles.heroWrap}>
+          <Animated.View style={{ transform: [{ scale: heroScale }] }}>
             <LinearGradient
-              colors={['rgba(255,255,255,0.12)', 'rgba(255,255,255,0)']}
-              pointerEvents="none"
-              style={styles.heroSheen}
-            />
-            <View style={styles.heroLeft}>
-              <Text style={s.heroGreeting}>{getTimeGreeting()}, 👋</Text>
-              <Text style={styles.heroName}>{userProfile.name} 🎓</Text>
-              <Badge label="PG • Nursery • Class 1" tone="glass" style={[styles.heroBadge, styles.glassBorder]} />
-            </View>
-            <View style={styles.heroRight}>
-              <View style={styles.heroAvatarRing}>
-                <View style={styles.heroAvatarCircle}>
-                  <Text style={styles.heroAvatar}>{userProfile.avatar}</Text>
-                </View>
-              </View>
-              <Badge label={String(stars || 0)} icon="⭐" tone="glass" style={styles.glassBorder} />
-            </View>
-          </LinearGradient>
-        </Animated.View>
+              colors={colors.gradients.hero}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.heroCard, coloredShadow(colors.brandSurface, 'xl')]}
+            >
+              <View style={styles.heroBlobTopRight} pointerEvents="none" />
+              <View style={styles.heroBlobBottomLeft} pointerEvents="none" />
+              <LinearGradient
+                colors={['rgba(255,255,255,0.12)', 'rgba(255,255,255,0)']}
+                pointerEvents="none"
+                style={styles.heroSheen}
+              />
 
-        {/* Learning Modules */}
+              <View style={styles.heroTextBlock}>
+                <Text style={styles.heroKicker}>TODAY'S ADVENTURE ✨</Text>
+                <Text style={styles.welcomeHeading}>Hi, {userProfile.name}! 👋</Text>
+                <Text style={s.welcomeSubtext}>Let's learn something new today!</Text>
+              </View>
+            </LinearGradient>
+          </Animated.View>
+
+          {/* Streak card straddles the hero card's bottom edge — half
+              resting on the gradient, half hanging over the page below,
+              same "floating stat" idiom as the character popping over
+              the top edge. */}
+          <View style={styles.heroStreakFloating}>
+            <View style={[s.heroStreakCard, coloredShadow('#F97316', 'md')]}>
+              <LinearGradient colors={['#FB923C', '#F97316']} style={styles.heroStreakBadge}>
+                <Text style={styles.heroStreakBadgeIcon}>🔥</Text>
+              </LinearGradient>
+              <View style={styles.heroStreakInfo}>
+                <View style={styles.heroStreakInfoTop}>
+                  <Text style={s.heroStreakLabel}>{streak} Day Streak</Text>
+                  <Text style={s.heroStreakCount}>{streak}/{STREAK_GOAL}</Text>
+                </View>
+                <ProgressBar
+                  value={streak}
+                  max={STREAK_GOAL}
+                  trackColor={colors.surfaceSunken}
+                  fillColor="#F97316"
+                />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.heroCharacterShadow}>
+            <Image
+              source={require('../../../assets/character-full.png')}
+              style={styles.heroCharacter}
+              resizeMode="contain"
+              pointerEvents="none"
+            />
+          </View>
+        </View>
+
+        {/* Learning Modules — horizontally scrolling row, fixed-width cards */}
         <SectionHeader emoji="📖" title="Learning Modules" />
-        <View style={styles.modulesGrid}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          snapToInterval={MODULE_CARD_WIDTH + Spacing.md}
+          snapToAlignment="start"
+          style={styles.modulesScroll}
+          contentContainerStyle={styles.modulesScrollContent}
+        >
           {MODULES.map((module, index) => (
             <ModuleCard
               key={module.id}
@@ -185,7 +332,11 @@ const HomeScreen = ({ navigation }) => {
               onPress={() => { tap(); navigation.navigate(module.screen, module.params); }}
             />
           ))}
-        </View>
+        </ScrollView>
+
+        {/* Continue Learning */}
+        <SectionHeader emoji="▶️" title="Continue Learning" />
+        <ContinueLearningCard lesson={continueLesson} onPress={goToContinueLesson} />
 
         {/* Explore My World */}
         <SectionHeader
@@ -194,52 +345,68 @@ const HomeScreen = ({ navigation }) => {
           actionLabel="See all"
           onActionPress={() => navigation.navigate('Learn', { moduleKey: 'world' })}
         />
-        <View style={styles.catGrid}>
-          {chunk(WORLD_CATEGORIES, CAT_COLUMNS).map((row, rowIndex) => (
-            <View key={`cat-row-${rowIndex}`} style={styles.catRow}>
-              {row.map((cat, i) => (
-                <TopicCard
-                  key={cat.key}
-                  variant="tile"
-                  index={rowIndex * CAT_COLUMNS + i}
-                  style={styles.catCell}
-                  emoji={cat.icon}
-                  color={cat.color}
-                  title={cat.name}
-                  badge={cat.count}
-                  onPress={() => { tap(); navigation.navigate('Learn', { moduleKey: 'world', initialTab: cat.key }); }}
-                />
-              ))}
-              {/* Keep a short last row left-aligned at the same column width */}
-              {Array.from({ length: CAT_COLUMNS - row.length }, (_, i) => (
-                <View key={`cat-spacer-${i}`} style={styles.catCell} />
-              ))}
-            </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.catScroll}
+          contentContainerStyle={styles.catScrollContent}
+        >
+          {WORLD_CATEGORIES.map((cat, i) => (
+            <TopicCard
+              key={cat.key}
+              variant="tile"
+              index={i}
+              style={styles.catCell}
+              emoji={cat.icon}
+              color={cat.color}
+              title={cat.name}
+              badge={cat.count}
+              onPress={() => { tap(); navigation.navigate('Learn', { moduleKey: 'world', initialTab: cat.key }); }}
+            />
+          ))}
+        </ScrollView>
+
+        {/* Quick Play */}
+        <SectionHeader
+          emoji="⚡"
+          title="Quick Play"
+          actionLabel="View all"
+          onActionPress={() => { tap(); navigation.navigate('Games'); }}
+        />
+        <View style={styles.quickActions}>
+          {QUICK_ACTIONS.map((action) => (
+            <TouchableOpacity
+              key={action.route}
+              style={[styles.quickWrap, coloredShadow(action.gradEnd, 'md')]}
+              onPress={() => { tap(); navigation.navigate(action.route); }}
+              activeOpacity={0.9}
+            >
+              <LinearGradient colors={[action.gradStart, action.gradEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.quickCard}>
+                <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.quickSheen} />
+                <View style={styles.quickBlobDecor} pointerEvents="none" />
+                {!!action.tag && (
+                  <Badge label={action.tag} tone="glass" style={styles.quickTag} />
+                )}
+                <View style={styles.quickIconBadge}>
+                  <Text style={styles.quickIcon}>{action.icon}</Text>
+                </View>
+                <Text style={styles.quickLabel}>{action.name}</Text>
+                <Text style={styles.quickDesc} numberOfLines={2}>{action.desc}</Text>
+                <View style={styles.quickPlayPill}>
+                  <Ionicons name="play" size={11} color="#1E1B4B" />
+                  <Text style={styles.quickPlayPillText}>Play Now</Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
           ))}
         </View>
 
-        {/* Quick Play */}
-        <SectionHeader emoji="⚡" title="Quick Play" />
-        <View style={styles.quickActions}>
-          {QUICK_ACTIONS.map((action) => {
-            const m = moduleColors[action.mod];
-            return (
-              <TouchableOpacity
-                key={action.name}
-                style={[styles.quickWrap, coloredShadow(m.solid, 'md')]}
-                onPress={() => { tap(); navigation.navigate(action.screen); }}
-                activeOpacity={0.9}
-              >
-                <LinearGradient colors={[m.from, m.to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.quickCard}>
-                  <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.quickSheen} />
-                  <View style={styles.quickIconBadge}>
-                    <Text style={styles.quickIcon}>{action.icon}</Text>
-                  </View>
-                  <Text style={styles.quickLabel}>{action.name}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            );
-          })}
+        {/* Daily Progress */}
+        <SectionHeader emoji="📊" title="Daily Progress" />
+        <View style={styles.statsRow}>
+          {stats.map((stat, index) => (
+            <StatTile key={stat.label} stat={stat} delay={index * Motion.stagger} />
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -249,27 +416,137 @@ const HomeScreen = ({ navigation }) => {
 // Theme-dependent styles
 const makeStyles = (colors) =>
   StyleSheet.create({
-    heroGreeting: { ...textStyles.overline, color: colors.onBrandMuted, marginBottom: Spacing.xs },
+    welcomeSubtext: { ...textStyles.body, color: colors.onBrandMuted },
+    heroStreakCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: Radius.lg,
+      padding: Spacing.md,
+      gap: Spacing.md,
+    },
+    heroStreakLabel: { ...textStyles.bodyStrong, color: colors.textPrimary },
+    heroStreakCount: { ...textStyles.caption, color: colors.textMuted },
+  });
+
+// Theme + per-module-accent styles — a light tint of the module's own
+// colour rather than a solid saturated block (see ModuleCard above).
+const makeModuleStyles = (colors, accent) =>
+  StyleSheet.create({
+    moduleCard: {
+      backgroundColor: colors.surface,
+      borderRadius: Radius.xl,
+      paddingVertical: Spacing.lg,
+      paddingHorizontal: Spacing.lg,
+      minHeight: 174,
+      justifyContent: 'space-between',
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: accent + '28',
+    },
+    moduleArrow: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      backgroundColor: accent + '1A',
+      borderWidth: 1,
+      borderColor: accent + '2E',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    moduleIconBadge: {
+      width: 56,
+      height: 56,
+      borderRadius: Radius.md,
+      borderWidth: 1,
+      borderColor: accent + '3A',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: Spacing.sm,
+    },
+    moduleName: { ...textStyles.title, color: colors.textPrimary, marginBottom: 2 },
+    moduleDescription: { ...textStyles.caption, color: colors.textSecondary },
+  });
+
+const makeContinueStyles = (colors, accent) =>
+  StyleSheet.create({
+    card: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: Radius.lg,
+      borderWidth: 1,
+      borderColor: accent + '26',
+      padding: Spacing.lg,
+      gap: Spacing.md,
+      marginBottom: Spacing.xxl,
+      overflow: 'hidden',
+    },
+    iconTile: {
+      width: 58,
+      height: 58,
+      borderRadius: 29,
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
+    iconGlyph: { fontSize: 26, lineHeight: 32, textAlign: 'center' },
+    body: { flex: 1 },
+    kicker: { ...textStyles.overline, color: accent, fontSize: 10, marginBottom: 3 },
+    title: { ...textStyles.title, color: colors.textPrimary, marginBottom: 2 },
+    subtitle: { ...textStyles.caption, color: colors.textSecondary },
+    continueBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      borderRadius: Radius.full,
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.md,
+    },
+    continueBtnText: { ...textStyles.caption, color: '#FFFFFF', fontSize: 12 },
+  });
+
+const makeStatStyles = (colors) =>
+  StyleSheet.create({
+    tile: {
+      flex: 1,
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: Radius.lg,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      paddingVertical: Spacing.lg,
+      gap: 6,
+    },
+    value: { ...textStyles.h3, color: colors.textPrimary },
+    label: { ...textStyles.caption, color: colors.textMuted, fontSize: 11 },
   });
 
 // Static styles
 const styles = StyleSheet.create({
   container: { flex: 1 },
   flex: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingTop: Spacing.md },
+  scrollContent: { paddingHorizontal: 16,  },
 
-  // Shared hairline rim for glass badges on brand-coloured surfaces
-  glassBorder: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
-
-  // Hero
+  // Hero — single self-contained card (see JSX comment). `marginTop` gives
+  // the character room to pop up above the card's top edge without being
+  // clipped by the ScrollView's own top boundary (its negative `top` below
+  // must not exceed this margin). `overflow: visible` lets the character
+  // render outside the card's own box.
+  heroWrap: {
+    overflow: 'visible',
+    marginTop: Spacing.huge,
+    // Extra bottom room for the streak card's lower half, which hangs
+    // below the hero card (see heroStreakFloating).
+    marginBottom: Spacing.xxl + STREAK_CARD_OVERLAP,
+  },
   heroCard: {
     borderRadius: Radius.xl,
-    paddingVertical: Spacing.xxl,
+    paddingTop: Spacing.xl,
+    // Generous bottom padding — the floating streak card's top half
+    // rests in this space, on top of the gradient, below the greeting.
+    paddingBottom: Spacing.xxxl + Spacing.md,
     paddingHorizontal: Spacing.xl,
-    marginBottom: Spacing.xxl,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.14)',
@@ -293,108 +570,161 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(252,211,77,0.10)',
   },
   heroSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%' },
-  heroLeft: { flex: 1 },
-  heroName: { ...textStyles.h1, color: '#FFFFFF', marginBottom: Spacing.md },
-  heroBadge: { alignSelf: 'flex-start' },
-  heroRight: { alignItems: 'center', marginLeft: Spacing.lg, gap: Spacing.sm },
-  heroAvatarRing: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 1.5,
-    borderColor: 'rgba(252,211,77,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroAvatarCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: Radius.full,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroAvatar: { fontSize: 36 },
 
-  // Module grid
-  modulesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: Spacing.xxl },
-  moduleCardWrapper: { width: (width - 32 - 12) / 2 },
-  moduleCard: {
-    borderRadius: Radius.lg,
-    paddingVertical: Spacing.lg,
+  // Greeting block — kicker + heading + subtext, all inside the card so
+  // nothing can ever paint over it. maxWidth keeps it clear of the
+  // character, which pops out over the card's right edge.
+  heroTextBlock: { maxWidth: '68%' },
+  heroKicker: {
+    ...textStyles.overline,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: Spacing.xs,
+  },
+  welcomeHeading: { ...textStyles.h1, color: '#FFFFFF', marginBottom: Spacing.xs },
+
+  // Streak card — floats as a sibling of the hero gradient, positioned so
+  // its vertical centre sits on the hero card's bottom edge: half shows
+  // over the gradient, half hangs below it over the page background.
+  // zIndex sits under the character (5) so the mascot appears to stand
+  // just in front of/on the ribbon.
+  heroStreakFloating: {
+    position: 'absolute',
+    left: Spacing.xl,
+    right: Spacing.xl,
+    bottom: -STREAK_CARD_OVERLAP,
+    zIndex: 4,
+  },
+  heroStreakBadge: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroStreakBadgeIcon: { fontSize: 20, lineHeight: 24 },
+  heroStreakInfo: { flex: 1, gap: 6 },
+  heroStreakInfoTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+
+  // Full-body character — pops out above the card's top edge. Wrapped in a
+  // plain View (not shadow props directly on Image) so the grounding shadow
+  // renders on Android too, where Image shadow props are unreliable on a
+  // transparent PNG. `top` is negative relative to heroWrap's own box, so it
+  // must not exceed heroWrap's `marginTop` above or it gets clipped by the
+  // ScrollView's top boundary.
+  heroCharacterShadow: {
+    position: 'absolute',
+    top: -36,
+    right: 6,
+    zIndex: 5,
+    elevation: 10,
+    ...coloredShadow('#1E1B4B', 'lg'),
+  },
+  heroCharacter: { width: 190, height: 220, marginTop: -15, marginRight: -15 },
+
+  // Learning Modules — horizontally-scrolling row of fixed-width cards
+  // (see makeModuleStyles for the colour-dependent parts of the card
+  // itself). paddingBottom clears room for the card's own shadow, which
+  // would otherwise be clipped by the ScrollView's bounds.
+  modulesScroll: { marginBottom: Spacing.xxl },
+  modulesScrollContent: { gap: Spacing.md, paddingRight: Spacing.lg, paddingBottom: Spacing.sm, paddingTop: 2 },
+  moduleCardWrapper: { width: MODULE_CARD_WIDTH },
+  moduleTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  moduleIcon: { fontSize: 28, lineHeight: 34, textAlign: 'center' },
+  moduleInfo: { marginTop: Spacing.sm },
+  // Soft decorative circle for depth, tucked behind the card content.
+  moduleBlobDecor: {
+    position: 'absolute',
+    bottom: -26,
+    right: -26,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+  },
+
+  // Explore My World — single horizontally-scrolling row. TopicCard owns
+  // the tile's own look; the screen only owns spacing + a fixed cell width
+  // (a scroll row can't rely on flex to divide space like the old 3-up grid).
+  catScroll: { marginBottom: Spacing.xxl },
+  catScrollContent: { gap: Spacing.md, paddingRight: Spacing.lg, paddingBottom: Spacing.sm, paddingTop: 2 },
+  catCell: { width: 104 },
+
+  // Continue Learning — glossy highlight on the icon tile, same idiom
+  // as the hero/quick-play gradient cards.
+  continueIconSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '55%' },
+
+  // Quick play
+  quickActions: { flexDirection: 'row', gap: 12, marginBottom: Spacing.xxl },
+  quickWrap: { flex: 1, borderRadius: Radius.xl },
+  quickCard: {
+    borderRadius: Radius.xl,
+    paddingVertical: Spacing.xl,
     paddingHorizontal: Spacing.lg,
-    minHeight: 178,
-    justifyContent: 'space-between',
+    alignItems: 'center',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: 'rgba(255,255,255,0.2)',
   },
-  moduleSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '42%' },
-  moduleTopRow: { flexDirection: 'row' },
-  moduleIconBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+  quickSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '45%' },
+  quickBlobDecor: {
+    position: 'absolute',
+    bottom: -34,
+    left: -30,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  quickTag: {
+    position: 'absolute',
+    top: Spacing.md,
+    right: Spacing.md,
+  },
+  quickIconBadge: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: 'rgba(255,255,255,0.18)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
+    borderColor: 'rgba(255,255,255,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: Spacing.sm,
-  },
-  moduleIcon: { fontSize: 30, lineHeight: 36, textAlign: 'center' },
-  moduleInfo: { marginTop: Spacing.sm },
-  moduleName: { ...textStyles.title, color: '#FFFFFF', marginBottom: 2 },
-  moduleDescription: { ...textStyles.caption, color: 'rgba(255,255,255,0.85)' },
-  moduleArrow: {
-    position: 'absolute',
-    top: Spacing.lg,
-    right: Spacing.lg,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Category grid — 3 up on every screen size. TopicCard owns the tile's
-  // look; the screen only owns the columns. Cells flex instead of carrying a
-  // computed pixel width so the row always divides the available space
-  // exactly, whatever the device width or orientation.
-  catGrid: { gap: Spacing.md, marginBottom: Spacing.xxl },
-  catRow: { flexDirection: 'row', gap: Spacing.md },
-  catCell: { flex: 1 },
-
-  // Quick play
-  quickActions: { flexDirection: 'row', gap: 12 },
-  quickWrap: { flex: 1, borderRadius: Radius.lg },
-  quickCard: {
-    borderRadius: Radius.lg,
-    paddingVertical: Spacing.xxl,
-    alignItems: 'center',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
-  },
-  quickSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '45%' },
-  quickIconBadge: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: Spacing.sm,
   },
-  quickIcon: { fontSize: 26, lineHeight: 32, textAlign: 'center' },
-  quickLabel: { ...textStyles.overline, color: '#FFFFFF', fontSize: 12 },
+  quickIcon: { fontSize: 28, lineHeight: 34, textAlign: 'center' },
+  quickLabel: { ...textStyles.overline, color: '#FFFFFF', fontSize: 12, marginBottom: 4 },
+  quickDesc: {
+    ...textStyles.caption,
+    color: 'rgba(255,255,255,0.85)',
+    textAlign: 'center',
+    fontSize: 11,
+    lineHeight: 15,
+    marginBottom: Spacing.md,
+    minHeight: 30,
+  },
+  quickPlayPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderRadius: Radius.full,
+    paddingVertical: 7,
+    paddingHorizontal: Spacing.lg,
+  },
+  quickPlayPillText: { ...textStyles.caption, fontSize: 11, fontWeight: '900', color: '#1E1B4B' },
+
+  // Daily progress footer — colour-tinted icon badge per stat (colour
+  // itself lives in the stat's own coloredShadow + gradient in StatTile).
+  statsRow: { flexDirection: 'row', gap: 8 },
+  statIconBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statIcon: { fontSize: 20, lineHeight: 24 },
 });
 
 export default HomeScreen;

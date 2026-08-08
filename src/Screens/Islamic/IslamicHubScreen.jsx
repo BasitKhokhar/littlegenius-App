@@ -11,11 +11,15 @@ import { Header } from '../../Components/UI';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
 import { Fonts } from '../../Theme/fonts';
+import { islamicPalette, moduleColors } from '../../Theme/colors';
 
 // ──────────────────────────────────────────────────────────────
 // IslamicHubScreen — "Islamic Prayer Companion" home. A grid of
 // feature cards: prayer tools (Namaz guide, Tasbeeh, Juz Amma),
-// stories, and all the classic study sections.
+// stories, and all the classic study sections. Card colours come from the
+// shared `islamicPalette` in Theme/colors.js (spiritual jewel tones) rather
+// than being hardcoded per-screen, so the hub matches the rest of the app's
+// premium theme.
 // ──────────────────────────────────────────────────────────────
 
 const FEATURED = [
@@ -25,7 +29,7 @@ const FEATURED = [
     title: 'Namaz Guide',
     urdu: 'نماز گائیڈ',
     desc: 'Step-by-step prayer with pictures',
-    colors: ['#10B981', '#059669'],
+    colors: [islamicPalette[0].from, islamicPalette[0].to],
     nav: (n) => n.navigate('NamazGuide'),
   },
   {
@@ -34,7 +38,7 @@ const FEATURED = [
     title: 'Tasbeeh Counter',
     urdu: 'تسبیح',
     desc: 'Count your dhikr with targets',
-    colors: ['#8B5CF6', '#7C3AED'],
+    colors: [islamicPalette[6].from, islamicPalette[6].to],
     nav: (n) => n.navigate('Tasbeeh'),
   },
   {
@@ -43,7 +47,7 @@ const FEATURED = [
     title: 'Juz Amma',
     urdu: 'جز عم',
     desc: 'Short surahs with Urdu & repeat mode',
-    colors: ['#0EA5E9', '#0284C7'],
+    colors: [islamicPalette[3].from, islamicPalette[3].to],
     nav: (n) => n.navigate('JuzAmma'),
   },
   {
@@ -52,20 +56,20 @@ const FEATURED = [
     title: 'Islamic Stories',
     urdu: 'اسلامی کہانیاں',
     desc: 'Prophets & Sahaba for kids',
-    colors: ['#F59E0B', '#D97706'],
+    colors: [islamicPalette[2].from, islamicPalette[2].to],
     nav: (n) => n.navigate('IslamicStories'),
   },
 ];
 
 const SECTIONS = [
-  { key: 'duas', emoji: '🤲', title: 'Daily Duas', color: '#10B981', tab: 'duas' },
-  { key: 'kalmas', emoji: '☪️', title: '6 Kalmas', color: '#0EA5E9', tab: 'kalmas' },
-  { key: 'pillars', emoji: '🕋', title: '5 Pillars', color: '#F59E0B', tab: 'pillars' },
-  { key: 'names', emoji: '💜', title: '99 Names of Allah', color: '#6366F1', tab: 'names' },
-  { key: 'namesM', emoji: '💚', title: 'Names of Prophet ﷺ', color: '#14B8A6', tab: 'namesMuhammad' },
-  { key: 'prophets', emoji: '⭐', title: 'Prophets', color: '#EC4899', tab: 'prophets' },
-  { key: 'manners', emoji: '😊', title: 'Manners', color: '#EF4444', tab: 'manners' },
-  { key: 'salah', emoji: '🚿', title: 'Wudu & Salah', color: '#8B5CF6', tab: 'salah' },
+  { key: 'duas', emoji: '🤲', title: 'Daily Duas', color: islamicPalette[0].solid, tab: 'duas' },
+  { key: 'kalmas', emoji: '☪️', title: '6 Kalmas', color: islamicPalette[3].solid, tab: 'kalmas' },
+  { key: 'pillars', emoji: '🕋', title: '5 Pillars', color: islamicPalette[2].solid, tab: 'pillars' },
+  { key: 'names', emoji: '💜', title: '99 Names of Allah', color: islamicPalette[1].solid, tab: 'names' },
+  { key: 'namesM', emoji: '💚', title: 'Names of Prophet ﷺ', color: islamicPalette[4].solid, tab: 'namesMuhammad' },
+  { key: 'prophets', emoji: '⭐', title: 'Prophets', color: islamicPalette[5].solid, tab: 'prophets' },
+  { key: 'manners', emoji: '😊', title: 'Manners', color: islamicPalette[7].solid, tab: 'manners' },
+  { key: 'salah', emoji: '🚿', title: 'Wudu & Salah', color: islamicPalette[6].solid, tab: 'salah' },
 ];
 
 const IslamicHubScreen = ({ navigation }) => {
@@ -112,16 +116,22 @@ const IslamicHubScreen = ({ navigation }) => {
 
         {/* Quiz CTA */}
         <TouchableOpacity
-          style={styles.quizBar}
           onPress={() => navigation.navigate('QuizList', { module: 'islamic' })}
           activeOpacity={0.88}
         >
-          <Text style={styles.quizBarEmoji}>🧠</Text>
-          <View style={styles.quizBarInfo}>
-            <Text style={styles.quizBarTitle}>Islamic Quizzes</Text>
-            <Text style={styles.quizBarDesc}>Test what you learned & earn stars!</Text>
-          </View>
-          <Text style={styles.quizBarArrow}>→</Text>
+          <LinearGradient
+            colors={[moduleColors.islamic.from, moduleColors.islamic.to]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.quizBar}
+          >
+            <Text style={styles.quizBarEmoji}>🧠</Text>
+            <View style={styles.quizBarInfo}>
+              <Text style={styles.quizBarTitle}>Islamic Quizzes</Text>
+              <Text style={styles.quizBarDesc}>Test what you learned & earn stars!</Text>
+            </View>
+            <Text style={styles.quizBarArrow}>→</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -201,7 +211,6 @@ const makeStyles = (colors) => StyleSheet.create({
   quizBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#00897B',
     borderRadius: 18,
     padding: 16,
     gap: 12,

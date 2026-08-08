@@ -2,12 +2,17 @@
 // Six words per letter — same shape as alphabetData, so UrduScreen can lay them
 // out as a 3x2 grid exactly like AlphabetScreen. `speak` is the romanization,
 // used ONLY as the no-voice-pack fallback (the app speaks `word` in ur-PK).
-const COLORS = [
-  '#F85A9B', '#FFAF3A', '#3EC38B', '#3C97F9', '#8A6FF0',
-  '#FF6B5A', '#8B5CF6', '#00BCD4', '#E91E63', '#607D8B',
-];
+//
+// Colours are cycled from the shared premium palette in Theme/colors.js (the
+// same one Alphabet uses) instead of a local hex list, so both letter decks
+// read as one cohesive theme. `GRADIENTS` mirrors the same cycle for cards
+// that want a from/to pair rather than a single solid.
+import { premiumPalette } from '../Theme/colors';
 
-export const urduData = [
+const COLORS = premiumPalette.map((p) => p.solid);
+const GRADIENTS = premiumPalette;
+
+const RAW_URDU = [
   {
     letter: 'ا', name: 'Alif', color: COLORS[0],
     vocabulary: [
@@ -429,5 +434,14 @@ export const urduData = [
     ],
   },
 ];
+
+// Attach the matching gradient pair (from/to) alongside the flat `color`
+// each letter already carries, so the hero/grid cards can render a premium
+// gradient instead of a flat fill.
+export const urduData = RAW_URDU.map((item) => {
+  const idx = COLORS.indexOf(item.color);
+  const g = GRADIENTS[idx] || GRADIENTS[0];
+  return { ...item, gradientFrom: g.from, gradientTo: g.to };
+});
 
 export default urduData;

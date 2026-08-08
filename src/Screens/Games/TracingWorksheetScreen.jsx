@@ -12,7 +12,7 @@ import * as Haptics from 'expo-haptics';
 import { Header } from '../../Components/UI';
 import { useTheme } from '../../Context/ThemeContext';
 import { getGameTheme } from '../../Theme/gameThemes';
-import { useAuth } from '../../Context';
+import { useAuth, useProgress } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { DrawCanvas, MarksBadge, GameStage, Mascot } from '../../Components/Games';
@@ -74,6 +74,7 @@ const TracingWorksheetScreen = ({ navigation }) => {
   const { colors, isDark } = useTheme();
   const gt = getGameTheme(7, isDark); // violet stage
   const { addStars } = useAuth();
+  const { recordGameComplete } = useProgress();
   const styles = makeStyles(colors);
 
   const [setKey, setSetKey] = useState('abc');
@@ -150,6 +151,7 @@ const TracingWorksheetScreen = ({ navigation }) => {
         const reward = calculateReward(total);
         setStarsAwarded(reward);
         addStars(reward);
+        recordGameComplete({ xpAmount: reward });
         setRowDone(true);
         // Fixed praise phrase (pre-baked teacher voice); the score/stars show
         // on screen rather than being read as dynamic numbers.

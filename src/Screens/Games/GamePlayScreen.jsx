@@ -22,7 +22,7 @@ import { getGameTheme } from '../../Theme/gameThemes';
 import { useTabBarClearance } from '../../Hooks';
 import { Header } from '../../Components/UI';
 import { GameStage, Mascot, CelebrationOverlay } from '../../Components/Games';
-import { useAuth } from '../../Context';
+import { useAuth, useProgress } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { generateMathProblem, shuffleArray } from '../../Utils/dataHelpers';
@@ -120,6 +120,7 @@ const MemoryCard = ({ card, isFlipped, isMatched, onPress, accent, colors }) => 
 const GamePlayScreen = ({ navigation, route }) => {
   const { gameId } = route.params;
   const { addStars } = useAuth();
+  const { recordGameComplete } = useProgress();
   const { colors, isDark } = useTheme();
   const gt = getGameTheme(gameId, isDark);
   const bottomPad = useTabBarClearance();
@@ -249,6 +250,7 @@ const GamePlayScreen = ({ navigation, route }) => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     setGameState('won');
     addStars(starsReward);
+    recordGameComplete({ xpAmount: starsReward });
     victoryScale.setValue(0);
     Animated.spring(victoryScale, { toValue: 1, friction: 6, tension: 80, useNativeDriver: true }).start();
     Animated.loop(

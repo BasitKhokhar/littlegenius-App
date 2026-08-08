@@ -152,6 +152,14 @@ export const deleteUserAccount = async (userId) => {
   const remaining = users.filter((u) => u.id !== userId);
   await saveUsers(remaining);
   await AsyncStorage.removeItem(`stars_${userId}`);
+  await AsyncStorage.multiRemove([
+    `streak_${userId}`,
+    `xp_${userId}`,
+    `lessonsCompleted_${userId}`,
+    `gamesPlayed_${userId}`,
+    `badges_${userId}`,
+    `lastLesson_${userId}`,
+  ]);
   await clearSessionUser();
   await clearToken();
 };

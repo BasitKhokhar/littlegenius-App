@@ -7,8 +7,10 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { Fonts } from '../../Theme/fonts';
+import { moduleColors } from '../../Theme/colors';
 import { urduData } from '../../Data/urduData';
 import { Header } from '../../Components/UI';
 import { VocabularyTile, SketchCanvas } from '../../Components/Educational';
@@ -66,7 +68,12 @@ const UrduScreen = ({ navigation, route }) => {
         <View style={styles.stage}>
           {/* Hero — emoji beside the glyph, with both actions inside it so the
               card stays short and the word grid gets the height. */}
-          <View style={[styles.hero, { backgroundColor: letter.color }]}>
+          <LinearGradient
+            colors={[letter.gradientFrom, letter.gradientTo]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.hero}
+          >
             <View style={styles.heroDecor} />
 
             <View style={styles.heroTop}>
@@ -111,7 +118,7 @@ const UrduScreen = ({ navigation, route }) => {
                 <Text style={styles.sketchPillText}>✏️ Write {letter.name}</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </LinearGradient>
 
           {/* Six words — 3 per row, 2 rows, sized to fill the leftover height */}
           <View style={styles.wordsSection}>
@@ -222,13 +229,16 @@ const UrduScreen = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
           <QuizEntryBar
-            color="#8A6FF0"
+            color={moduleColors.urdu.solid}
             onPress={() => navigation.navigate('QuizList', { module: 'urdu' })}
           />
         }
         renderItem={({ item, index }) => (
           <TouchableOpacity
-            style={[styles.card, { borderColor: item.color }]}
+            style={[
+              styles.card,
+              { backgroundColor: item.color + '14', borderColor: item.color, borderBottomColor: item.gradientTo },
+            ]}
             onPress={() => setSelectedLetter(index)}
             activeOpacity={0.85}
           >
@@ -236,7 +246,7 @@ const UrduScreen = ({ navigation, route }) => {
               {item.letter}
             </Text>
             <Text style={styles.gridNameText}>{item.name}</Text>
-            <Text style={styles.hint}>6 Words • ۶ الفاظ</Text>
+            <Text style={[styles.hint, { color: item.color }]}>6 Words • ۶ الفاظ</Text>
           </TouchableOpacity>
         )}
       />

@@ -1,75 +1,223 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
   TouchableOpacity,
   Text,
+  Animated,
   StyleSheet,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { quizPacksByModule } from '../../Data/quizPacksData';
 import { getQuizBank } from '../../Utils/quizGenerators';
+import { shadeColor } from '../../Utils/colorHelpers';
 import { Header } from '../../Components/UI';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
+import { Spacing, Radius, Motion, coloredShadow } from '../../Theme';
+
+// ──────────────────────────────────────────────────────────────
+// QuizPackCard — premium gradient tile for a single quiz pack
+// ("Letter Match", "Word Match", …). Two-stop gradient built from the
+// pack's own accent colour, a soft emoji medallion, a question-count
+// pill and a circular "go" button — the same cartoon-premium language
+// as the mini-game cards, applied to the quiz picker.
+// ──────────────────────────────────────────────────────────────
+const QuizPackCard = ({ pack, bankSize, index, onPress }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+  const enter = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(enter, {
+      toValue: 1,
+      delay: Math.min(index, 6) * Motion.stagger,
+      ...Motion.timing.base,
+      useNativeDriver: true,
+    }).start();
+  }, [enter, index]);
+
+  const pressIn = () =>
+    Animated.spring(scale, { toValue: Motion.pressScale, useNativeDriver: true, ...Motion.spring.soft }).start();
+  const pressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, ...Motion.spring.soft }).start();
+
+  const deep = shadeColor(pack.color, 0.34);
+
+  return (
+    <Animated.View
+      style={{
+        opacity: enter,
+        transform: [
+          { scale },
+          { translateY: enter.interpolate({ inputRange: [0, 1], outputRange: [14, 0] }) },
+        ],
+      }}
+    >
+      <TouchableOpacity
+        style={coloredShadow(pack.color, 'md')}
+        onPress={onPress}
+        onPressIn={pressIn}
+        onPressOut={pressOut}
+        activeOpacity={0.92}
+        accessibilityRole="button"
+        accessibilityLabel={`${pack.title}. ${pack.description}`}
+      >
+        <LinearGradient
+          colors={[pack.color, deep]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.packCard}
+        >
+          <View style={styles.packDecorBig} pointerEvents="none" />
+          <View style={styles.packDecorSmall} pointerEvents="none" />
+
+          <View style={styles.packEmojiBubble}>
+            <Text style={styles.packEmoji}>{pack.emoji}</Text>
+          </View>
+
+          <View style={styles.packInfo}>
+            <Text style={styles.packTitle} numberOfLines={1}>{pack.title}</Text>
+            <Text style={styles.packDesc} numberOfLines={2}>{pack.description}</Text>
+            <View style={styles.packBadge}>
+              <Text style={styles.packBadgeText}>🎯 {bankSize}+ Questions • 10 per round</Text>
+            </View>
+          </View>
+
+          <View style={styles.packGoBtn}>
+            <Text style={styles.packArrow}>→</Text>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
 
 const QuizListScreen = ({ navigation, route }) => {
   const { module } = route.params;
   const config = quizPacksByModule[module];
   const colors = useThemeColors();
   const bottomPad = useTabBarClearance();
-  const styles = makeStyles(colors);
+  const screenStyles = makeScreenStyles(colors);
 
   if (!config) {
     return (
-      <View style={styles.container}>
+      <View style={screenStyles.container}>
         <Header title="Quiz" showBack onBackPress={() => navigation.goBack()} />
-        <View style={styles.errorWrap}>
-          <Text style={styles.errorText}>Quiz not found for this module.</Text>
+        <View style={screenStyles.errorWrap}>
+          <Text style={screenStyles.errorText}>Quiz not found for this module.</Text>
         </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={screenStyles.container}>
       <Header
         title={config.title}
         showBack
         onBackPress={() => navigation.goBack()}
       />
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
-        <Text style={styles.subtitle}>{config.subtitle}</Text>
+      <ScrollView contentContainerStyle={[screenStyles.content, { paddingBottom: bottomPad }]} showsVerticalScrollIndicator={false}>
+        <Text style={screenStyles.subtitle}>{config.subtitle}</Text>
 
-        {config.packs.map((pack) => {
-          const bankSize = getQuizBank(pack.bankKey).length;
-          return (
-            <TouchableOpacity
-              key={pack.id}
-              style={[styles.packCard, { backgroundColor: pack.color }]}
-              onPress={() => navigation.navigate('ModuleQuiz', { module, packId: pack.id })}
-              activeOpacity={0.88}
-            >
-              <View style={styles.packDecor} />
-              <View style={styles.packEmojiBubble}>
-                <Text style={styles.packEmoji}>{pack.emoji}</Text>
-              </View>
-              <View style={styles.packInfo}>
-                <Text style={styles.packTitle}>{pack.title}</Text>
-                <Text style={styles.packDesc}>{pack.description}</Text>
-                <View style={styles.packBadge}>
-                  <Text style={styles.packBadgeText}>{bankSize}+ Questions • 10 per round</Text>
-                </View>
-              </View>
-              <Text style={styles.packArrow}>→</Text>
-            </TouchableOpacity>
-          );
-        })}
+        {config.packs.map((pack, index) => (
+          <QuizPackCard
+            key={pack.id}
+            pack={pack}
+            index={index}
+            bankSize={getQuizBank(pack.bankKey).length}
+            onPress={() => navigation.navigate('ModuleQuiz', { module, packId: pack.id })}
+          />
+        ))}
       </ScrollView>
     </View>
   );
 };
 
-const makeStyles = (colors) => StyleSheet.create({
+// Theme-independent card geometry — the gradient supplies its own colour.
+const styles = StyleSheet.create({
+  packCard: {
+    flexDirection: 'row',
+    borderRadius: Radius.xl,
+    padding: Spacing.lg,
+    marginBottom: Spacing.md,
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  packDecorBig: {
+    position: 'absolute',
+    top: -36,
+    right: -36,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+  },
+  packDecorSmall: {
+    position: 'absolute',
+    bottom: -20,
+    right: 50,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  packEmojiBubble: {
+    width: 60,
+    height: 60,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.26)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Spacing.md,
+  },
+  packEmoji: { fontSize: 28, lineHeight: 34, textAlign: 'center' },
+  packInfo: { flex: 1, paddingRight: Spacing.sm },
+  packTitle: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    marginBottom: 3,
+    letterSpacing: -0.2,
+  },
+  packDesc: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.88)',
+    marginBottom: 9,
+    lineHeight: 16,
+  },
+  packBadge: {
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    borderRadius: Radius.full,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    alignSelf: 'flex-start',
+  },
+  packBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
+  },
+  packGoBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(255,255,255,0.28)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  packArrow: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+});
+
+const makeScreenStyles = (colors) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   content: {
     paddingHorizontal: 16,
@@ -81,72 +229,6 @@ const makeStyles = (colors) => StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: 16,
     lineHeight: 18,
-  },
-  packCard: {
-    flexDirection: 'row',
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: 'center',
-    overflow: 'hidden',
-    elevation: 6,
-    shadowColor: '#1E1B4B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 16,
-  },
-  packDecor: {
-    position: 'absolute',
-    top: -30,
-    right: -30,
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-  },
-  packEmojiBubble: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  packEmoji: { fontSize: 24 },
-  packInfo: { flex: 1 },
-  packTitle: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  packDesc: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.85)',
-    marginBottom: 8,
-    lineHeight: 15,
-  },
-  packBadge: {
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    borderRadius: 8,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    alignSelf: 'flex-start',
-  },
-  packBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  packArrow: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    marginLeft: 8,
   },
   errorWrap: {
     flex: 1,

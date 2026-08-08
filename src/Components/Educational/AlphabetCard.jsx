@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, Animated, Dimensions } from 'react-native';
-import { Colors } from '../../Data/colorsTheme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { premiumPalette } from '../../Theme/colors';
 import { Radius, Spacing, textStyles, coloredShadow, Motion } from '../../Theme';
 
 const { width } = Dimensions.get('window');
@@ -11,7 +12,9 @@ const CARD_SIZE = (width - 32 - COLUMN_GAP) / 2;
 
 const AlphabetCard = ({
   letter = 'A',
-  color = Colors.pink,
+  color = premiumPalette[0].solid,
+  gradientFrom = premiumPalette[0].from,
+  gradientTo = premiumPalette[0].to,
   emoji = '🍎',
   word = 'Apple',
   onPress = () => {},
@@ -26,28 +29,35 @@ const AlphabetCard = ({
   return (
     <Animated.View style={[styles.wrapper, { transform: [{ scale }] }]}>
       <TouchableOpacity
-        style={[styles.card, coloredShadow(color, 'md'), { backgroundColor: color }]}
+        style={[styles.wrapperTouchable, coloredShadow(color, 'md')]}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={1}
       >
-        {/* Decorative circle */}
-        <View style={styles.decorCircle} />
+        <LinearGradient
+          colors={[gradientFrom, gradientTo]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.card}
+        >
+          {/* Decorative circle */}
+          <View style={styles.decorCircle} />
 
-        <View style={styles.letterRow}>
-          <Text style={styles.letter}>{letter}</Text>
-          <Text style={styles.letterSmall}>{letter.toLowerCase()}</Text>
-        </View>
-
-        <Text style={styles.emoji}>{emoji}</Text>
-
-        <View style={styles.wordRow}>
-          <Text style={styles.word} numberOfLines={1}>{word}</Text>
-          <View style={styles.arrowBubble}>
-            <Text style={styles.arrow}>→</Text>
+          <View style={styles.letterRow}>
+            <Text style={styles.letter}>{letter}</Text>
+            <Text style={styles.letterSmall}>{letter.toLowerCase()}</Text>
           </View>
-        </View>
+
+          <Text style={styles.emoji}>{emoji}</Text>
+
+          <View style={styles.wordRow}>
+            <Text style={styles.word} numberOfLines={1}>{word}</Text>
+            <View style={styles.arrowBubble}>
+              <Text style={styles.arrow}>→</Text>
+            </View>
+          </View>
+        </LinearGradient>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -58,6 +68,10 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: CARD_SIZE,
     maxWidth: CARD_SIZE,
+  },
+  wrapperTouchable: {
+    flex: 1,
+    borderRadius: Radius.lg,
   },
   card: {
     borderRadius: Radius.lg,

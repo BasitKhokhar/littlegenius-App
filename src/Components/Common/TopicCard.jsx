@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors } from '../../Context/ThemeContext';
-import { Spacing, Radius, Motion, Elevation, coloredShadow } from '../../Theme';
+import { Spacing, Radius, Motion, coloredShadow } from '../../Theme';
 import { Fonts } from '../../Theme/fonts';
 import useSpeak from '../../Hooks/useSpeak';
 
@@ -26,7 +26,7 @@ import useSpeak from '../../Hooks/useSpeak';
 
 const ROW_TILE = 95;
 const ROW_GLYPH = 55;
-const TILE_ICON = 54;
+const TILE_ICON = 60;
 
 // Three bars that "breathe" while a card is speaking. Different
 // durations keep them out of phase without extra bookkeeping.
@@ -143,7 +143,7 @@ const TopicCard = ({
     return (
       <Animated.View style={[enterStyle, style]}>
         <TouchableOpacity
-          style={[styles.tileShell, Elevation.sm]}
+          style={coloredShadow(accent, 'sm')}
           onPress={handlePress}
           onPressIn={pressIn}
           onPressOut={pressOut}
@@ -151,24 +151,28 @@ const TopicCard = ({
           accessibilityRole="button"
           accessibilityLabel={title}
         >
-          <LinearGradient
-            colors={[accent + '2E', accent + '12']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.tileIcon, { borderColor: accent + '26' }]}
-          >
-            <Text style={staticStyles.tileGlyph}>{emoji}</Text>
-          </LinearGradient>
+          <View style={[styles.tileShell, { borderColor: accent + '24' }]}>
+            <View style={[staticStyles.tileBlobDecor, { backgroundColor: accent + '14' }]} pointerEvents="none" />
 
-          <Text style={styles.tileName} numberOfLines={1}>
-            {title}
-          </Text>
+            <LinearGradient
+              colors={[accent + '40', accent + '18']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.tileIcon, { borderColor: accent + '30' }]}
+            >
+              <Text style={staticStyles.tileGlyph}>{emoji}</Text>
+            </LinearGradient>
 
-          {badge != null && (
-            <View style={[staticStyles.tilePill, { backgroundColor: accent }]}>
-              <Text style={staticStyles.tilePillText}>{badge}</Text>
-            </View>
-          )}
+            <Text style={styles.tileName} numberOfLines={1}>
+              {title}
+            </Text>
+
+            {badge != null && (
+              <View style={[staticStyles.tilePill, { backgroundColor: accent }]}>
+                <Text style={staticStyles.tilePillText}>{badge}</Text>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
       </Animated.View>
     );
@@ -291,13 +295,23 @@ const staticStyles = StyleSheet.create({
     flexShrink: 1,
   },
 
-  tileGlyph: { fontSize: 28, lineHeight: 36, textAlign: 'center' },
+  tileGlyph: { fontSize: 30, lineHeight: 38, textAlign: 'center' },
   tilePill: {
     borderRadius: Radius.full,
-    paddingVertical: 2,
+    paddingVertical: 3,
     paddingHorizontal: Spacing.md,
   },
   tilePillText: { fontSize: 11, color: '#FFFFFF', fontFamily: Fonts.extraBold },
+  // Soft decorative circle tucked behind the icon for depth — same idiom
+  // as Home's module/quick-play cards.
+  tileBlobDecor: {
+    position: 'absolute',
+    top: -18,
+    right: -18,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+  },
 });
 
 const makeStyles = (colors) =>
@@ -343,20 +357,21 @@ const makeStyles = (colors) =>
     tileShell: {
       backgroundColor: colors.surface,
       borderRadius: Radius.lg,
-      borderWidth: StyleSheet.hairlineWidth,
+      borderWidth: 1,
       borderColor: colors.border,
-      paddingVertical: Spacing.md,
+      paddingVertical: Spacing.lg,
       paddingHorizontal: Spacing.sm,
       alignItems: 'center',
+      overflow: 'hidden',
     },
     tileIcon: {
       width: TILE_ICON,
       height: TILE_ICON,
       borderRadius: TILE_ICON / 2,
-      borderWidth: 1,
+      borderWidth: 1.5,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: Spacing.sm,
+      marginBottom: Spacing.md,
     },
     tileName: {
       fontFamily: Fonts.bold,

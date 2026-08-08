@@ -13,7 +13,7 @@ import { GameStage, Mascot, CelebrationOverlay } from '../../Components/Games';
 import { useTheme } from '../../Context/ThemeContext';
 import { getGameTheme } from '../../Theme/gameThemes';
 import { useTabBarClearance } from '../../Hooks';
-import { useAuth } from '../../Context';
+import { useAuth, useProgress } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { calculateStarReward } from '../../Utils/dataHelpers';
@@ -34,6 +34,7 @@ const LetterPuzzleScreen = ({ navigation }) => {
   const gt = getGameTheme(10, isDark); // ocean / fish
   const bottomPad = useTabBarClearance();
   const { addStars } = useAuth();
+  const { recordGameComplete } = useProgress();
   const styles = makeStyles(colors, gt);
 
   const [session, setSession] = useState(0);
@@ -116,6 +117,7 @@ const LetterPuzzleScreen = ({ navigation }) => {
       const finalCount = correctRef.current;
       const reward = calculateStarReward(finalCount, ROUNDS, 3);
       addStars(reward);
+      recordGameComplete({ xpAmount: reward });
       // Fixed praise phrase (pre-baked teacher voice); the score/stars show on
       // screen rather than being read as dynamic numbers.
       SpeechEngine.speak(SPEECH_PHRASES.PUZZLE_COMPLETE, 'en-US');

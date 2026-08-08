@@ -44,7 +44,6 @@ const learnModules = {
           { emoji: '🦘', en: 'Kangaroo', ur: 'کینگرو', fact: 'It jumps and keeps its baby in a pocket.', urFact: 'چھلانگ لگاتا، بچہ تھیلی میں۔', color: '#B45309' },
           { emoji: '🐼', en: 'Panda', ur: 'پانڈا', fact: 'A black and white bear that eats bamboo.', urFact: 'سیاہ سفید ریچھ جو بانس کھاتا ہے۔', color: '#374151' },
           { emoji: '🐿️', en: 'Squirrel', ur: 'گلہری', fact: 'A small animal with a fluffy tail.', urFact: 'چھوٹی، جھاڑی دار دم والی۔', color: '#A16207' },
-          { emoji: '🐷', en: 'Pig', ur: 'سور', fact: 'A pink animal that says oink.', urFact: 'گلابی جانور جو آواز نکالتا ہے۔', color: '#F9A8D4' },
           { emoji: '🐭', en: 'Mouse', ur: 'چوہا', fact: 'A tiny animal that likes cheese.', urFact: 'چھوٹا جانور جسے پنیر پسند ہے۔', color: '#9CA3AF' },
           { emoji: '🐊', en: 'Crocodile', ur: 'مگرمچھ', fact: 'It lives in water with big sharp teeth.', urFact: 'پانی میں رہتا، تیز دانت والا۔', color: '#16A34A' },
         ],

@@ -1,9 +1,13 @@
 // English Alphabet Data - 26 Letters with Vocabulary
-export const alphabetData = [
+// Card colours are NOT hardcoded here — they're cycled from the shared
+// premium palette in Theme/colors.js so every module (Alphabet, Urdu,
+// Islamic) reads as one cohesive jewel-tone theme instead of a per-screen
+// grab-bag of hex codes.
+import { premiumPalette } from '../Theme/colors';
+
+const RAW_LETTERS = [
   {
     letter: 'A',
-    color: '#F85A9B',
-    borderColor: '#E04285',
     vocabulary: [
       { word: 'Apple', emoji: '🍎', category: 'Fruits' },
       { word: 'Ant', emoji: '🐜', category: 'Insects' },
@@ -15,8 +19,6 @@ export const alphabetData = [
   },
   {
     letter: 'B',
-    color: '#FFAF3A',
-    borderColor: '#D88E23',
     vocabulary: [
       { word: 'Ball', emoji: '⚽', category: 'Sports' },
       { word: 'Butterfly', emoji: '🦋', category: 'Insects' },
@@ -28,8 +30,6 @@ export const alphabetData = [
   },
   {
     letter: 'C',
-    color: '#3EC38B',
-    borderColor: '#2AA570',
     vocabulary: [
       { word: 'Cat', emoji: '🐱', category: 'Animals' },
       { word: 'Car', emoji: '🚗', category: 'Vehicles' },
@@ -41,8 +41,6 @@ export const alphabetData = [
   },
   {
     letter: 'D',
-    color: '#3C97F9',
-    borderColor: '#267CD3',
     vocabulary: [
       { word: 'Dog', emoji: '🐶', category: 'Animals' },
       { word: 'Duck', emoji: '🦆', category: 'Birds' },
@@ -54,8 +52,6 @@ export const alphabetData = [
   },
   {
     letter: 'E',
-    color: '#8A6FF0',
-    borderColor: '#7154DE',
     vocabulary: [
       { word: 'Elephant', emoji: '🐘', category: 'Animals' },
       { word: 'Egg', emoji: '🥚', category: 'Food' },
@@ -67,8 +63,6 @@ export const alphabetData = [
   },
   {
     letter: 'F',
-    color: '#FF6B5A',
-    borderColor: '#E04A3A',
     vocabulary: [
       { word: 'Fish', emoji: '🐟', category: 'Sea Creatures' },
       { word: 'Frog', emoji: '🐸', category: 'Amphibians' },
@@ -80,8 +74,6 @@ export const alphabetData = [
   },
   {
     letter: 'G',
-    color: '#8B5CF6',
-    borderColor: '#7C3AED',
     vocabulary: [
       { word: 'Grapes', emoji: '🍇', category: 'Fruits' },
       { word: 'Goat', emoji: '🐐', category: 'Animals' },
@@ -93,8 +85,6 @@ export const alphabetData = [
   },
   {
     letter: 'H',
-    color: '#EC4899',
-    borderColor: '#DB2777',
     vocabulary: [
       { word: 'House', emoji: '🏠', category: 'Buildings' },
       { word: 'Horse', emoji: '🐎', category: 'Animals' },
@@ -106,8 +96,6 @@ export const alphabetData = [
   },
   {
     letter: 'I',
-    color: '#06B6D4',
-    borderColor: '#0891B2',
     vocabulary: [
       { word: 'Ice Cream', emoji: '🍦', category: 'Sweets' },
       { word: 'Iguana', emoji: '🦎', category: 'Reptiles' },
@@ -119,8 +107,6 @@ export const alphabetData = [
   },
   {
     letter: 'J',
-    color: '#F59E0B',
-    borderColor: '#D97706',
     vocabulary: [
       { word: 'Juice', emoji: '🧃', category: 'Drinks' },
       { word: 'Jaguar', emoji: '🐆', category: 'Animals' },
@@ -132,8 +118,6 @@ export const alphabetData = [
   },
   {
     letter: 'K',
-    color: '#10B981',
-    borderColor: '#059669',
     vocabulary: [
       { word: 'Kite', emoji: '🪁', category: 'Toys' },
       { word: 'Kangaroo', emoji: '🦘', category: 'Animals' },
@@ -145,8 +129,6 @@ export const alphabetData = [
   },
   {
     letter: 'L',
-    color: '#3B82F6',
-    borderColor: '#2563EB',
     vocabulary: [
       { word: 'Lion', emoji: '🦁', category: 'Animals' },
       { word: 'Lemon', emoji: '🍋', category: 'Fruits' },
@@ -158,8 +140,6 @@ export const alphabetData = [
   },
   {
     letter: 'M',
-    color: '#EF4444',
-    borderColor: '#DC2626',
     vocabulary: [
       { word: 'Moon', emoji: '🌙', category: 'Space' },
       { word: 'Monkey', emoji: '🐒', category: 'Animals' },
@@ -171,8 +151,6 @@ export const alphabetData = [
   },
   {
     letter: 'N',
-    color: '#14B8A6',
-    borderColor: '#0D9488',
     vocabulary: [
       { word: 'Nest', emoji: '🪺', category: 'Birds' },
       { word: 'Nut', emoji: '🥜', category: 'Food' },
@@ -184,8 +162,6 @@ export const alphabetData = [
   },
   {
     letter: 'O',
-    color: '#F97316',
-    borderColor: '#EA580C',
     vocabulary: [
       { word: 'Orange', emoji: '🍊', category: 'Fruits' },
       { word: 'Owl', emoji: '🦉', category: 'Birds' },
@@ -197,8 +173,6 @@ export const alphabetData = [
   },
   {
     letter: 'P',
-    color: '#84CC16',
-    borderColor: '#65A30D',
     vocabulary: [
       { word: 'Parrot', emoji: '🦜', category: 'Birds' },
       { word: 'Pencil', emoji: '✏️', category: 'School' },
@@ -210,8 +184,6 @@ export const alphabetData = [
   },
   {
     letter: 'Q',
-    color: '#D946EF',
-    borderColor: '#C026D3',
     vocabulary: [
       { word: 'Queen', emoji: '👑', category: 'People' },
       { word: 'Quill', emoji: '🪶', category: 'Objects' },
@@ -223,8 +195,6 @@ export const alphabetData = [
   },
   {
     letter: 'R',
-    color: '#EC4899',
-    borderColor: '#DB2777',
     vocabulary: [
       { word: 'Rabbit', emoji: '🐰', category: 'Animals' },
       { word: 'Ring', emoji: '💍', category: 'Objects' },
@@ -236,8 +206,6 @@ export const alphabetData = [
   },
   {
     letter: 'S',
-    color: '#EAB308',
-    borderColor: '#CA8A04',
     vocabulary: [
       { word: 'Sun', emoji: '☀️', category: 'Space' },
       { word: 'Star', emoji: '⭐', category: 'Shapes' },
@@ -249,8 +217,6 @@ export const alphabetData = [
   },
   {
     letter: 'T',
-    color: '#F97316',
-    borderColor: '#EA580C',
     vocabulary: [
       { word: 'Tiger', emoji: '🐯', category: 'Animals' },
       { word: 'Turtle', emoji: '🐢', category: 'Reptiles' },
@@ -262,8 +228,6 @@ export const alphabetData = [
   },
   {
     letter: 'U',
-    color: '#6366F1',
-    borderColor: '#4F46E5',
     vocabulary: [
       { word: 'Umbrella', emoji: '☂️', category: 'Objects' },
       { word: 'Unicorn', emoji: '🦄', category: 'Fantasy' },
@@ -275,8 +239,6 @@ export const alphabetData = [
   },
   {
     letter: 'V',
-    color: '#A855F7',
-    borderColor: '#9333EA',
     vocabulary: [
       { word: 'Violin', emoji: '🎻', category: 'Music' },
       { word: 'Vase', emoji: '🏺', category: 'Objects' },
@@ -288,8 +250,6 @@ export const alphabetData = [
   },
   {
     letter: 'W',
-    color: '#22C55E',
-    borderColor: '#16A34A',
     vocabulary: [
       { word: 'Watermelon', emoji: '🍉', category: 'Fruits' },
       { word: 'Whale', emoji: '🐋', category: 'Sea Creatures' },
@@ -301,8 +261,6 @@ export const alphabetData = [
   },
   {
     letter: 'X',
-    color: '#F43F5E',
-    borderColor: '#E11D48',
     vocabulary: [
       { word: 'Xylophone', emoji: '🎵', category: 'Music' },
       { word: 'X-ray', emoji: '🩻', category: 'Science' },
@@ -314,8 +272,6 @@ export const alphabetData = [
   },
   {
     letter: 'Y',
-    color: '#0EA5E9',
-    borderColor: '#0284C7',
     vocabulary: [
       { word: 'Yacht', emoji: '⛵', category: 'Vehicles' },
       { word: 'Yak', emoji: '🐂', category: 'Animals' },
@@ -327,8 +283,6 @@ export const alphabetData = [
   },
   {
     letter: 'Z',
-    color: '#64748B',
-    borderColor: '#475569',
     vocabulary: [
       { word: 'Zebra', emoji: '🦓', category: 'Animals' },
       { word: 'Zip', emoji: '🤐', category: 'Objects' },
@@ -339,3 +293,18 @@ export const alphabetData = [
     ]
   }
 ];
+
+// Cycle the shared premium palette across the 26 letters — `color` /
+// `borderColor` stay for existing consumers (hero backgrounds, nav buttons,
+// SketchCanvas accents); `gradientFrom`/`gradientTo` feed the new gradient
+// card look in AlphabetCard.
+export const alphabetData = RAW_LETTERS.map((item, i) => {
+  const p = premiumPalette[i % premiumPalette.length];
+  return {
+    ...item,
+    color: p.solid,
+    borderColor: p.to,
+    gradientFrom: p.from,
+    gradientTo: p.to,
+  };
+});

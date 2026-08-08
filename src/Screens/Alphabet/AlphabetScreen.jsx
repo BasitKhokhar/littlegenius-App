@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useThemeColors } from '../../Context/ThemeContext';
+import { moduleColors } from '../../Theme/colors';
 import { alphabetData } from '../../Data/alphabetData';
 import { Header } from '../../Components/UI';
 import AlphabetCard, { COLUMN_GAP } from '../../Components/Educational/AlphabetCard';
@@ -215,7 +216,7 @@ const AlphabetScreen = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
           <QuizEntryBar
-            color="#F43F5E"
+            color={moduleColors.alphabet.solid}
             onPress={() => navigation.navigate('QuizList', { module: 'alphabet' })}
           />
         }
@@ -223,6 +224,8 @@ const AlphabetScreen = ({ navigation, route }) => {
           <AlphabetCard
             letter={item.letter}
             color={item.color}
+            gradientFrom={item.gradientFrom}
+            gradientTo={item.gradientTo}
             emoji={item.vocabulary[0].emoji}
             word={item.vocabulary[0].word}
             onPress={() => setSelectedLetter(index)}

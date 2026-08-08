@@ -171,6 +171,36 @@ export const moduleColors = {
   games: { from: '#60A5FA', to: '#8B5CF6', solid: '#6366F1' },
 };
 
+// ── Premium letter-card palette (curated jewel tones) ──────────
+// Cycled by index across the Alphabet/Urdu letter grids so 26/38-card decks
+// stay varied without reading as a random, muddy rainbow. Each entry is a
+// gradient pair (`from`→`to`) plus a flattened `solid` for places that only
+// take one colour (borders, shadows, accent text).
+export const premiumPalette = [
+  { from: '#FB7185', to: '#E11D48', solid: '#F43F5E' }, // rose
+  { from: '#FBBF24', to: '#D97706', solid: '#F59E0B' }, // amber
+  { from: '#34D399', to: '#059669', solid: '#10B981' }, // emerald
+  { from: '#38BDF8', to: '#0284C7', solid: '#0EA5E9' }, // sky
+  { from: '#A78BFA', to: '#7C3AED', solid: '#8B5CF6' }, // violet
+  { from: '#FB923C', to: '#EA580C', solid: '#F97316' }, // coral
+  { from: '#2DD4BF', to: '#0D9488', solid: '#14B8A6' }, // teal
+  { from: '#818CF8', to: '#4338CA', solid: '#6366F1' }, // indigo
+  { from: '#E879F9', to: '#A21CAF', solid: '#D946EF' }, // fuchsia
+  { from: '#94A3B8', to: '#334155', solid: '#475569' }, // deep slate
+];
+
+// ── Islamic hub — spiritual jewel tones (emerald / gold / indigo / teal) ──
+export const islamicPalette = [
+  { from: '#34D399', to: '#059669', solid: '#10B981' }, // emerald
+  { from: '#818CF8', to: '#4F46E5', solid: '#6366F1' }, // indigo
+  { from: '#FBBF24', to: '#D97706', solid: '#F59E0B' }, // gold
+  { from: '#38BDF8', to: '#0284C7', solid: '#0EA5E9' }, // sky
+  { from: '#2DD4BF', to: '#0D9488', solid: '#14B8A6' }, // teal
+  { from: '#FB7185', to: '#E11D48', solid: '#F43F5E' }, // rose
+  { from: '#A78BFA', to: '#7C3AED', solid: '#8B5CF6' }, // violet
+  { from: '#94A3B8', to: '#334155', solid: '#475569' }, // deep slate
+];
+
 // Add the module gradient pairs onto each palette under `gradients`
 // so `Colors.gradients.alphabet` etc. resolve. Header/hero/cta too.
 const moduleGradientPairs = Object.fromEntries(

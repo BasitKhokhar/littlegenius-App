@@ -19,7 +19,7 @@ import * as Haptics from 'expo-haptics';
 import { Header } from '../../Components/UI';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { useTabBarClearance } from '../../Hooks';
-import { useAuth } from '../../Context';
+import { useAuth, useProgress } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { ColorPalette, ERASER } from '../../Components/Games';
@@ -70,6 +70,7 @@ const ColoringBookScreen = ({ navigation }) => {
   const colors = useThemeColors();
   const bottomPad = useTabBarClearance();
   const { addStars } = useAuth();
+  const { recordGameComplete } = useProgress();
   const styles = makeStyles(colors);
 
   const [sceneId, setSceneId] = useState(coloringData[0].id);
@@ -210,6 +211,7 @@ const ColoringBookScreen = ({ navigation }) => {
     if (allFilled && !rewardedRef.current[sceneId]) {
       rewardedRef.current[sceneId] = true;
       addStars(10);
+      recordGameComplete({ xpAmount: 10 });
       setCelebrating(true);
       pop.setValue(0);
       Animated.spring(pop, { toValue: 1, friction: 5, useNativeDriver: true }).start();

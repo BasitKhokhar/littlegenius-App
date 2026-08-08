@@ -6,27 +6,42 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { quizPacksByModule } from '../../Data/quizPacksData';
 import { getQuizBank } from '../../Utils/quizGenerators';
-import { createQuizSession, QUIZ_QUESTION_COUNT } from '../../Utils/quizHelpers';
+import { createQuizSession, QUIZ_QUESTION_COUNT, splitTrailingEmoji } from '../../Utils/quizHelpers';
 import { calculateStarReward } from '../../Utils/dataHelpers';
+import { gradientStageFromAccent } from '../../Utils/colorHelpers';
+import { moduleColors } from '../../Theme/colors';
 import { Header } from '../../Components/UI';
+import { GameStage, CelebrationOverlay } from '../../Components/Games';
 import SpeakButton from '../../Components/Common/SpeakButton';
-import { useAuth } from '../../Context';
+import QuizOptionButton from '../../Components/Common/QuizOptionButton';
+import { useAuth, useProgress } from '../../Context';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
-import { useThemeColors } from '../../Context/ThemeContext';
+import { useTheme } from '../../Context/ThemeContext';
 
 const ModuleQuizScreen = ({ navigation, route }) => {
   const { module, packId } = route.params;
   const { addStars } = useAuth();
-  const colors = useThemeColors();
+  const { recordLessonComplete } = useProgress();
+  const { colors, isDark } = useTheme();
   const styles = makeStyles(colors);
 
   const pack = useMemo(() => {
     const config = quizPacksByModule[module];
     return config?.packs.find((p) => p.id === packId);
   }, [module, packId]);
+
+  // Themed gradient stage, built from the module's own accent colour — the
+  // same "cartoon premium" full-bleed treatment the mini-games use, so a
+  // quiz feels like part of the same app rather than a plain form screen.
+  const accent = moduleColors[module]?.solid || pack?.color || colors.primary;
+  const stage = useMemo(
+    () => ({ bg: gradientStageFromAccent(accent, isDark), accent, deco: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.16)' }),
+    [accent, isDark]
+  );
 
   const buildSession = useCallback(() => {
     if (!pack) return [];
@@ -38,8 +53,16 @@ const ModuleQuizScreen = ({ navigation, route }) => {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [gameState, setGameState] = useState('playing');
+  const [picked, setPicked] = useState(null); // selected option text, for right/wrong tile colouring
 
   const question = questions[currentIdx];
+  // Question banks tuck the picture emoji on the end of `q` (see
+  // quizGenerators.js) — pull it off so it can be shown BIG in its own
+  // bubble instead of tiny and inline with the sentence.
+  const { text: questionText, emoji: questionEmoji } = useMemo(
+    () => splitTrailingEmoji(question?.q),
+    [question]
+  );
 
   // Read each question aloud as it appears — many players are still learning to
   // read, so a silent question is unanswerable for them. Declared above the
@@ -72,16 +95,23 @@ const ModuleQuizScreen = ({ navigation, route }) => {
   const total = questions.length;
 
   const handleAnswer = (selected) => {
+    if (picked) return; // already answered this question — ignore extra taps
+    setPicked(selected);
     const isCorrect = selected === currentQuestion.answer;
     const nextCorrect = isCorrect ? correctCount + 1 : correctCount;
+    Haptics.notificationAsync(
+      isCorrect ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
+    ).catch(() => {});
 
     const advance = () => {
+      setPicked(null);
       if (currentIdx < total - 1) {
         setCurrentIdx((prev) => prev + 1);
         return;
       }
       const reward = calculateStarReward(nextCorrect, total, 5);
       addStars(reward);
+      recordLessonComplete({ xpAmount: reward, mod: module, packId, packTitle: pack.title });
       setGameState('finished');
       // Fixed praise phrase (pre-baked teacher voice); the exact score/stars are
       // shown on the results screen rather than read as dynamic numbers.
@@ -123,31 +153,63 @@ const ModuleQuizScreen = ({ navigation, route }) => {
     setQuestions(buildSession());
     setCurrentIdx(0);
     setCorrectCount(0);
+    setPicked(null);
     setGameState('playing');
   };
 
   return (
-    <View style={styles.container}>
+    <GameStage theme={stage}>
       <Header
         title={pack.title}
         showBack
+        variant="transparent"
         onBackPress={() => navigation.goBack()}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {gameState === 'playing' ? (
+      {gameState === 'finished' ? (
+        <CelebrationOverlay
+          title="Quiz Completed!"
+          scoreLabel={`Score: ${correctCount} / ${total}`}
+          reward={calculateStarReward(correctCount, total, 5)}
+          accent={stage.accent}
+          onReplay={restartQuiz}
+          onExit={() => navigation.goBack()}
+          replayLabel="Try Again 🔁"
+          exitLabel="Back to Quizzes ➔"
+        />
+      ) : (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.quizContent}>
             <Text style={styles.progText}>
               Question {currentIdx + 1} of {total}
             </Text>
+
+            {!!questionEmoji && (
+              <View style={styles.emojiBubble}>
+                <Text style={styles.emojiGlyph}>{questionEmoji}</Text>
+                {currentQuestion.speech?.text ? (
+                  <View style={styles.emojiSpeakBadge}>
+                    <SpeakButton
+                      text={currentQuestion.speech.text}
+                      language={currentQuestion.speech.language}
+                      color={stage.accent}
+                      variant="icon"
+                      size="sm"
+                      accessibilityLabel="Hear the question again"
+                    />
+                  </View>
+                ) : null}
+              </View>
+            )}
+
             <View style={styles.questionCard}>
-              <Text style={styles.questionText}>{currentQuestion.q}</Text>
-              {currentQuestion.speech?.text ? (
+              <Text style={styles.questionText}>{questionText}</Text>
+              {!questionEmoji && currentQuestion.speech?.text ? (
                 <View style={styles.questionAudio}>
                   <SpeakButton
                     text={currentQuestion.speech.text}
                     language={currentQuestion.speech.language}
-                    color={colors.primary}
+                    color={stage.accent}
                     label="🔊 Hear again"
                     size="sm"
                   />
@@ -156,44 +218,29 @@ const ModuleQuizScreen = ({ navigation, route }) => {
             </View>
 
             <View style={styles.optionsContainer}>
-              {currentQuestion.shuffledOptions.map((option, idx) => (
-                <TouchableOpacity
-                  key={`${currentIdx}-${idx}-${option}`}
-                  style={styles.optionBtn}
-                  onPress={() => handleAnswer(option)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.optionText}>{option}</Text>
-                </TouchableOpacity>
-              ))}
+              {currentQuestion.shuffledOptions.map((option, idx) => {
+                let state = 'idle';
+                if (picked) {
+                  if (option === currentQuestion.answer) state = 'correct';
+                  else if (option === picked) state = 'wrong';
+                  else state = 'dim';
+                }
+                return (
+                  <QuizOptionButton
+                    key={`${currentIdx}-${idx}-${option}`}
+                    label={option}
+                    state={state}
+                    disabled={!!picked}
+                    onPress={() => handleAnswer(option)}
+                    colors={colors}
+                  />
+                );
+              })}
             </View>
           </View>
-        ) : (
-          <View style={styles.resultCard}>
-            <Text style={styles.resultEmoji}>🏆</Text>
-            <Text style={styles.resultTitle}>Quiz Completed!</Text>
-            <Text style={styles.scoreText}>
-              Score: {correctCount} / {total}
-            </Text>
-            <Text style={styles.rewardText}>
-              You earned +{calculateStarReward(correctCount, total, 5)} Stars!
-            </Text>
-
-            <View style={styles.btnRow}>
-              <TouchableOpacity style={styles.btn} onPress={restartQuiz}>
-                <Text style={styles.btnText}>Try Again 🔁</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.btn, { backgroundColor: colors.secondary }]}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.btnText}>Back to Quizzes ➔</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-      </ScrollView>
-    </View>
+        </ScrollView>
+      )}
+    </GameStage>
   );
 };
 
@@ -201,86 +248,67 @@ const makeStyles = (colors) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingVertical: 24,
+    paddingVertical: 20,
     flexGrow: 1,
     justifyContent: 'center',
   },
   quizContent: { alignItems: 'center', width: '100%' },
   progText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: colors.textSecondary,
+    fontWeight: '900',
+    color: '#FFFFFF',
     textTransform: 'uppercase',
-    marginBottom: 16,
+    letterSpacing: 0.6,
+    marginBottom: 14,
+    textShadowColor: 'rgba(0,0,0,0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  // Big picture bubble — the emoji is the question's subject, so it gets
+  // room to actually read at a glance instead of riding inline with text.
+  emojiBubble: {
+    width: 128,
+    height: 128,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 18,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+  },
+  emojiGlyph: { fontSize: 76, lineHeight: 90, textAlign: 'center' },
+  emojiSpeakBadge: {
+    position: 'absolute',
+    right: -10,
+    bottom: -10,
   },
   questionCard: {
     backgroundColor: colors.surface,
     borderRadius: 24,
-    borderWidth: 2,
-    borderColor: colors.border,
-    paddingVertical: 32,
+    paddingVertical: 24,
     paddingHorizontal: 20,
     width: '100%',
     alignItems: 'center',
-    marginBottom: 32,
-    elevation: 1,
+    marginBottom: 26,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
   },
   questionText: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: '900',
     color: colors.textPrimary,
     textAlign: 'center',
-    lineHeight: 28,
+    lineHeight: 26,
   },
-  questionAudio: { marginTop: 16 },
+  questionAudio: { marginTop: 14 },
   optionsContainer: { width: '100%', gap: 12 },
-  optionBtn: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: colors.border,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2,
-    borderBottomWidth: 4,
-    borderBottomColor: 'rgba(0,0,0,0.12)',
-  },
-  optionText: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
-  resultCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 32,
-    borderWidth: 2,
-    borderColor: colors.border,
-    padding: 28,
-    alignItems: 'center',
-    elevation: 3,
-  },
-  resultEmoji: { fontSize: 72, marginBottom: 16 },
-  resultTitle: {
-    fontSize: 26,
-    fontWeight: '900',
-    color: colors.textPrimary,
-    marginBottom: 8,
-  },
-  scoreText: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: colors.primary,
-    marginBottom: 4,
-  },
-  rewardText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    marginBottom: 32,
-  },
   btnRow: { width: '100%', gap: 12 },
   btn: {
     backgroundColor: colors.primary,
