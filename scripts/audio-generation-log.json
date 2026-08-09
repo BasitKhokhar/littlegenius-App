@@ -126,6 +126,15 @@
     "generatedAt": "2026-08-01T13:14:27.149Z"
   },
   {
+    "file": "00942494ab471aaa.mp3",
+    "text": "حرارت",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 5,
+    "generatedAt": "2026-08-09T15:20:34.119Z"
+  },
+  {
     "file": "00a535319200606f.mp3",
     "text": "جگ",
     "lang": "ur-PK",
@@ -261,6 +270,15 @@
     "generatedAt": "2026-07-26T18:02:56.958Z"
   },
   {
+    "file": "015155d5b35c8bb3.mp3",
+    "text": "ثالث",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 4,
+    "generatedAt": "2026-08-09T15:20:30.483Z"
+  },
+  {
     "file": "01657570e4e7d286.mp3",
     "text": "ع سے عناب",
     "lang": "ur-PK",
@@ -342,6 +360,15 @@
     "generatedAt": "2026-07-16T06:19:54.759Z"
   },
   {
+    "file": "01c2ce6f4e434969.mp3",
+    "text": "ب سے برف",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:28:14.918Z"
+  },
+  {
     "file": "01c3bd91904d2017.mp3",
     "text": "Which number is Sixty Eight?",
     "lang": "en-US",
@@ -349,6 +376,15 @@
     "source": "quiz",
     "chars": 28,
     "generatedAt": "2026-07-16T06:20:19.941Z"
+  },
+  {
+    "file": "01c41991e21b5077.mp3",
+    "text": "د سے دھوپ",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 9,
+    "generatedAt": "2026-08-09T12:28:17.890Z"
   },
   {
     "file": "01cd6b526754c98c.mp3",
@@ -367,15 +403,6 @@
     "source": "quizAnswers",
     "chars": 13,
     "generatedAt": "2026-08-01T13:15:57.111Z"
-  },
-  {
-    "file": "01d3b5391251024f.mp3",
-    "text": "کس حرف سے ورق شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 27,
-    "generatedAt": "2026-08-04T18:46:32.803Z"
   },
   {
     "file": "01df5af7dc4b5321.mp3",
@@ -430,6 +457,15 @@
     "source": "quiz",
     "chars": 24,
     "generatedAt": "2026-07-16T06:07:47.317Z"
+  },
+  {
+    "file": "025e499954d80fff.mp3",
+    "text": "Messy Hair",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 10,
+    "generatedAt": "2026-08-09T12:18:23.762Z"
   },
   {
     "file": "025f67ba2712934c.mp3",
@@ -528,7 +564,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "quiz",
     "chars": 27,
-    "generatedAt": "2026-08-04T18:08:34.819Z"
+    "generatedAt": "2026-08-09T11:40:22.880Z"
   },
   {
     "file": "0305a523bdc56875.mp3",
@@ -1015,15 +1051,6 @@
     "source": "quiz",
     "chars": 41,
     "generatedAt": "2026-07-16T06:22:22.912Z"
-  },
-  {
-    "file": "05aeb75b38a9a7fd.mp3",
-    "text": "دل کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 18,
-    "generatedAt": "2026-07-16T06:14:27.018Z"
   },
   {
     "file": "05bb125dc03deedb.mp3",
@@ -1717,6 +1744,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:20:56.849Z"
+  },
+  {
+    "file": "0aa2d7bb2ff5190d.mp3",
+    "text": "حلق",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 3,
+    "generatedAt": "2026-08-09T15:20:35.382Z"
   },
   {
     "file": "0aa91742b1ed88e4.mp3",
@@ -2664,6 +2700,15 @@
     "generatedAt": "2026-07-16T06:16:04.241Z"
   },
   {
+    "file": "10000540394dfee6.mp3",
+    "text": "ثبات",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 4,
+    "generatedAt": "2026-08-09T15:20:28.250Z"
+  },
+  {
     "file": "1006218c6d5a842a.mp3",
     "text": "گیارہ",
     "lang": "ur-PK",
@@ -2743,6 +2788,15 @@
     "source": "quiz",
     "chars": 22,
     "generatedAt": "2026-07-16T06:21:15.635Z"
+  },
+  {
+    "file": "107eddb1be1ffeff.mp3",
+    "text": "د سے دیوار",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 10,
+    "generatedAt": "2026-08-09T12:28:15.649Z"
   },
   {
     "file": "10821cf967c6052f.mp3",
@@ -2868,7 +2922,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 8,
-    "generatedAt": "2026-08-01T13:44:49.779Z"
+    "generatedAt": "2026-08-09T12:28:22.192Z"
   },
   {
     "file": "115c9a9419edc2b2.mp3",
@@ -2934,15 +2988,6 @@
     "generatedAt": "2026-07-16T06:14:53.446Z"
   },
   {
-    "file": "118bb94d31db4ba3.mp3",
-    "text": "ث سے ثقافت",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 10,
-    "generatedAt": "2026-08-04T17:12:47.471Z"
-  },
-  {
     "file": "118eb503e5ff77c5.mp3",
     "text": "بیالیس کون سا نمبر ہے؟",
     "lang": "ur-PK",
@@ -2959,15 +3004,6 @@
     "source": "pakistan",
     "chars": 63,
     "generatedAt": "2026-07-16T06:02:07.061Z"
-  },
-  {
-    "file": "119a7e7eb622eca0.mp3",
-    "text": "کس حرف سے ثابت شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:08:55.277Z"
   },
   {
     "file": "11aad0087435c82e.mp3",
@@ -3042,6 +3078,15 @@
     "generatedAt": "2026-08-04T18:12:22.553Z"
   },
   {
+    "file": "12419091213c5f8f.mp3",
+    "text": "دونوں پاؤں ٹخنوں تک تین بار دھوئے۔",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "wuduSalah",
+    "chars": 34,
+    "generatedAt": "2026-08-09T12:18:20.949Z"
+  },
+  {
     "file": "124babc10cfaf6f7.mp3",
     "text": "حرف گ سے کون سا لفظ شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -3094,6 +3139,15 @@
     "source": "duas",
     "chars": 60,
     "generatedAt": "2026-07-17T17:44:39.651Z"
+  },
+  {
+    "file": "1280707f963904d9.mp3",
+    "text": "Snow",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 4,
+    "generatedAt": "2026-08-09T12:54:02.428Z"
   },
   {
     "file": "1284c6ce7339a888.mp3",
@@ -3355,6 +3409,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:14:10.557Z"
+  },
+  {
+    "file": "14509a62c20fa4cc.mp3",
+    "text": "ژ سے ٹیلی ویژن",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 14,
+    "generatedAt": "2026-08-09T08:35:54.007Z"
   },
   {
     "file": "145ad87d91f407db.mp3",
@@ -3715,15 +3778,6 @@
     "source": "alphabetVocabPhrase",
     "chars": 10,
     "generatedAt": "2026-08-01T05:43:37.124Z"
-  },
-  {
-    "file": "16979f515b127cff.mp3",
-    "text": "کس حرف سے حل شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 26,
-    "generatedAt": "2026-08-04T18:09:05.684Z"
   },
   {
     "file": "16c740ebd7b8da2d.mp3",
@@ -4122,15 +4176,6 @@
     "generatedAt": "2026-07-16T06:20:06.311Z"
   },
   {
-    "file": "19941530d92e954e.mp3",
-    "text": "ث سے ثابت",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-04T17:12:49.153Z"
-  },
-  {
     "file": "1999876eb9721c68.mp3",
     "text": "Orange. A sweet fruit full of vitamin C.",
     "lang": "en-US",
@@ -4138,6 +4183,15 @@
     "source": "learn",
     "chars": 40,
     "generatedAt": "2026-07-16T06:02:58.090Z"
+  },
+  {
+    "file": "19b962073480ad71.mp3",
+    "text": "کس حرف سے دیوار شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 29,
+    "generatedAt": "2026-08-09T12:28:25.164Z"
   },
   {
     "file": "19c6a516cca67910.mp3",
@@ -4383,15 +4437,6 @@
     "generatedAt": "2026-07-16T06:04:51.821Z"
   },
   {
-    "file": "1af754ff0e5c42f1.mp3",
-    "text": "ورق",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 3,
-    "generatedAt": "2026-08-04T18:46:29.547Z"
-  },
-  {
     "file": "1b0514221e207464.mp3",
     "text": "Meem",
     "lang": "en-US",
@@ -4561,6 +4606,15 @@
     "source": "namesMuhammad",
     "chars": 8,
     "generatedAt": "2026-07-26T13:29:51.647Z"
+  },
+  {
+    "file": "1be61ebea7a236b8.mp3",
+    "text": "ثبات کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 20,
+    "generatedAt": "2026-08-09T15:21:22.164Z"
   },
   {
     "file": "1c31c685b1b4f403.mp3",
@@ -4822,6 +4876,15 @@
     "source": "quizAnswers",
     "chars": 3,
     "generatedAt": "2026-07-23T18:48:17.787Z"
+  },
+  {
+    "file": "1d4c74d6faf8f098.mp3",
+    "text": "ثمین",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 4,
+    "generatedAt": "2026-08-09T15:20:29.503Z"
   },
   {
     "file": "1d4d0ad8335060fe.mp3",
@@ -5175,15 +5238,6 @@
     "generatedAt": "2026-07-16T06:04:25.990Z"
   },
   {
-    "file": "1f7df6873e150099.mp3",
-    "text": "حرف کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 19,
-    "generatedAt": "2026-08-04T18:12:07.596Z"
-  },
-  {
     "file": "1f9879c6da2e98c0.mp3",
     "text": "Gilgit Baltistan. Its capital is Gilgit.",
     "lang": "en-US",
@@ -5227,6 +5281,15 @@
     "source": "quiz",
     "chars": 29,
     "generatedAt": "2026-07-16T06:19:47.986Z"
+  },
+  {
+    "file": "1fc7faba9c8b895c.mp3",
+    "text": "حیرت کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 20,
+    "generatedAt": "2026-08-09T15:21:40.425Z"
   },
   {
     "file": "1fe1ae8c56fb3e72.mp3",
@@ -5380,6 +5443,15 @@
     "source": "quizAnswers",
     "chars": 9,
     "generatedAt": "2026-08-01T13:14:33.473Z"
+  },
+  {
+    "file": "20a61462d81691e4.mp3",
+    "text": "Second",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 6,
+    "generatedAt": "2026-08-09T12:54:04.403Z"
   },
   {
     "file": "20af0c621675dd84.mp3",
@@ -5794,6 +5866,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:15:56.366Z"
+  },
+  {
+    "file": "2313472731497661.mp3",
+    "text": "کس حرف سے گیراژ شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 29,
+    "generatedAt": "2026-08-09T08:36:05.378Z"
   },
   {
     "file": "231926630283dd4d.mp3",
@@ -6261,7 +6342,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 10,
-    "generatedAt": "2026-08-01T13:44:35.410Z"
+    "generatedAt": "2026-08-09T07:39:57.982Z"
   },
   {
     "file": "2600964372e07615.mp3",
@@ -7173,15 +7254,6 @@
     "generatedAt": "2026-07-23T18:48:40.922Z"
   },
   {
-    "file": "2b88ab4d745e944b.mp3",
-    "text": "ح سے حل",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 7,
-    "generatedAt": "2026-08-04T18:08:27.054Z"
-  },
-  {
     "file": "2b8a83266d52c850.mp3",
     "text": "نمبر 33 اردو میں کیا ہے؟",
     "lang": "ur-PK",
@@ -7243,6 +7315,24 @@
     "source": "numbers",
     "chars": 5,
     "generatedAt": "2026-07-16T05:56:33.746Z"
+  },
+  {
+    "file": "2bdce5d9c1eefbcf.mp3",
+    "text": "ثبت",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 3,
+    "generatedAt": "2026-08-09T15:20:31.614Z"
+  },
+  {
+    "file": "2bdf6500e8a8fede.mp3",
+    "text": "ثنا کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 19,
+    "generatedAt": "2026-08-09T15:21:13.089Z"
   },
   {
     "file": "2be51d94f129f9fa.mp3",
@@ -7416,6 +7506,15 @@
     "generatedAt": "2026-07-23T18:47:01.695Z"
   },
   {
+    "file": "2ce3400e541f4588.mp3",
+    "text": "برف کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 19,
+    "generatedAt": "2026-08-09T12:28:30.076Z"
+  },
+  {
     "file": "2d060a9e6d158968.mp3",
     "text": "ضرور کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -7549,6 +7648,15 @@
     "source": "urdu",
     "chars": 2,
     "generatedAt": "2026-08-01T13:08:00.329Z"
+  },
+  {
+    "file": "2dfe047f69a2ecf1.mp3",
+    "text": "ح سے حصہ",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 8,
+    "generatedAt": "2026-08-09T15:20:43.468Z"
   },
   {
     "file": "2e118f30f3a88ff6.mp3",
@@ -8127,13 +8235,13 @@
     "generatedAt": "2026-08-01T13:09:51.952Z"
   },
   {
-    "file": "3151760380285685.mp3",
-    "text": "ث سے ثقیل",
+    "file": "318434853216acd3.mp3",
+    "text": "حلق کا مطلب کیا ہے؟",
     "lang": "ur-PK",
     "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-04T17:12:46.669Z"
+    "source": "quiz",
+    "chars": 19,
+    "generatedAt": "2026-08-09T15:21:44.898Z"
   },
   {
     "file": "31b84fd84460eb7e.mp3",
@@ -8188,15 +8296,6 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-08-01T13:14:54.606Z"
-  },
-  {
-    "file": "320d0d66d50261d8.mp3",
-    "text": "حلقہ کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-08-04T18:12:06.985Z"
   },
   {
     "file": "324933c26fa8a71c.mp3",
@@ -8388,15 +8487,6 @@
     "generatedAt": "2026-07-16T06:05:49.646Z"
   },
   {
-    "file": "3347b0672690d121.mp3",
-    "text": "حل",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 2,
-    "generatedAt": "2026-08-04T18:08:22.968Z"
-  },
-  {
     "file": "3362e8b26b3b8d04.mp3",
     "text": "What did young Yusuf (AS) see in his dream?",
     "lang": "en-US",
@@ -8424,6 +8514,15 @@
     "generatedAt": "2026-07-16T06:06:42.171Z"
   },
   {
+    "file": "338d89395125d3df.mp3",
+    "text": "دھوپ",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 4,
+    "generatedAt": "2026-08-09T12:28:11.651Z"
+  },
+  {
     "file": "3392a77b35fd8dad.mp3",
     "text": "Van",
     "lang": "en-US",
@@ -8433,6 +8532,15 @@
     "generatedAt": "2026-08-01T13:13:47.434Z"
   },
   {
+    "file": "33a0977428f92d8a.mp3",
+    "text": "ثانی",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 4,
+    "generatedAt": "2026-08-09T15:20:28.872Z"
+  },
+  {
     "file": "33c95e8d03d35a1b.mp3",
     "text": "Which number is Thirty Three?",
     "lang": "en-US",
@@ -8440,6 +8548,15 @@
     "source": "quiz",
     "chars": 29,
     "generatedAt": "2026-07-16T06:19:52.439Z"
+  },
+  {
+    "file": "33def88317415f1d.mp3",
+    "text": "کس حرف سے ثالث شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 28,
+    "generatedAt": "2026-08-09T15:20:48.504Z"
   },
   {
     "file": "33f1827713062931.mp3",
@@ -8566,6 +8683,15 @@
     "source": "urdu",
     "chars": 3,
     "generatedAt": "2026-08-01T13:10:09.689Z"
+  },
+  {
+    "file": "34be9c71d0bcd57f.mp3",
+    "text": "منہ میں پانی لے کر تین بار کلی کرے۔",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "wuduSalah",
+    "chars": 35,
+    "generatedAt": "2026-08-09T12:18:17.008Z"
   },
   {
     "file": "34c9a54c9cbe3d9a.mp3",
@@ -8739,15 +8865,6 @@
     "generatedAt": "2026-07-26T13:32:14.875Z"
   },
   {
-    "file": "35c9370014475bee.mp3",
-    "text": "و سے ورق",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 8,
-    "generatedAt": "2026-08-04T18:46:31.381Z"
-  },
-  {
     "file": "35e602f345666bcd.mp3",
     "text": "نمبر 81 اردو میں کیا ہے؟",
     "lang": "ur-PK",
@@ -8800,6 +8917,15 @@
     "source": "quizAnswers",
     "chars": 2,
     "generatedAt": "2026-08-01T13:17:21.300Z"
+  },
+  {
+    "file": "362be3ae6aed9448.mp3",
+    "text": "ح سے حیرت",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 9,
+    "generatedAt": "2026-08-09T15:20:41.477Z"
   },
   {
     "file": "3631e47fdeb19439.mp3",
@@ -8937,6 +9063,15 @@
     "generatedAt": "2026-08-01T13:15:44.666Z"
   },
   {
+    "file": "37438e39174d712f.mp3",
+    "text": "Third",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 5,
+    "generatedAt": "2026-08-09T12:54:05.219Z"
+  },
+  {
     "file": "376850eaf1fd76e4.mp3",
     "text": "غ سے غلطی",
     "lang": "ur-PK",
@@ -9070,6 +9205,15 @@
     "source": "quizAnswers",
     "chars": 2,
     "generatedAt": "2026-08-01T13:17:11.731Z"
+  },
+  {
+    "file": "382ad09942a1bf1f.mp3",
+    "text": "Superman",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:18:24.177Z"
   },
   {
     "file": "38321299febbeec7.mp3",
@@ -9315,6 +9459,15 @@
     "generatedAt": "2026-08-01T13:07:47.787Z"
   },
   {
+    "file": "397dbb9cc3ee7a92.mp3",
+    "text": "د سے دوا",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:28:16.244Z"
+  },
+  {
     "file": "39a965e351625dd5.mp3",
     "text": "What is the Capital City of Pakistan?",
     "lang": "en-US",
@@ -9349,6 +9502,15 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-07-23T18:49:21.250Z"
+  },
+  {
+    "file": "39d4f1ac75cd128a.mp3",
+    "text": "Bubble",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 6,
+    "generatedAt": "2026-08-09T12:54:06.006Z"
   },
   {
     "file": "39e21eaa5dbc6784.mp3",
@@ -9412,15 +9574,6 @@
     "source": "urduVocabPhrase",
     "chars": 8,
     "generatedAt": "2026-08-01T13:44:27.657Z"
-  },
-  {
-    "file": "3a6af641e4821ccf.mp3",
-    "text": "ورق کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 19,
-    "generatedAt": "2026-08-04T18:46:34.214Z"
   },
   {
     "file": "3a7644146fc8650a.mp3",
@@ -9576,15 +9729,6 @@
     "generatedAt": "2026-07-23T18:46:38.980Z"
   },
   {
-    "file": "3b97fb77c4c8f901.mp3",
-    "text": "ح سے حوصلہ",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 10,
-    "generatedAt": "2026-08-04T18:08:27.686Z"
-  },
-  {
     "file": "3baaa547aba39ec1.mp3",
     "text": "Lahore",
     "lang": "en-US",
@@ -9666,15 +9810,6 @@
     "generatedAt": "2026-07-16T06:21:51.270Z"
   },
   {
-    "file": "3ca6caf1a3b36717.mp3",
-    "text": "ثقیل کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-08-04T17:13:50.564Z"
-  },
-  {
     "file": "3cc50995bffcbb8b.mp3",
     "text": "کس حرف سے قلم شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -9682,15 +9817,6 @@
     "source": "quiz",
     "chars": 27,
     "generatedAt": "2026-08-04T18:10:40.483Z"
-  },
-  {
-    "file": "3cdeff4b3c8737b5.mp3",
-    "text": "ح سے حجام",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-04T18:08:26.388Z"
   },
   {
     "file": "3ce1a5ea5ae94aac.mp3",
@@ -9844,6 +9970,15 @@
     "source": "quizAnswers",
     "chars": 7,
     "generatedAt": "2026-08-01T13:16:46.239Z"
+  },
+  {
+    "file": "3dc69ced12d70b1b.mp3",
+    "text": "Hailstone",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 9,
+    "generatedAt": "2026-08-09T12:18:21.580Z"
   },
   {
     "file": "3dcc586e70615768.mp3",
@@ -10647,6 +10782,15 @@
     "generatedAt": "2026-07-16T06:03:33.385Z"
   },
   {
+    "file": "42067d9fefa3ba41.mp3",
+    "text": "کس حرف سے ٹیلی ویژن شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 33,
+    "generatedAt": "2026-08-09T08:36:03.912Z"
+  },
+  {
     "file": "4220f7c2a0062b94.mp3",
     "text": "Tooth",
     "lang": "en-US",
@@ -10797,7 +10941,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:42:07.681Z"
+    "generatedAt": "2026-08-09T12:28:14.203Z"
   },
   {
     "file": "4306766abad30dc4.mp3",
@@ -10843,6 +10987,15 @@
     "source": "namesAllah",
     "chars": 14,
     "generatedAt": "2026-07-26T13:27:51.124Z"
+  },
+  {
+    "file": "433eb0c7ea0b3471.mp3",
+    "text": "ثبت کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 19,
+    "generatedAt": "2026-08-09T15:21:36.638Z"
   },
   {
     "file": "434509e6f39aa1b0.mp3",
@@ -11007,6 +11160,15 @@
     "generatedAt": "2026-08-01T13:10:22.494Z"
   },
   {
+    "file": "44670645b06fb88b.mp3",
+    "text": "حصہ",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 3,
+    "generatedAt": "2026-08-09T15:20:34.798Z"
+  },
+  {
     "file": "447899cc3beb5ce2.mp3",
     "text": "رنگ",
     "lang": "ur-PK",
@@ -11095,6 +11257,15 @@
     "source": "islamicStories",
     "chars": 28,
     "generatedAt": "2026-07-26T13:32:26.374Z"
+  },
+  {
+    "file": "44f97d843343b322.mp3",
+    "text": "حیرت",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 4,
+    "generatedAt": "2026-08-09T15:20:33.470Z"
   },
   {
     "file": "450008fe13a1f428.mp3",
@@ -11229,7 +11400,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduLetters",
     "chars": 1,
-    "generatedAt": "2026-08-01T13:41:45.469Z"
+    "generatedAt": "2026-08-09T07:39:56.796Z"
   },
   {
     "file": "4604d5e2d4ffe2e4.mp3",
@@ -11266,6 +11437,15 @@
     "source": "numbers",
     "chars": 7,
     "generatedAt": "2026-07-16T05:54:47.908Z"
+  },
+  {
+    "file": "46121089b52e7907.mp3",
+    "text": "گیراژ",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 5,
+    "generatedAt": "2026-08-09T08:35:47.463Z"
   },
   {
     "file": "4652b3e7b6d64ca1.mp3",
@@ -11329,6 +11509,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:14:54.233Z"
+  },
+  {
+    "file": "4694c9a575c9593b.mp3",
+    "text": "کس حرف سے حلق شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 27,
+    "generatedAt": "2026-08-09T15:21:07.950Z"
   },
   {
     "file": "46957b510983e237.mp3",
@@ -11691,6 +11880,15 @@
     "generatedAt": "2026-07-16T06:03:03.676Z"
   },
   {
+    "file": "48c45c746cb3277a.mp3",
+    "text": "کس حرف سے وین شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 27,
+    "generatedAt": "2026-08-09T12:28:29.361Z"
+  },
+  {
     "file": "48da516c68a094a2.mp3",
     "text": "پینتالیس",
     "lang": "en-US",
@@ -11862,15 +12060,6 @@
     "generatedAt": "2026-08-01T05:44:17.330Z"
   },
   {
-    "file": "49ffcb2804096926.mp3",
-    "text": "د سے دروازہ",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 11,
-    "generatedAt": "2026-08-01T13:44:26.140Z"
-  },
-  {
     "file": "4a110530910cd8b6.mp3",
     "text": "Which letter goes with this emoji?",
     "lang": "en-US",
@@ -12013,15 +12202,6 @@
     "source": "quizAnswers",
     "chars": 1,
     "generatedAt": "2026-08-01T13:16:49.315Z"
-  },
-  {
-    "file": "4b02da7016b4250e.mp3",
-    "text": "دروازہ",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 6,
-    "generatedAt": "2026-08-01T13:08:50.156Z"
   },
   {
     "file": "4b2115a9725548e7.mp3",
@@ -12168,6 +12348,15 @@
     "generatedAt": "2026-07-16T06:20:20.677Z"
   },
   {
+    "file": "4c08ab379b089b49.mp3",
+    "text": "کس حرف سے دھوپ شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 28,
+    "generatedAt": "2026-08-09T12:28:27.735Z"
+  },
+  {
     "file": "4c108e6bab9e6305.mp3",
     "text": "کس حرف سے رکشا شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -12292,15 +12481,6 @@
     "source": "quiz",
     "chars": 22,
     "generatedAt": "2026-07-16T06:21:07.578Z"
-  },
-  {
-    "file": "4ce8207f196d6359.mp3",
-    "text": "دستک کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-07-16T06:14:27.671Z"
   },
   {
     "file": "4cf31cbada10874c.mp3",
@@ -12465,15 +12645,6 @@
     "generatedAt": "2026-07-16T06:07:10.745Z"
   },
   {
-    "file": "4e3929bffa4f77c1.mp3",
-    "text": "حجام کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-08-04T18:12:05.006Z"
-  },
-  {
     "file": "4e3f1e88cf1eacfe.mp3",
     "text": "What category is Quill?",
     "lang": "en-US",
@@ -12490,6 +12661,15 @@
     "source": "quiz",
     "chars": 29,
     "generatedAt": "2026-07-26T12:48:32.396Z"
+  },
+  {
+    "file": "4e45f5bb4789eced.mp3",
+    "text": "ژولیدہ بال کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 26,
+    "generatedAt": "2026-08-09T08:36:14.057Z"
   },
   {
     "file": "4e5bb1231ee06ce5.mp3",
@@ -12544,6 +12724,15 @@
     "source": "quizAnswers",
     "chars": 5,
     "generatedAt": "2026-07-23T18:48:52.790Z"
+  },
+  {
+    "file": "4eac9c901f5e1aae.mp3",
+    "text": "د سے دیا",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:28:17.068Z"
   },
   {
     "file": "4ece4be0d53332e6.mp3",
@@ -12616,15 +12805,6 @@
     "source": "learn",
     "chars": 47,
     "generatedAt": "2026-07-16T06:03:21.699Z"
-  },
-  {
-    "file": "4f9aaacf80a5c289.mp3",
-    "text": "وعدہ کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-08-04T18:46:34.925Z"
   },
   {
     "file": "4faec306b97b0e90.mp3",
@@ -12888,15 +13068,6 @@
     "generatedAt": "2026-08-01T13:17:23.055Z"
   },
   {
-    "file": "50ccf94f8858f8c9.mp3",
-    "text": "ثقیل",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-04T17:12:43.731Z"
-  },
-  {
     "file": "50d0d722d0e94804.mp3",
     "text": "22",
     "lang": "en-US",
@@ -12958,6 +13129,15 @@
     "source": "learn",
     "chars": 51,
     "generatedAt": "2026-07-16T06:04:50.966Z"
+  },
+  {
+    "file": "5136332406dab5b2.mp3",
+    "text": "حباب",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 4,
+    "generatedAt": "2026-08-09T15:20:32.175Z"
   },
   {
     "file": "51656538c19a234e.mp3",
@@ -13239,6 +13419,15 @@
     "generatedAt": "2026-08-01T13:16:19.298Z"
   },
   {
+    "file": "52d3144e4b6a7ff8.mp3",
+    "text": "ح سے حباب",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 9,
+    "generatedAt": "2026-08-09T15:20:40.132Z"
+  },
+  {
     "file": "52dacb930b489405.mp3",
     "text": "Watch",
     "lang": "en-US",
@@ -13354,6 +13543,15 @@
     "source": "islamicStories",
     "chars": 50,
     "generatedAt": "2026-07-26T13:31:16.951Z"
+  },
+  {
+    "file": "5372f71a8d7891e4.mp3",
+    "text": "دوا کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 19,
+    "generatedAt": "2026-08-09T12:28:31.818Z"
   },
   {
     "file": "537a55d2bd9c699c.mp3",
@@ -13525,6 +13723,15 @@
     "source": "namesMuhammad",
     "chars": 22,
     "generatedAt": "2026-07-26T13:29:10.979Z"
+  },
+  {
+    "file": "547e0357f885d019.mp3",
+    "text": "گیراژ کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 21,
+    "generatedAt": "2026-08-09T08:36:13.426Z"
   },
   {
     "file": "5485ed860f32c848.mp3",
@@ -13894,15 +14101,6 @@
     "source": "numbers",
     "chars": 15,
     "generatedAt": "2026-07-16T05:56:37.096Z"
-  },
-  {
-    "file": "56b727558ec3c9bb.mp3",
-    "text": "ثمر کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 19,
-    "generatedAt": "2026-07-16T06:14:06.587Z"
   },
   {
     "file": "56eec7a38382f3d5.mp3",
@@ -14499,15 +14697,6 @@
     "generatedAt": "2026-07-16T06:04:29.372Z"
   },
   {
-    "file": "5a7049532a6e4ae5.mp3",
-    "text": "حوصلہ کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 21,
-    "generatedAt": "2026-08-04T18:12:06.334Z"
-  },
-  {
     "file": "5a7da5a895c9a496.mp3",
     "text": "حَبِيبُ اللهِ",
     "lang": "ar-SA",
@@ -14676,7 +14865,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 9,
-    "generatedAt": "2026-08-01T13:44:48.335Z"
+    "generatedAt": "2026-08-09T12:28:20.037Z"
   },
   {
     "file": "5b45c859dd86a6bf.mp3",
@@ -14940,6 +15129,15 @@
     "generatedAt": "2026-08-01T13:16:28.025Z"
   },
   {
+    "file": "5cc1f89e49b04b98.mp3",
+    "text": "کس حرف سے حیرت شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 28,
+    "generatedAt": "2026-08-09T15:20:53.942Z"
+  },
+  {
     "file": "5cd1ab708b8b877e.mp3",
     "text": "ستاون",
     "lang": "en-US",
@@ -14965,15 +15163,6 @@
     "source": "namesAllah",
     "chars": 10,
     "generatedAt": "2026-07-26T18:01:13.737Z"
-  },
-  {
-    "file": "5cfb19cd484f8dcb.mp3",
-    "text": "د سے دل",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 7,
-    "generatedAt": "2026-08-01T13:44:24.663Z"
   },
   {
     "file": "5d3baaaadfae322c.mp3",
@@ -15066,15 +15255,6 @@
     "generatedAt": "2026-07-26T13:00:56.256Z"
   },
   {
-    "file": "5de48e832964cc1d.mp3",
-    "text": "ح سے حرف",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 8,
-    "generatedAt": "2026-08-04T18:08:29.028Z"
-  },
-  {
     "file": "5dee319cecf5a7aa.mp3",
     "text": "H for Honey",
     "lang": "en-US",
@@ -15091,6 +15271,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:14:52.780Z"
+  },
+  {
+    "file": "5df652ae53000670.mp3",
+    "text": "کس حرف سے ثانی شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 28,
+    "generatedAt": "2026-08-09T15:20:46.766Z"
   },
   {
     "file": "5df93874b52744a2.mp3",
@@ -15444,6 +15633,15 @@
     "generatedAt": "2026-07-16T06:03:04.472Z"
   },
   {
+    "file": "601b5a596ad85b5f.mp3",
+    "text": "Firmness",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:54:03.990Z"
+  },
+  {
     "file": "602aa68fde7ee891.mp3",
     "text": "گ سے گاڑی",
     "lang": "ur-PK",
@@ -15666,7 +15864,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 9,
-    "generatedAt": "2026-08-01T13:44:36.349Z"
+    "generatedAt": "2026-08-09T07:39:59.255Z"
   },
   {
     "file": "61319a402eb58a7e.mp3",
@@ -15712,15 +15910,6 @@
     "source": "quiz",
     "chars": 28,
     "generatedAt": "2026-08-04T18:10:58.633Z"
-  },
-  {
-    "file": "616627bc0a329f22.mp3",
-    "text": "ثعلب",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-01T13:08:02.593Z"
   },
   {
     "file": "616d170a9517cdcc.mp3",
@@ -15930,6 +16119,15 @@
     "generatedAt": "2026-08-01T14:11:54.962Z"
   },
   {
+    "file": "62710abf079b34c1.mp3",
+    "text": "سپرمین کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 22,
+    "generatedAt": "2026-08-09T08:36:15.067Z"
+  },
+  {
     "file": "6271844dacbaebc3.mp3",
     "text": "اَلْحَمْدُ لِلّٰهِ",
     "lang": "ar-SA",
@@ -16126,6 +16324,15 @@
     "source": "quizAnswers",
     "chars": 9,
     "generatedAt": "2026-08-01T13:14:35.416Z"
+  },
+  {
+    "file": "63fb59c519b774f3.mp3",
+    "text": "ژولیدہ بال",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 10,
+    "generatedAt": "2026-08-09T08:35:48.201Z"
   },
   {
     "file": "640d7a317b4ebb37.mp3",
@@ -16335,15 +16542,6 @@
     "generatedAt": "2026-08-01T13:14:30.078Z"
   },
   {
-    "file": "654334cc4942269a.mp3",
-    "text": "ثواب کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-07-16T06:14:07.245Z"
-  },
-  {
     "file": "6544afadff7a236b.mp3",
     "text": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ أَنْ أُشْرِكَ بِكَ شَيْئًا وَأَنَا أَعْلَمُ بِهِ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ بِهِ، تُبْتُ عَنْهُ وَتَبَرَّأْتُ مِنَ الْكُفْرِ وَالشِّرْكِ وَالْكِذْبِ وَالْغِيبَةِ وَالْبِدْعَةِ وَالنَّمِيمَةِ وَالْفَوَاحِشِ وَالْبُهْتَانِ وَالْمَعَاصِي كُلِّهَا، وَأَسْلَمْتُ وَأَقُولُ لَا إِلَٰهَ إِلَّا اللَّهُ مُحَمَّدٌ رَسُولُ اللَّهِ",
     "lang": "ar-SA",
@@ -16423,6 +16621,15 @@
     "source": "namesAllah",
     "chars": 10,
     "generatedAt": "2026-07-17T17:47:11.805Z"
+  },
+  {
+    "file": "65b641c18a736c7f.mp3",
+    "text": "سپرمین",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 6,
+    "generatedAt": "2026-08-09T08:35:48.871Z"
   },
   {
     "file": "65b88b9030b48386.mp3",
@@ -16875,6 +17082,15 @@
     "generatedAt": "2026-07-26T12:48:52.444Z"
   },
   {
+    "file": "684d157e4178d668.mp3",
+    "text": "کس حرف سے حباب شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 28,
+    "generatedAt": "2026-08-09T15:20:49.949Z"
+  },
+  {
     "file": "684e34610fbe7077.mp3",
     "text": "77. Seventy Seven",
     "lang": "en-US",
@@ -17125,6 +17341,15 @@
     "source": "quiz",
     "chars": 21,
     "generatedAt": "2026-07-16T06:13:46.725Z"
+  },
+  {
+    "file": "6a0e807a491a9464.mp3",
+    "text": "ث سے ثنا",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 8,
+    "generatedAt": "2026-08-09T15:20:36.042Z"
   },
   {
     "file": "6a213f9ec8132478.mp3",
@@ -17476,6 +17701,15 @@
     "source": "quizAnswers",
     "chars": 2,
     "generatedAt": "2026-08-01T13:17:09.370Z"
+  },
+  {
+    "file": "6bbe021edbd894b8.mp3",
+    "text": "حیوان کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 21,
+    "generatedAt": "2026-08-09T15:21:38.861Z"
   },
   {
     "file": "6bc27760ba802dc6.mp3",
@@ -18234,6 +18468,24 @@
     "generatedAt": "2026-08-01T13:07:55.031Z"
   },
   {
+    "file": "70cdc12a9ef99cd4.mp3",
+    "text": "حرارت کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 21,
+    "generatedAt": "2026-08-09T15:21:41.533Z"
+  },
+  {
+    "file": "70e9393a31ccd57c.mp3",
+    "text": "کس حرف سے برف شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 27,
+    "generatedAt": "2026-08-09T12:28:24.407Z"
+  },
+  {
     "file": "7101c9edd8c9701b.mp3",
     "text": "7",
     "lang": "en-US",
@@ -18295,6 +18547,15 @@
     "source": "urdu",
     "chars": 4,
     "generatedAt": "2026-08-01T13:08:44.285Z"
+  },
+  {
+    "file": "712e34a6c4b32ea8.mp3",
+    "text": "دیا کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 19,
+    "generatedAt": "2026-08-09T12:28:32.535Z"
   },
   {
     "file": "713133496c4fe41f.mp3",
@@ -18621,6 +18882,15 @@
     "generatedAt": "2026-08-01T13:15:51.193Z"
   },
   {
+    "file": "72d17dfdf0459db3.mp3",
+    "text": "اللہ کے سوا کوئی معبود نہیں، وہ اکیلا ہے، اس کا کوئی شریک نہیں، بادشاہی اسی کی ہے اور تمام تعریفیں اسی کے لیے ہیں، وہی زندہ کرتا ہے اور مارتا ہے، اور وہ زندہ ہے، کبھی نہیں مرے گا، وہ صاحبِ جلال و اکرام ہے، ہر قسم کی بھلائی اسی کے ہاتھ میں ہے اور وہ ہر چیز پر قادر ہے۔",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "kalmas",
+    "chars": 267,
+    "generatedAt": "2026-08-09T10:01:03.442Z"
+  },
+  {
     "file": "72eae767ed1cd6c1.mp3",
     "text": "Rashid Minhas was a brave young pilot of the Pakistan Air Force.",
     "lang": "en-US",
@@ -18673,6 +18943,15 @@
     "source": "quiz",
     "chars": 22,
     "generatedAt": "2026-07-16T06:10:22.138Z"
+  },
+  {
+    "file": "7321dc84287ab1ba.mp3",
+    "text": "کس حرف سے ثنا شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 27,
+    "generatedAt": "2026-08-09T15:20:45.128Z"
   },
   {
     "file": "73351e77accc6789.mp3",
@@ -18799,15 +19078,6 @@
     "source": "quizAnswers",
     "chars": 3,
     "generatedAt": "2026-07-26T13:01:04.806Z"
-  },
-  {
-    "file": "73e474a00b3b3c0e.mp3",
-    "text": "درخت",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-01T13:08:47.231Z"
   },
   {
     "file": "741b31eb1e8e26bd.mp3",
@@ -19051,6 +19321,15 @@
     "source": "stories",
     "chars": 47,
     "generatedAt": "2026-07-16T06:05:40.436Z"
+  },
+  {
+    "file": "7531ec19cc4ded3f.mp3",
+    "text": "ث سے ثالث",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 9,
+    "generatedAt": "2026-08-09T15:20:38.903Z"
   },
   {
     "file": "7532aaa1f26afc77.mp3",
@@ -19366,15 +19645,6 @@
     "source": "urdu",
     "chars": 3,
     "generatedAt": "2026-08-01T13:09:25.094Z"
-  },
-  {
-    "file": "772b86eba5ff2dc5.mp3",
-    "text": "ثمر",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 3,
-    "generatedAt": "2026-08-01T13:08:03.158Z"
   },
   {
     "file": "772e1d02411b2e94.mp3",
@@ -20169,6 +20439,15 @@
     "generatedAt": "2026-07-16T06:00:13.361Z"
   },
   {
+    "file": "7b4b328aeadb8834.mp3",
+    "text": "ثانی کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 20,
+    "generatedAt": "2026-08-09T15:21:31.454Z"
+  },
+  {
     "file": "7b4f48b93111726f.mp3",
     "text": "V for Volcano",
     "lang": "en-US",
@@ -20248,6 +20527,15 @@
     "source": "urduVocabPhrase",
     "chars": 9,
     "generatedAt": "2026-08-01T13:45:00.269Z"
+  },
+  {
+    "file": "7bb0c59eadf55d58.mp3",
+    "text": "Television",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 10,
+    "generatedAt": "2026-08-09T12:18:22.001Z"
   },
   {
     "file": "7bb31f3ba11ce9fd.mp3",
@@ -20475,6 +20763,15 @@
     "generatedAt": "2026-07-26T18:02:14.565Z"
   },
   {
+    "file": "7ceb99daf9506cfc.mp3",
+    "text": "دونوں بازو کہنیوں تک تین بار دھوئے۔",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "wuduSalah",
+    "chars": 35,
+    "generatedAt": "2026-08-09T12:18:19.261Z"
+  },
+  {
     "file": "7cf2e03b934afd3d.mp3",
     "text": "باسٹھ",
     "lang": "ur-PK",
@@ -20583,6 +20880,15 @@
     "generatedAt": "2026-08-01T13:14:58.815Z"
   },
   {
+    "file": "7d96ae8cb7614a8a.mp3",
+    "text": "Wall",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 4,
+    "generatedAt": "2026-08-09T12:54:08.093Z"
+  },
+  {
     "file": "7dc77db1561fad07.mp3",
     "text": "حفاظت کرنے والا",
     "lang": "ur-PK",
@@ -20661,7 +20967,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 9,
-    "generatedAt": "2026-08-01T13:44:37.325Z"
+    "generatedAt": "2026-08-09T07:39:59.863Z"
   },
   {
     "file": "7e516600c04c3146.mp3",
@@ -20907,15 +21213,6 @@
     "generatedAt": "2026-07-26T18:03:25.220Z"
   },
   {
-    "file": "7fcff4870abb6969.mp3",
-    "text": "ثقافت کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 21,
-    "generatedAt": "2026-08-04T17:13:51.568Z"
-  },
-  {
     "file": "7fdf8a314f130f77.mp3",
     "text": "Which number is Eighty Four?",
     "lang": "en-US",
@@ -21015,6 +21312,15 @@
     "generatedAt": "2026-07-16T06:09:31.406Z"
   },
   {
+    "file": "8097d41d2db59cbb.mp3",
+    "text": "أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "kalmas",
+    "chars": 115,
+    "generatedAt": "2026-08-09T10:00:57.823Z"
+  },
+  {
     "file": "809ea985e8664fb3.mp3",
     "text": "O",
     "lang": "en-US",
@@ -21058,15 +21364,6 @@
     "source": "quizAnswers",
     "chars": 2,
     "generatedAt": "2026-08-01T13:17:26.899Z"
-  },
-  {
-    "file": "80cc04321a312c2c.mp3",
-    "text": "ح سے حلقہ",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-04T18:08:28.304Z"
   },
   {
     "file": "80e02925ce2ef8f3.mp3",
@@ -21330,13 +21627,13 @@
     "generatedAt": "2026-08-04T18:09:49.335Z"
   },
   {
-    "file": "82674e8ddf3d3a1b.mp3",
-    "text": "حوصلہ",
+    "file": "825c889bfba84f35.mp3",
+    "text": "ورزش کا مطلب کیا ہے؟",
     "lang": "ur-PK",
     "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 5,
-    "generatedAt": "2026-08-04T18:08:23.481Z"
+    "source": "quiz",
+    "chars": 20,
+    "generatedAt": "2026-08-09T12:28:34.080Z"
   },
   {
     "file": "8281981de39024ab.mp3",
@@ -21456,15 +21753,6 @@
     "generatedAt": "2026-07-26T13:29:37.670Z"
   },
   {
-    "file": "83408ec528211ac3.mp3",
-    "text": "ب سے بکری",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-04T17:00:56.508Z"
-  },
-  {
     "file": "83522895336170a3.mp3",
     "text": "Alligator",
     "lang": "en-US",
@@ -21535,15 +21823,6 @@
     "source": "quiz",
     "chars": 33,
     "generatedAt": "2026-08-04T18:12:00.027Z"
-  },
-  {
-    "file": "83b1517902c8989f.mp3",
-    "text": "حل کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 18,
-    "generatedAt": "2026-08-04T18:12:05.694Z"
   },
   {
     "file": "83b619ed4b4cbb73.mp3",
@@ -21697,15 +21976,6 @@
     "source": "numbers",
     "chars": 15,
     "generatedAt": "2026-07-16T05:58:03.944Z"
-  },
-  {
-    "file": "84a5271980892e87.mp3",
-    "text": "حرف",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 3,
-    "generatedAt": "2026-08-04T18:08:25.006Z"
   },
   {
     "file": "84b46e3ec4079650.mp3",
@@ -21913,15 +22183,6 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-08-01T13:16:30.490Z"
-  },
-  {
-    "file": "8621f79cba9f8902.mp3",
-    "text": "حلوا",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-04T18:08:20.689Z"
   },
   {
     "file": "862c2101d299f577.mp3",
@@ -22183,15 +22444,6 @@
     "source": "urdu",
     "chars": 4,
     "generatedAt": "2026-08-01T13:08:47.790Z"
-  },
-  {
-    "file": "87e58b9eeb46b170.mp3",
-    "text": "بکری",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-04T17:00:54.750Z"
   },
   {
     "file": "87f1a54fd989c579.mp3",
@@ -22509,6 +22761,15 @@
     "generatedAt": "2026-08-01T13:15:49.735Z"
   },
   {
+    "file": "8a27881e870d5fc8.mp3",
+    "text": "کس حرف سے ژالہ شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 28,
+    "generatedAt": "2026-08-09T08:36:02.732Z"
+  },
+  {
     "file": "8a2a68dc6a47f022.mp3",
     "text": "طبلہ",
     "lang": "en-US",
@@ -22579,6 +22840,15 @@
     "source": "quizAnswers",
     "chars": 5,
     "generatedAt": "2026-08-01T13:15:07.387Z"
+  },
+  {
+    "file": "8ab14c014d6904d7.mp3",
+    "text": "ح سے حلق",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 8,
+    "generatedAt": "2026-08-09T15:20:44.205Z"
   },
   {
     "file": "8ab62adcb89d053a.mp3",
@@ -22696,15 +22966,6 @@
     "source": "quiz",
     "chars": 28,
     "generatedAt": "2026-08-04T18:10:22.500Z"
-  },
-  {
-    "file": "8b6bd506faa16e18.mp3",
-    "text": "کس حرف سے حلوا شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:09:04.322Z"
   },
   {
     "file": "8b6c70a1741f7277.mp3",
@@ -22914,6 +23175,15 @@
     "generatedAt": "2026-07-23T18:48:21.919Z"
   },
   {
+    "file": "8cb9c340f56ee33e.mp3",
+    "text": "ث سے ثانی",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 9,
+    "generatedAt": "2026-08-09T15:20:37.590Z"
+  },
+  {
     "file": "8cd8c47e4582e130.mp3",
     "text": "ژالہ باری",
     "lang": "en-US",
@@ -22921,15 +23191,6 @@
     "source": "quizAnswers",
     "chars": 9,
     "generatedAt": "2026-07-23T18:48:50.446Z"
-  },
-  {
-    "file": "8ceae4eee9aa4798.mp3",
-    "text": "ث سے ثواب",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-01T13:44:08.592Z"
   },
   {
     "file": "8cfe54038ad98ac5.mp3",
@@ -23047,6 +23308,15 @@
     "source": "namesMuhammad",
     "chars": 7,
     "generatedAt": "2026-07-26T18:03:06.889Z"
+  },
+  {
+    "file": "8d67d27238eb2a84.mp3",
+    "text": "ناک میں تھوڑا پانی ڈال کر تین بار صاف کرے۔",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "wuduSalah",
+    "chars": 42,
+    "generatedAt": "2026-08-09T12:18:17.831Z"
   },
   {
     "file": "8d7896d34e96b4b5.mp3",
@@ -23380,6 +23650,15 @@
     "source": "namaz",
     "chars": 28,
     "generatedAt": "2026-07-17T17:48:41.701Z"
+  },
+  {
+    "file": "8ee9e9bdff65cd9b.mp3",
+    "text": "Garage",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 6,
+    "generatedAt": "2026-08-09T12:18:23.201Z"
   },
   {
     "file": "8efd44b6dbc648a0.mp3",
@@ -24030,6 +24309,15 @@
     "generatedAt": "2026-08-01T13:45:03.154Z"
   },
   {
+    "file": "93b3623e99a03620.mp3",
+    "text": "کس حرف سے دوا شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 27,
+    "generatedAt": "2026-08-09T12:28:25.882Z"
+  },
+  {
     "file": "93b6ee7613bc21b0.mp3",
     "text": "V for Vase",
     "lang": "en-US",
@@ -24109,6 +24397,15 @@
     "source": "quiz",
     "chars": 33,
     "generatedAt": "2026-07-16T06:17:39.266Z"
+  },
+  {
+    "file": "945425d92a328fbb.mp3",
+    "text": "میں گواہی دیتا ہوں کہ اللہ کے سوا کوئی معبود نہیں، وہ اکیلا ہے، اس کا کوئی شریک نہیں، اور میں گواہی دیتا ہوں کہ محمد ﷺ اس کے بندے اور رسول ہیں",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "kalmas",
+    "chars": 142,
+    "generatedAt": "2026-08-09T10:00:59.850Z"
   },
   {
     "file": "94568f8fc1895021.mp3",
@@ -24279,16 +24576,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 9,
-    "generatedAt": "2026-08-01T13:44:37.798Z"
-  },
-  {
-    "file": "9595d0f1a2533457.mp3",
-    "text": "وعدہ",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-04T18:46:30.705Z"
+    "generatedAt": "2026-08-09T07:40:00.570Z"
   },
   {
     "file": "9599912ef418f9f0.mp3",
@@ -24768,15 +25056,6 @@
     "generatedAt": "2026-08-04T18:10:06.423Z"
   },
   {
-    "file": "98f1ce7f05f03b71.mp3",
-    "text": "کس حرف سے وعدہ شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:46:33.536Z"
-  },
-  {
     "file": "98f3c4d421a8d222.mp3",
     "text": "نمبر 57 اردو میں کیا ہے؟",
     "lang": "ur-PK",
@@ -25038,6 +25317,15 @@
     "generatedAt": "2026-07-26T18:01:26.130Z"
   },
   {
+    "file": "9a19068e27eb7c50.mp3",
+    "text": "کس حرف سے حرارت شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 29,
+    "generatedAt": "2026-08-09T15:20:59.129Z"
+  },
+  {
     "file": "9a27b941791f0de7.mp3",
     "text": "عَبْدُ اللهِ",
     "lang": "ar-SA",
@@ -25200,6 +25488,15 @@
     "generatedAt": "2026-07-16T06:07:51.198Z"
   },
   {
+    "file": "9b7ffb9ef3e818b8.mp3",
+    "text": "Praise",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 6,
+    "generatedAt": "2026-08-09T12:54:03.583Z"
+  },
+  {
     "file": "9baebf23535b2a55.mp3",
     "text": "The Kaaba",
     "lang": "en-US",
@@ -25234,6 +25531,15 @@
     "source": "urdu",
     "chars": 3,
     "generatedAt": "2026-08-01T13:09:39.605Z"
+  },
+  {
+    "file": "9c032fc832f60266.mp3",
+    "text": "ثمین کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 20,
+    "generatedAt": "2026-08-09T15:21:32.676Z"
   },
   {
     "file": "9c145389a6f043bf.mp3",
@@ -25326,22 +25632,13 @@
     "generatedAt": "2026-08-01T14:11:38.726Z"
   },
   {
-    "file": "9c919fe5bfc14aa3.mp3",
-    "text": "دل",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 2,
-    "generatedAt": "2026-08-01T13:08:48.352Z"
-  },
-  {
     "file": "9c9d858c78598542.mp3",
     "text": "بلی",
     "lang": "ur-PK",
     "voice": "ur-PK-AsadNeural",
     "source": "urdu",
     "chars": 3,
-    "generatedAt": "2026-08-04T17:00:55.889Z"
+    "generatedAt": "2026-08-09T11:40:07.362Z"
   },
   {
     "file": "9cac43a37df83b75.mp3",
@@ -25434,6 +25731,15 @@
     "generatedAt": "2026-07-16T06:20:58.332Z"
   },
   {
+    "file": "9d1a51ab02339435.mp3",
+    "text": "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ حَيٌّ لَا يَمُوتُ أَبَدًا أَبَدًا، ذُو الْجَلَالِ وَالْإِكْرَامِ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+    "lang": "ar-SA",
+    "voice": "ar-SA-HamedNeural",
+    "source": "kalmas",
+    "chars": 233,
+    "generatedAt": "2026-08-09T10:01:01.549Z"
+  },
+  {
     "file": "9d1f59fd5860bcdb.mp3",
     "text": "Buffalo. A big animal that gives lots of milk.",
     "lang": "en-US",
@@ -25470,6 +25776,15 @@
     "generatedAt": "2026-07-16T06:07:30.835Z"
   },
   {
+    "file": "9d66214e0b5444e0.mp3",
+    "text": "وین",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 3,
+    "generatedAt": "2026-08-09T12:28:13.073Z"
+  },
+  {
     "file": "9d97c9d9c39c69ff.mp3",
     "text": "Lungs. They help us breathe air.",
     "lang": "en-US",
@@ -25494,7 +25809,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 8,
-    "generatedAt": "2026-08-01T13:44:47.400Z"
+    "generatedAt": "2026-08-09T12:28:18.525Z"
   },
   {
     "file": "9dbf41d3287b5efd.mp3",
@@ -25638,7 +25953,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 8,
-    "generatedAt": "2026-08-01T13:44:47.891Z"
+    "generatedAt": "2026-08-09T12:28:19.323Z"
   },
   {
     "file": "9e85a8300446e926.mp3",
@@ -26235,6 +26550,15 @@
     "generatedAt": "2026-07-16T06:14:37.779Z"
   },
   {
+    "file": "a27df6230f77be65.mp3",
+    "text": "Surprise",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:54:06.366Z"
+  },
+  {
     "file": "a282684eace8a3b8.mp3",
     "text": "Which number is Twenty Six?",
     "lang": "en-US",
@@ -26278,6 +26602,15 @@
     "source": "quizAnswers",
     "chars": 6,
     "generatedAt": "2026-08-01T13:14:24.775Z"
+  },
+  {
+    "file": "a2de26b262b294d4.mp3",
+    "text": "Heat",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 4,
+    "generatedAt": "2026-08-09T12:54:06.780Z"
   },
   {
     "file": "a2e40b4d1feb9f8b.mp3",
@@ -26350,6 +26683,15 @@
     "source": "learn",
     "chars": 33,
     "generatedAt": "2026-07-16T06:04:09.827Z"
+  },
+  {
+    "file": "a38e3a647c7fee1a.mp3",
+    "text": "دوا",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 3,
+    "generatedAt": "2026-08-09T12:28:10.314Z"
   },
   {
     "file": "a3ae1ae009cbe956.mp3",
@@ -26451,15 +26793,6 @@
     "generatedAt": "2026-08-01T13:41:05.461Z"
   },
   {
-    "file": "a40fc772890524e4.mp3",
-    "text": "ثواب",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-01T13:08:05.014Z"
-  },
-  {
     "file": "a41777d4bd8f5c12.mp3",
     "text": "Do Chashmi Hay",
     "lang": "en-US",
@@ -26503,15 +26836,6 @@
     "source": "numbers",
     "chars": 13,
     "generatedAt": "2026-07-16T05:56:05.557Z"
-  },
-  {
-    "file": "a42df501191547c7.mp3",
-    "text": "دستک",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-01T13:08:49.012Z"
   },
   {
     "file": "a4453a44bbf5ccea.mp3",
@@ -26575,15 +26899,6 @@
     "source": "pakistan",
     "chars": 49,
     "generatedAt": "2026-07-16T06:01:45.727Z"
-  },
-  {
-    "file": "a4a6bb6fc30bb3a9.mp3",
-    "text": "کس حرف سے حجام شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:09:05.042Z"
   },
   {
     "file": "a4ba21a74a148661.mp3",
@@ -26874,6 +27189,15 @@
     "generatedAt": "2026-08-01T05:44:12.283Z"
   },
   {
+    "file": "a6224d8a0368118c.mp3",
+    "text": "کس حرف سے حیوان شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 29,
+    "generatedAt": "2026-08-09T15:20:51.562Z"
+  },
+  {
     "file": "a624a9d67b957550.mp3",
     "text": "40",
     "lang": "en-US",
@@ -27036,15 +27360,6 @@
     "generatedAt": "2026-07-23T18:47:26.688Z"
   },
   {
-    "file": "a77d23a9d99b808f.mp3",
-    "text": "د سے دستک",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-01T13:44:25.157Z"
-  },
-  {
     "file": "a780feefafc07d11.mp3",
     "text": "غبارہ کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -27124,15 +27439,6 @@
     "source": "urduVocabPhrase",
     "chars": 8,
     "generatedAt": "2026-08-01T13:45:44.676Z"
-  },
-  {
-    "file": "a814966000239e0e.mp3",
-    "text": "بکری کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-08-04T17:01:00.081Z"
   },
   {
     "file": "a824fcc6b3d4e554.mp3",
@@ -27360,6 +27666,15 @@
     "generatedAt": "2026-08-01T13:09:04.675Z"
   },
   {
+    "file": "a99c182339e169c5.mp3",
+    "text": "Sunshine",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:54:08.921Z"
+  },
+  {
     "file": "a9b3f4ca60d2365c.mp3",
     "text": "Be Careful Near Cars. Never play on the road.",
     "lang": "en-US",
@@ -27504,6 +27819,15 @@
     "generatedAt": "2026-07-16T06:08:38.414Z"
   },
   {
+    "file": "aad3e6d79cec70d9.mp3",
+    "text": "کس حرف سے ثبت شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 27,
+    "generatedAt": "2026-08-09T15:20:49.212Z"
+  },
+  {
     "file": "aad8b9132ca01f05.mp3",
     "text": "Student",
     "lang": "en-US",
@@ -27537,7 +27861,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 8,
-    "generatedAt": "2026-08-01T13:44:49.281Z"
+    "generatedAt": "2026-08-09T12:28:21.419Z"
   },
   {
     "file": "ab24cd53e53203c5.mp3",
@@ -27700,15 +28024,6 @@
     "source": "quizAnswers",
     "chars": 6,
     "generatedAt": "2026-08-01T13:15:07.762Z"
-  },
-  {
-    "file": "ac4f8e9793a82af1.mp3",
-    "text": "کس حرف سے ثقافت شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 29,
-    "generatedAt": "2026-08-04T18:08:54.526Z"
   },
   {
     "file": "ac5c0aadf01071eb.mp3",
@@ -28233,15 +28548,6 @@
     "generatedAt": "2026-08-01T13:16:59.671Z"
   },
   {
-    "file": "af961f297e9025d7.mp3",
-    "text": "کس حرف سے ثقیل شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:08:53.756Z"
-  },
-  {
     "file": "af9978ca8ff8ac4c.mp3",
     "text": "Which letter is for Egg?",
     "lang": "en-US",
@@ -28305,6 +28611,15 @@
     "generatedAt": "2026-07-16T06:17:55.455Z"
   },
   {
+    "file": "afcb0169ea3dfb57.mp3",
+    "text": "دیوار",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 5,
+    "generatedAt": "2026-08-09T12:28:09.591Z"
+  },
+  {
     "file": "afda2fccf38c0b2a.mp3",
     "text": "Don't Fight. Solve problems with kind words.",
     "lang": "en-US",
@@ -28339,6 +28654,15 @@
     "source": "namesMuhammad",
     "chars": 16,
     "generatedAt": "2026-07-26T13:29:15.570Z"
+  },
+  {
+    "file": "b0115ba09a7d5ce6.mp3",
+    "text": "حیوان",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 5,
+    "generatedAt": "2026-08-09T15:20:32.839Z"
   },
   {
     "file": "b018cbc65095e3c0.mp3",
@@ -28482,7 +28806,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 9,
-    "generatedAt": "2026-08-01T13:44:38.289Z"
+    "generatedAt": "2026-08-09T07:40:01.251Z"
   },
   {
     "file": "b0e4dd6c7ab2e9f2.mp3",
@@ -28656,6 +28980,15 @@
     "generatedAt": "2026-07-16T06:19:59.052Z"
   },
   {
+    "file": "b1e1e3760073c530.mp3",
+    "text": "Medicine",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:54:08.506Z"
+  },
+  {
     "file": "b1e40bc3082dc2d5.mp3",
     "text": "The sun",
     "lang": "en-US",
@@ -28809,6 +29142,15 @@
     "generatedAt": "2026-08-01T13:44:12.865Z"
   },
   {
+    "file": "b2dc7fa766a642f9.mp3",
+    "text": "\"بسم اللہ\" کہہ کر اللہ کے لیے وضو کی نیت کرے۔",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "wuduSalah",
+    "chars": 45,
+    "generatedAt": "2026-08-09T12:18:14.552Z"
+  },
+  {
     "file": "b2dc81aa7d41b9b4.mp3",
     "text": "گھر کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -28879,15 +29221,6 @@
     "source": "duas",
     "chars": 26,
     "generatedAt": "2026-07-26T18:00:11.766Z"
-  },
-  {
-    "file": "b3119b1edb48ecf0.mp3",
-    "text": "درخت کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-07-16T06:14:25.527Z"
   },
   {
     "file": "b316ce29a202f95f.mp3",
@@ -29061,15 +29394,6 @@
     "generatedAt": "2026-08-04T15:55:18.156Z"
   },
   {
-    "file": "b46a35aa4f7e8be4.mp3",
-    "text": "و سے وعدہ",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-04T18:46:32.068Z"
-  },
-  {
     "file": "b48eff6c97b68cea.mp3",
     "text": "Eighty",
     "lang": "en-US",
@@ -29133,13 +29457,13 @@
     "generatedAt": "2026-08-01T13:42:01.985Z"
   },
   {
-    "file": "b50ef357f6f8e181.mp3",
-    "text": "کس حرف سے حرف شروع ہوتا ہے؟",
+    "file": "b5101c2721d64b21.mp3",
+    "text": "دھوپ کا مطلب کیا ہے؟",
     "lang": "ur-PK",
     "voice": "ur-PK-AsadNeural",
     "source": "quiz",
-    "chars": 27,
-    "generatedAt": "2026-08-04T18:09:07.809Z"
+    "chars": 20,
+    "generatedAt": "2026-08-09T12:28:33.364Z"
   },
   {
     "file": "b51e20e45e44d712.mp3",
@@ -29185,6 +29509,15 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-08-01T13:13:42.831Z"
+  },
+  {
+    "file": "b5517fb0966d7bde.mp3",
+    "text": "وین کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 19,
+    "generatedAt": "2026-08-09T12:28:34.725Z"
   },
   {
     "file": "b551c5e0d17c4ab6.mp3",
@@ -29277,15 +29610,6 @@
     "generatedAt": "2026-07-16T06:16:06.733Z"
   },
   {
-    "file": "b5ef0e0aaec64504.mp3",
-    "text": "کس حرف سے درخت شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:09:12.814Z"
-  },
-  {
     "file": "b5fc001733a2b7e9.mp3",
     "text": "و سے وزن",
     "lang": "ur-PK",
@@ -29338,6 +29662,15 @@
     "source": "quizAnswers",
     "chars": 5,
     "generatedAt": "2026-07-26T13:01:00.222Z"
+  },
+  {
+    "file": "b62463ded6a1d530.mp3",
+    "text": "ژ سے گیراژ",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 10,
+    "generatedAt": "2026-08-09T08:35:55.022Z"
   },
   {
     "file": "b63750783d7eacfe.mp3",
@@ -29403,15 +29736,6 @@
     "generatedAt": "2026-07-16T06:03:20.649Z"
   },
   {
-    "file": "b6e45628985dbab6.mp3",
-    "text": "د سے درخت",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-01T13:44:23.348Z"
-  },
-  {
     "file": "b6f219276749a5b1.mp3",
     "text": "ریل کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -29428,6 +29752,15 @@
     "source": "urduVocabPhrase",
     "chars": 9,
     "generatedAt": "2026-08-01T05:45:15.808Z"
+  },
+  {
+    "file": "b7008ece44c9ad70.mp3",
+    "text": "ح سے حرارت",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 10,
+    "generatedAt": "2026-08-09T15:20:42.159Z"
   },
   {
     "file": "b7063467921cd649.mp3",
@@ -29592,6 +29925,15 @@
     "generatedAt": "2026-07-26T18:02:44.363Z"
   },
   {
+    "file": "b80d537032239716.mp3",
+    "text": "برف",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 3,
+    "generatedAt": "2026-08-09T12:28:08.279Z"
+  },
+  {
     "file": "b8170d6580a191fb.mp3",
     "text": "تاج",
     "lang": "ur-PK",
@@ -29673,15 +30015,6 @@
     "generatedAt": "2026-07-16T06:17:20.873Z"
   },
   {
-    "file": "b86e5da483eaef0a.mp3",
-    "text": "کس حرف سے بکری شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:08:34.148Z"
-  },
-  {
     "file": "b87530dadf963f0c.mp3",
     "text": "مَهْدِيٌّ",
     "lang": "ar-SA",
@@ -29718,13 +30051,22 @@
     "generatedAt": "2026-08-01T05:43:53.149Z"
   },
   {
+    "file": "b8bd1b58d7ef8e36.mp3",
+    "text": "دیا",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 3,
+    "generatedAt": "2026-08-09T12:28:11.024Z"
+  },
+  {
     "file": "b8c3ab926e3a4bfc.mp3",
     "text": "بلی کا مطلب کیا ہے؟",
     "lang": "ur-PK",
     "voice": "ur-PK-AsadNeural",
     "source": "quiz",
     "chars": 19,
-    "generatedAt": "2026-08-04T17:01:01.398Z"
+    "generatedAt": "2026-08-09T11:40:28.616Z"
   },
   {
     "file": "b8c6fc2ea709b0c8.mp3",
@@ -29905,15 +30247,6 @@
     "source": "namesMuhammad",
     "chars": 5,
     "generatedAt": "2026-07-26T18:02:02.379Z"
-  },
-  {
-    "file": "b9ec51782eaa73ee.mp3",
-    "text": "کس حرف سے ثواب شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:08:53.070Z"
   },
   {
     "file": "b9fb23e5adcca0d3.mp3",
@@ -30132,6 +30465,15 @@
     "generatedAt": "2026-07-17T17:48:33.875Z"
   },
   {
+    "file": "bb3b034a300d79cc.mp3",
+    "text": "ژ سے ژولیدہ بال",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 15,
+    "generatedAt": "2026-08-09T08:35:56.021Z"
+  },
+  {
     "file": "bb50d34bf0c73e5d.mp3",
     "text": "Clean Your Desk. Keep your study desk tidy.",
     "lang": "en-US",
@@ -30330,15 +30672,6 @@
     "generatedAt": "2026-08-01T13:14:53.541Z"
   },
   {
-    "file": "bc221eefbe2ccdc1.mp3",
-    "text": "کس حرف سے دستک شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:09:16.356Z"
-  },
-  {
     "file": "bc2ae302bca71fc4.mp3",
     "text": "What category is Elephant?",
     "lang": "en-US",
@@ -30382,15 +30715,6 @@
     "source": "urdu",
     "chars": 3,
     "generatedAt": "2026-08-01T13:09:53.039Z"
-  },
-  {
-    "file": "bc6e7b98f36ac986.mp3",
-    "text": "حلقہ",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-04T18:08:24.356Z"
   },
   {
     "file": "bc79ef2671566280.mp3",
@@ -31671,15 +31995,6 @@
     "generatedAt": "2026-08-01T13:13:07.906Z"
   },
   {
-    "file": "c3a02519c49d76b7.mp3",
-    "text": "ثقافت",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 5,
-    "generatedAt": "2026-08-04T17:12:45.145Z"
-  },
-  {
     "file": "c3baf7c8ad53dade.mp3",
     "text": "الشَّكُورُ",
     "lang": "ar-SA",
@@ -31875,7 +32190,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 8,
-    "generatedAt": "2026-08-04T17:00:57.332Z"
+    "generatedAt": "2026-08-09T11:40:12.725Z"
   },
   {
     "file": "c580062d4e63638b.mp3",
@@ -32220,6 +32535,15 @@
     "generatedAt": "2026-07-16T06:04:24.684Z"
   },
   {
+    "file": "c7103b15f278a723.mp3",
+    "text": "ث سے ثبت",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 8,
+    "generatedAt": "2026-08-09T15:20:39.512Z"
+  },
+  {
     "file": "c71218ec30ec37ca.mp3",
     "text": "Which letter is for Hen?",
     "lang": "en-US",
@@ -32236,6 +32560,15 @@
     "source": "namesAllah",
     "chars": 19,
     "generatedAt": "2026-07-26T13:28:01.765Z"
+  },
+  {
+    "file": "c7240cac7dba09ca.mp3",
+    "text": "ث سے ثبات",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 9,
+    "generatedAt": "2026-08-09T15:20:36.690Z"
   },
   {
     "file": "c7394dfb73f70afd.mp3",
@@ -32517,6 +32850,15 @@
     "generatedAt": "2026-07-26T18:02:58.397Z"
   },
   {
+    "file": "c9a86fefed89a409.mp3",
+    "text": "کس حرف سے سپرمین شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 30,
+    "generatedAt": "2026-08-09T08:36:07.277Z"
+  },
+  {
     "file": "c9ad0a015682b52f.mp3",
     "text": "بطخ",
     "lang": "en-US",
@@ -32679,15 +33021,6 @@
     "generatedAt": "2026-07-16T06:10:15.477Z"
   },
   {
-    "file": "cac2e0c1368a2f7f.mp3",
-    "text": "حجام",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-04T18:08:22.272Z"
-  },
-  {
     "file": "cad8cd464969de40.mp3",
     "text": "Cover Your Cough. Cover your mouth when you cough.",
     "lang": "en-US",
@@ -32767,6 +33100,15 @@
     "source": "pakistan",
     "chars": 30,
     "generatedAt": "2026-07-16T06:01:47.089Z"
+  },
+  {
+    "file": "cb682ed33b8e15a5.mp3",
+    "text": "کس حرف سے حصہ شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 27,
+    "generatedAt": "2026-08-09T15:21:01.805Z"
   },
   {
     "file": "cb71819c77e427ea.mp3",
@@ -32994,6 +33336,15 @@
     "generatedAt": "2026-07-16T06:10:29.204Z"
   },
   {
+    "file": "ccd68cf368eae5e5.mp3",
+    "text": "کس حرف سے ورزش شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 28,
+    "generatedAt": "2026-08-09T12:28:28.549Z"
+  },
+  {
     "file": "ccdec42aac03f904.mp3",
     "text": "ڑیلا کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -33039,15 +33390,6 @@
     "generatedAt": "2026-07-16T06:18:44.905Z"
   },
   {
-    "file": "cd28470ef16a55f0.mp3",
-    "text": "دروازہ کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 22,
-    "generatedAt": "2026-07-26T13:00:35.005Z"
-  },
-  {
     "file": "cd4e37510dcd0217.mp3",
     "text": "What category is Kiwi?",
     "lang": "en-US",
@@ -33055,6 +33397,15 @@
     "source": "quiz",
     "chars": 22,
     "generatedAt": "2026-07-16T06:09:35.972Z"
+  },
+  {
+    "file": "cd9d50eb65ade62d.mp3",
+    "text": "ثالث کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 20,
+    "generatedAt": "2026-08-09T15:21:34.765Z"
   },
   {
     "file": "cdd4384d8e173d3b.mp3",
@@ -33225,7 +33576,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 10,
-    "generatedAt": "2026-08-01T13:44:35.895Z"
+    "generatedAt": "2026-08-09T07:39:58.630Z"
   },
   {
     "file": "ced11daa75fc3784.mp3",
@@ -33289,6 +33640,15 @@
     "source": "quizAnswers",
     "chars": 4,
     "generatedAt": "2026-07-23T18:48:06.307Z"
+  },
+  {
+    "file": "cefac9f2df83f4dc.mp3",
+    "text": "ث سے ثمین",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 9,
+    "generatedAt": "2026-08-09T15:20:38.277Z"
   },
   {
     "file": "cf107174ae71ea72.mp3",
@@ -33453,15 +33813,6 @@
     "generatedAt": "2026-07-16T06:20:39.507Z"
   },
   {
-    "file": "cfdf32ff1cb38dd1.mp3",
-    "text": "ث سے ثمر",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 8,
-    "generatedAt": "2026-08-01T13:44:08.018Z"
-  },
-  {
     "file": "cfe10e8ef4b6eef0.mp3",
     "text": "کس حرف سے گھر شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -33570,15 +33921,6 @@
     "generatedAt": "2026-07-16T06:20:15.225Z"
   },
   {
-    "file": "d06247a82228c2b6.mp3",
-    "text": "ث سے ثعلب",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-01T13:44:07.399Z"
-  },
-  {
     "file": "d0843be4a634d3f2.mp3",
     "text": "حرمت والے",
     "lang": "ur-PK",
@@ -33586,15 +33928,6 @@
     "source": "namesMuhammad",
     "chars": 9,
     "generatedAt": "2026-07-26T13:29:39.514Z"
-  },
-  {
-    "file": "d09125e6a61d8518.mp3",
-    "text": "کس حرف سے ثعلب شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:08:51.694Z"
   },
   {
     "file": "d09491170cfe72c1.mp3",
@@ -33613,6 +33946,15 @@
     "source": "learn",
     "chars": 52,
     "generatedAt": "2026-07-16T06:04:47.420Z"
+  },
+  {
+    "file": "d0aaf4ecc665e262.mp3",
+    "text": "کس حرف سے ثمین شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 28,
+    "generatedAt": "2026-08-09T15:20:47.678Z"
   },
   {
     "file": "d0bbda78e5f33aae.mp3",
@@ -33694,6 +34036,15 @@
     "source": "learn",
     "chars": 45,
     "generatedAt": "2026-07-16T06:04:53.733Z"
+  },
+  {
+    "file": "d18a7c6f897614f9.mp3",
+    "text": "ٹیلی ویژن کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 25,
+    "generatedAt": "2026-08-09T08:36:12.708Z"
   },
   {
     "file": "d18cc66f50c7f689.mp3",
@@ -33966,6 +34317,15 @@
     "generatedAt": "2026-08-04T18:08:59.375Z"
   },
   {
+    "file": "d3a20d3e925247e0.mp3",
+    "text": "ثنا",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 3,
+    "generatedAt": "2026-08-09T15:20:27.186Z"
+  },
+  {
     "file": "d3b40ede43c22f98.mp3",
     "text": "ق سے قمیض",
     "lang": "ur-PK",
@@ -34018,6 +34378,15 @@
     "source": "quiz",
     "chars": 23,
     "generatedAt": "2026-07-16T06:10:00.251Z"
+  },
+  {
+    "file": "d3fbe3bed109e358.mp3",
+    "text": "Throat",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 6,
+    "generatedAt": "2026-08-09T12:54:07.693Z"
   },
   {
     "file": "d4155e3a26755c6c.mp3",
@@ -34108,6 +34477,15 @@
     "source": "quiz",
     "chars": 33,
     "generatedAt": "2026-07-16T06:16:57.208Z"
+  },
+  {
+    "file": "d47ea54d5c320723.mp3",
+    "text": "س سے سپرمین",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 11,
+    "generatedAt": "2026-08-09T08:35:56.690Z"
   },
   {
     "file": "d4a5bfcd244d1bfb.mp3",
@@ -34677,6 +35055,24 @@
     "generatedAt": "2026-07-16T05:57:43.569Z"
   },
   {
+    "file": "d7ed034676ace700.mp3",
+    "text": "پورا چہرہ تین بار دھوئے۔",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "wuduSalah",
+    "chars": 24,
+    "generatedAt": "2026-08-09T12:18:18.567Z"
+  },
+  {
+    "file": "d7f97b7ee96abef8.mp3",
+    "text": "Precious",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:54:04.811Z"
+  },
+  {
     "file": "d82f2e826c0aa1ac.mp3",
     "text": "ق",
     "lang": "en-US",
@@ -35136,6 +35532,15 @@
     "generatedAt": "2026-08-01T13:45:21.475Z"
   },
   {
+    "file": "db0c3632a0fa087c.mp3",
+    "text": "کس حرف سے دیا شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 27,
+    "generatedAt": "2026-08-09T12:28:27.010Z"
+  },
+  {
     "file": "db1892cc41ccef9a.mp3",
     "text": "حرف ت سے کون سا لفظ شروع ہوتا ہے؟",
     "lang": "ur-PK",
@@ -35262,6 +35667,15 @@
     "generatedAt": "2026-07-16T05:57:14.150Z"
   },
   {
+    "file": "dbcb1c7abed8c89c.mp3",
+    "text": "ح سے حیوان",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 10,
+    "generatedAt": "2026-08-09T15:20:40.829Z"
+  },
+  {
     "file": "dbdcade1bfd4fad7.mp3",
     "text": "Comb Hair. Comb your hair neatly every day.",
     "lang": "en-US",
@@ -35278,6 +35692,15 @@
     "source": "namesMuhammad",
     "chars": 9,
     "generatedAt": "2026-07-26T18:02:51.030Z"
+  },
+  {
+    "file": "dbfb3a91278aaee7.mp3",
+    "text": "ٹیلی ویژن",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 9,
+    "generatedAt": "2026-08-09T08:35:46.808Z"
   },
   {
     "file": "dc11c8b9f1ba916f.mp3",
@@ -35343,6 +35766,15 @@
     "generatedAt": "2026-07-16T06:03:18.364Z"
   },
   {
+    "file": "dca482d36cffaa7d.mp3",
+    "text": "کس حرف سے ژولیدہ بال شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 34,
+    "generatedAt": "2026-08-09T08:36:06.470Z"
+  },
+  {
     "file": "dcaf38d153de3a37.mp3",
     "text": "Needle",
     "lang": "en-US",
@@ -35379,13 +35811,13 @@
     "generatedAt": "2026-08-01T13:15:54.102Z"
   },
   {
-    "file": "dcf910337d26d2ed.mp3",
-    "text": "کس حرف سے دل شروع ہوتا ہے؟",
+    "file": "dce936e90cb58117.mp3",
+    "text": "و سے وین",
     "lang": "ur-PK",
     "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 26,
-    "generatedAt": "2026-08-04T18:09:14.208Z"
+    "source": "urduVocabPhrase",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:28:23.566Z"
   },
   {
     "file": "dd14dee4179e69d2.mp3",
@@ -35664,7 +36096,7 @@
     "voice": "ur-PK-AsadNeural",
     "source": "urduVocabPhrase",
     "chars": 8,
-    "generatedAt": "2026-08-01T13:44:48.810Z"
+    "generatedAt": "2026-08-09T12:28:20.758Z"
   },
   {
     "file": "df085bdfb47a6be9.mp3",
@@ -35746,6 +36178,15 @@
     "source": "catalog",
     "chars": 16,
     "generatedAt": "2026-07-16T06:06:47.602Z"
+  },
+  {
+    "file": "df9c54fe8d13a268.mp3",
+    "text": "و سے ورزش",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urduVocabPhrase",
+    "chars": 9,
+    "generatedAt": "2026-08-09T12:28:22.907Z"
   },
   {
     "file": "dfa27d45be688e63.mp3",
@@ -35937,6 +36378,15 @@
     "generatedAt": "2026-08-01T13:14:49.412Z"
   },
   {
+    "file": "e09162aa54d4f08c.mp3",
+    "text": "کس حرف سے ثبات شروع ہوتا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 28,
+    "generatedAt": "2026-08-09T15:20:45.947Z"
+  },
+  {
     "file": "e096dd0c28fd1682.mp3",
     "text": "جمع کرنے والا",
     "lang": "ur-PK",
@@ -36052,15 +36502,6 @@
     "source": "namesMuhammad",
     "chars": 7,
     "generatedAt": "2026-07-26T18:02:00.024Z"
-  },
-  {
-    "file": "e12938e2e560755c.mp3",
-    "text": "ثعلب کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-07-16T06:14:05.765Z"
   },
   {
     "file": "e1428083b53e9905.mp3",
@@ -36504,15 +36945,6 @@
     "generatedAt": "2026-07-16T06:17:46.025Z"
   },
   {
-    "file": "e3691b326a6948ac.mp3",
-    "text": "کس حرف سے حلقہ شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 28,
-    "generatedAt": "2026-08-04T18:09:07.087Z"
-  },
-  {
     "file": "e36ddb1bcd0e3b5d.mp3",
     "text": "Which number is Seventy Two?",
     "lang": "en-US",
@@ -36583,6 +37015,15 @@
     "source": "quizAnswers",
     "chars": 5,
     "generatedAt": "2026-07-26T13:01:04.388Z"
+  },
+  {
+    "file": "e3f35c5fef55c159.mp3",
+    "text": "Record",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 6,
+    "generatedAt": "2026-08-09T12:54:05.620Z"
   },
   {
     "file": "e4094b61d7424317.mp3",
@@ -36853,15 +37294,6 @@
     "source": "islamicStories",
     "chars": 68,
     "generatedAt": "2026-07-26T13:31:28.219Z"
-  },
-  {
-    "file": "e5ef26f6a249ff28.mp3",
-    "text": "ح سے حلوا",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urduVocabPhrase",
-    "chars": 9,
-    "generatedAt": "2026-08-04T18:08:25.659Z"
   },
   {
     "file": "e5fd0188e6b02ba6.mp3",
@@ -37269,6 +37701,15 @@
     "generatedAt": "2026-08-01T05:43:58.076Z"
   },
   {
+    "file": "e83fec5aa8dd5e8c.mp3",
+    "text": "حباب کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 20,
+    "generatedAt": "2026-08-09T15:21:37.477Z"
+  },
+  {
     "file": "e85c2692e7de4084.mp3",
     "text": "ہنسی",
     "lang": "en-US",
@@ -37465,6 +37906,15 @@
     "source": "urduVocabPhrase",
     "chars": 8,
     "generatedAt": "2026-08-01T13:45:20.975Z"
+  },
+  {
+    "file": "e973493b31d242f5.mp3",
+    "text": "حصہ کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 19,
+    "generatedAt": "2026-08-09T15:21:43.095Z"
   },
   {
     "file": "e97a4ea5f65d1273.mp3",
@@ -38061,6 +38511,15 @@
     "generatedAt": "2026-08-01T13:45:38.500Z"
   },
   {
+    "file": "ed02dea5c6c58b4b.mp3",
+    "text": "ورزش",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "urdu",
+    "chars": 4,
+    "generatedAt": "2026-08-09T12:28:12.437Z"
+  },
+  {
     "file": "ed22b06da7d7855b.mp3",
     "text": "الْمُصَوِّرُ",
     "lang": "ar-SA",
@@ -38437,6 +38896,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:14:41.606Z"
+  },
+  {
+    "file": "f0322f3779800989.mp3",
+    "text": "دیوار کا مطلب کیا ہے؟",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "quiz",
+    "chars": 21,
+    "generatedAt": "2026-08-09T12:28:30.864Z"
   },
   {
     "file": "f0632fad582ad5db.mp3",
@@ -39258,6 +39726,15 @@
     "generatedAt": "2026-07-17T17:47:48.070Z"
   },
   {
+    "file": "f62c9467608d8671.mp3",
+    "text": "Share",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 5,
+    "generatedAt": "2026-08-09T12:54:07.198Z"
+  },
+  {
     "file": "f62d924563d5b8b3.mp3",
     "text": "What word starts with the letter B?",
     "lang": "en-US",
@@ -39510,15 +39987,6 @@
     "generatedAt": "2026-07-16T05:56:02.719Z"
   },
   {
-    "file": "f82b9b0bffa5ce15.mp3",
-    "text": "کس حرف سے حوصلہ شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 29,
-    "generatedAt": "2026-08-04T18:09:06.409Z"
-  },
-  {
     "file": "f8412a06ad73fe50.mp3",
     "text": "یار",
     "lang": "en-US",
@@ -39679,15 +40147,6 @@
     "source": "quiz",
     "chars": 24,
     "generatedAt": "2026-07-16T06:18:52.767Z"
-  },
-  {
-    "file": "f93e21dada27e9e4.mp3",
-    "text": "ثابت کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-08-04T17:13:52.786Z"
   },
   {
     "file": "f94051387df7aad6.mp3",
@@ -40059,15 +40518,6 @@
     "generatedAt": "2026-08-04T18:10:21.849Z"
   },
   {
-    "file": "fbe74bba73695624.mp3",
-    "text": "کس حرف سے دروازہ شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 30,
-    "generatedAt": "2026-08-04T18:09:18.432Z"
-  },
-  {
     "file": "fbf296e397f88365.mp3",
     "text": "لڑکا کا مطلب کیا ہے؟",
     "lang": "ur-PK",
@@ -40149,6 +40599,15 @@
     "generatedAt": "2026-08-01T13:17:06.389Z"
   },
   {
+    "file": "fc4766815d652b47.mp3",
+    "text": "گیلے ہاتھوں سے ایک بار سر کا مسح کرے۔",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "wuduSalah",
+    "chars": 37,
+    "generatedAt": "2026-08-09T12:18:20.185Z"
+  },
+  {
     "file": "fc6ea910c2ed56c6.mp3",
     "text": "What is the number 13 in English?",
     "lang": "en-US",
@@ -40210,6 +40669,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-07-16T06:13:45.968Z"
+  },
+  {
+    "file": "fcb72614a2528972.mp3",
+    "text": "Exercise",
+    "lang": "en-US",
+    "voice": "en-US-AndrewNeural",
+    "source": "quizAnswers",
+    "chars": 8,
+    "generatedAt": "2026-08-09T12:54:09.320Z"
   },
   {
     "file": "fcea0228be447d2e.mp3",
@@ -40300,6 +40768,15 @@
     "source": "quiz",
     "chars": 20,
     "generatedAt": "2026-08-04T18:13:04.271Z"
+  },
+  {
+    "file": "fd6ec0ad6f638803.mp3",
+    "text": "دونوں ہاتھ کلائیوں تک تین بار دھوئے۔",
+    "lang": "ur-PK",
+    "voice": "ur-PK-AsadNeural",
+    "source": "wuduSalah",
+    "chars": 36,
+    "generatedAt": "2026-08-09T12:18:15.815Z"
   },
   {
     "file": "fd77f909ba87203f.mp3",
@@ -40572,24 +41049,6 @@
     "generatedAt": "2026-08-01T13:44:20.941Z"
   },
   {
-    "file": "ff5be5c2161b0b3c.mp3",
-    "text": "حلوا کا مطلب کیا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 20,
-    "generatedAt": "2026-08-04T18:12:04.278Z"
-  },
-  {
-    "file": "ff6123a454a3461a.mp3",
-    "text": "ثابت",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "urdu",
-    "chars": 4,
-    "generatedAt": "2026-08-04T17:12:45.901Z"
-  },
-  {
     "file": "ff65f9d91ddc5def.mp3",
     "text": "Story",
     "lang": "en-US",
@@ -40687,14 +41146,5 @@
     "source": "urdu",
     "chars": 4,
     "generatedAt": "2026-08-01T13:08:46.083Z"
-  },
-  {
-    "file": "fff506750483d4a3.mp3",
-    "text": "کس حرف سے ثمر شروع ہوتا ہے؟",
-    "lang": "ur-PK",
-    "voice": "ur-PK-AsadNeural",
-    "source": "quiz",
-    "chars": 27,
-    "generatedAt": "2026-08-04T18:08:52.389Z"
   }
 ]

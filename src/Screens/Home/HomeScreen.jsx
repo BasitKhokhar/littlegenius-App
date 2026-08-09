@@ -55,7 +55,9 @@ const STREAK_GOAL = 7;
 // destination), so it needs its own display descriptor to appear in the
 // Continue Learning row. `moduleColors.stories` already exists in Theme, so
 // ContinueLearningCard's existing colour lookup resolves it for free.
-const STORY_TRACK = { mod: 'stories', icon: '📚', name: 'Story Time' };
+// `image` reuses the first story's cover art as a generic "Story Time"
+// thumbnail, so the card shows real art like every other Continue Learning entry.
+const STORY_TRACK = { mod: 'stories', icon: '📚', name: 'Story Time', image: require('../../../assets/stories/story1.png') };
 
 const WORLD_CATEGORIES = [
   { key: 'animals', name: 'Animals', icon: '🦁', count: 26, color: '#F59E0B' },
@@ -121,8 +123,8 @@ const ModuleCard = ({ module, onPress, delay }) => {
               <Ionicons name="chevron-forward" size={14} color="#FFFFFF" />
             </View>
           </View>
-          <View style={styles.moduleIconBadge}>
-            <Text style={styles.moduleIcon}>{module.icon}</Text>
+          <View style={styles.moduleArtTile}>
+            <Image source={module.image} style={styles.moduleArtImage} resizeMode="contain" />
           </View>
           <View style={styles.moduleInfo}>
             <Text style={styles.moduleName} numberOfLines={1}>{module.name}</Text>
@@ -235,7 +237,9 @@ const ContinueLearningCard = ({ lesson, onPress }) => {
 
         <LinearGradient colors={[m.from, m.to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.iconTile}>
           <LinearGradient colors={SHEEN_COLORS} pointerEvents="none" style={styles.continueIconSheen} />
-          <Text style={s.iconGlyph}>{lesson.icon}</Text>
+          <View style={styles.continueArtInner}>
+            <Image source={lesson.image} style={styles.continueArtImage} resizeMode="contain" />
+          </View>
         </LinearGradient>
 
         <View style={s.body}>
@@ -323,6 +327,7 @@ const HomeScreen = ({ navigation }) => {
         key: mod,
         mod,
         icon: track.icon,
+        image: track.image,
         title: track.name,
         subtitle: `Last played: ${entry.packTitle}`,
         packId: entry.packId,
@@ -342,6 +347,7 @@ const HomeScreen = ({ navigation }) => {
         key: mod,
         mod,
         icon: track.icon,
+        image: track.image,
         title: track.name,
         subtitle: `Continue from ${positionLabel(mod, entry.index) || 'where you left off'}`,
         resumeIndex: entry.index,
@@ -362,6 +368,7 @@ const HomeScreen = ({ navigation }) => {
       key: firstModule.mod,
       mod: firstModule.mod,
       icon: firstModule.icon,
+      image: firstModule.image,
       title: 'Start your first lesson!',
       subtitle: `Begin with ${firstModule.name}`,
       packId: null,
@@ -595,7 +602,7 @@ const makeModuleStyles = (accent) =>
       borderRadius: Radius.xl,
       paddingVertical: Spacing.lg,
       paddingHorizontal: Spacing.lg,
-      height: 186,
+      height: 208,
       justifyContent: 'space-between',
       overflow: 'hidden',
       borderWidth: 1,
@@ -619,12 +626,12 @@ const makeContinueStyles = (colors, accent) =>
     iconTile: {
       width: 58,
       height: 58,
-      borderRadius: 29,
+      borderRadius: Radius.md,
+      padding: 4,
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
     },
-    iconGlyph: { fontSize: 26, lineHeight: 32, textAlign: 'center' },
     body: { flex: 1 },
     kicker: { ...textStyles.overline, color: accent, fontSize: 10, marginBottom: 3 },
     title: { ...textStyles.title, color: colors.textPrimary, marginBottom: 2 },
@@ -660,7 +667,7 @@ const makeStatStyles = (colors) =>
 const styles = StyleSheet.create({
   container: { flex: 1 },
   flex: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16,  },
+  scrollContent: { paddingHorizontal: 12,  },
 
   // Hero — single self-contained card (see JSX comment). `marginTop` gives
   // the character room to pop up above the card's top edge without being
@@ -669,14 +676,14 @@ const styles = StyleSheet.create({
   // render outside the card's own box.
   heroWrap: {
     overflow: 'visible',
-    marginTop: Spacing.huge,
+    marginTop: Spacing.xxl,
     // Extra bottom room for the streak card's lower half, which hangs
     // below the hero card (see heroStreakFloating).
     marginBottom: Spacing.xxl + STREAK_CARD_OVERLAP,
   },
   heroCard: {
     borderRadius: Radius.xl,
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.xxl,
     // Generous bottom padding — the floating streak card's top half
     // rests in this space, on top of the gradient, below the greeting.
     paddingBottom: Spacing.xxxl + Spacing.md,
@@ -747,13 +754,13 @@ const styles = StyleSheet.create({
   // ScrollView's top boundary.
   heroCharacterShadow: {
     position: 'absolute',
-    top: -36,
+    top: -20,
     right: 6,
     zIndex: 5,
     elevation: 10,
     ...coloredShadow('#1E1B4B', 'lg'),
   },
-  heroCharacter: { width: 190, height: 220, marginTop: -15, marginRight: -15 },
+  heroCharacter: { width: 185, height: 210, marginTop: -15, marginRight: -15 },
 
   // Learning Modules — horizontally-scrolling row of fixed-width cards
   // (see makeModuleStyles for the colour-dependent parts of the card
@@ -774,18 +781,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  moduleIconBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: Radius.md,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+  // Art tile — the module's cover illustration on an opaque white "sticker"
+  // plate, same idiom as quickPreviewBoxFeatured: the real art needs to sit
+  // on white (not the tinted gradient) to read clean, and the raised shadow
+  // makes it pop off the card like a badge rather than sit flush.
+  moduleArtTile: {
+    width: 78,
+    height: 78,
+    borderRadius: Radius.lg,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Spacing.sm,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
   },
-  moduleIcon: { fontSize: 28, lineHeight: 34, textAlign: 'center' },
+  moduleArtImage: { width: 68, height: 68 },
   moduleInfo: { marginTop: Spacing.sm },
   moduleName: { ...textStyles.title, color: '#FFFFFF', marginBottom: 2 },
   moduleDescription: { ...textStyles.caption, color: 'rgba(255,255,255,0.76)', lineHeight: 15 },
@@ -810,6 +826,21 @@ const styles = StyleSheet.create({
   // Continue Learning — glossy highlight on the icon tile, same idiom
   // as the hero/quick-play gradient cards.
   continueIconSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '55%' },
+  // White "sticker" inset inside the colored gradient tile — same idiom as
+  // moduleArtTile, scaled down: the module's real cover art needs to sit on
+  // white (not the accent gradient) to read clean, with the gradient left
+  // showing as a premium colored ring around it.
+  continueArtInner: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    borderRadius: Radius.md - 4,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  continueArtImage: { width: 44, height: 44 },
 
   // Continue Learning — horizontally-scrolling row of fixed-width cards,
   // same pattern as modulesScroll/quickScroll.
@@ -828,7 +859,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: Radius.xl,
-    padding: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.xxl,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
@@ -845,7 +877,7 @@ const styles = StyleSheet.create({
   },
   quickPreviewBox: {
     width: 92,
-    height: 92,
+    height: 110,
     borderRadius: Radius.lg,
     backgroundColor: 'rgba(255,255,255,0.18)',
     borderWidth: 1,

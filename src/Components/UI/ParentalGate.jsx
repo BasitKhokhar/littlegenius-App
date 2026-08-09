@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, View, Text, TextInput, StyleSheet } from 'react-native';
+import { Modal, View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { Spacing, Radius, textStyles, Elevation } from '../../Theme';
 import Button from '../Common/Button';
@@ -45,7 +45,10 @@ const ParentalGate = ({ visible, title = 'Ask a Grown-Up', onSuccess, onCancel }
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
-      <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
+      <KeyboardAvoidingView
+        style={[styles.overlay, { backgroundColor: colors.overlay }]}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
         <View style={[styles.card, Elevation.xl, { backgroundColor: colors.surface }]}>
           <Text style={styles.emoji}>🧑‍🍼</Text>
           <Text style={[textStyles.h2, s.title]}>{title}</Text>
@@ -73,10 +76,12 @@ const ParentalGate = ({ visible, title = 'Ask a Grown-Up', onSuccess, onCancel }
 
           {error && <Text style={[styles.errorText, { color: colors.error }]}>That's not right — try again 🙂</Text>}
 
-          <Button title="Continue" variant="primary" size="md" onPress={handleVerify} style={styles.continueBtn} />
-          <Button title="Cancel" variant="ghost" size="sm" onPress={onCancel} />
+          <View style={styles.actionsRow}>
+            <Button title="Cancel" variant="secondary" size="md" onPress={onCancel} style={styles.actionBtn} />
+            <Button title="Continue" variant="primary" size="md" onPress={handleVerify} style={styles.actionBtn} />
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -116,7 +121,13 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   errorText: { fontFamily: 'Baloo2_700Bold', fontSize: 12, marginBottom: Spacing.sm },
-  continueBtn: { marginTop: Spacing.sm, marginBottom: Spacing.xs },
+  actionsRow: {
+    flexDirection: 'row',
+    width: '100%',
+    marginTop: Spacing.sm,
+    gap: Spacing.md,
+  },
+  actionBtn: { flex: 1 },
 });
 
 export default ParentalGate;

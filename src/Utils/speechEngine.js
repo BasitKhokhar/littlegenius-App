@@ -479,6 +479,12 @@ export const SpeechEngine = {
         // teacher clips; an explicit audioClip (Qari recitation) plays at 1x.
         // Guarded because pitch-corrected rate needs a recent native build; on
         // an older one this throws and the clip simply plays at normal speed.
+        // Tracks whatever rate actually got applied — status.duration below is
+        // always the clip's NATIVE (1x) length, so the done-timers must divide
+        // by this to land on the real wall-clock end instead of cutting a
+        // slowed-down clip off partway through (the longer the clip, the
+        // bigger the gap between native duration and real playback time).
+        let effectiveClipRate = 1;
         if (isTeacherClip) {
           try {
             // Per-call tuning × the user's global speed, clamped so an extreme
@@ -487,6 +493,7 @@ export const SpeechEngine = {
             const clipRate = clampRate((opts.clipRate ?? CLIP_PLAYBACK_RATE) * globalSpeed, floor, 3.0);
             player.shouldCorrectPitch = true;
             player.setPlaybackRate(clipRate, 'high');
+            effectiveClipRate = clipRate;
           } catch { /* older expo-audio native — play at 1x */ }
         }
 
@@ -530,7 +537,9 @@ export const SpeechEngine = {
             // Generous on purpose: real Qari recitation can be long (slow
             // tajweed) and this must never be short enough to cut a clip off.
             // It is tightened below as soon as the true duration is known.
-            doneTimer = setTimeout(() => settle(true), 90000);
+            // Scaled by the applied rate so a slowed-down clip (child-pace
+            // narration) still gets the full real-time allowance.
+            doneTimer = setTimeout(() => settle(true), Math.round(90000 / effectiveClipRate));
           }
 
           // didJustFinish fires once when the clip reaches its end.
@@ -546,11 +555,15 @@ export const SpeechEngine = {
 
           // Once the real length is known, arm a precise fallback (duration +
           // padding) in case didJustFinish is ever dropped — without risking an
-          // early cutoff the way a text-length estimate would.
+          // early cutoff the way a text-length estimate would. `dur` is the
+          // clip's NATIVE (1x) length regardless of the applied playback rate,
+          // so it must be divided by that rate to land on the real wall-clock
+          // end — otherwise a slowed-down long clip (the default teacher rate
+          // is ~0.68x) gets paused/removed well before it actually finishes.
           if (loaded && !armed && dur > 0 && Number.isFinite(dur)) {
             armed = true;
             if (doneTimer) clearTimeout(doneTimer);
-            doneTimer = setTimeout(() => settle(true), Math.round(dur * 1000) + 3000);
+            doneTimer = setTimeout(() => settle(true), Math.round((dur * 1000) / effectiveClipRate) + 3000);
           }
         });
         // settle() runs this to release the native player + listener exactly once.

@@ -13,12 +13,12 @@ export const kalmasData = [
   {
     number: 2,
     title: 'Second Kalma: Shahadat (دوسرا کلمہ شہادت)',
-    arabic: 'أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّا عَبْدُهُ وَرَسُولُهُ',
-    transliteration: 'Ash hadu an la ilaha illallahu wa ash hadu anna Muhammadan abduhu wa rasuluhu',
-    urdu: 'میں گواہی دیتا ہوں کہ اللہ کے سوا کوئی معبود نہیں اور محمد ﷺ اس کے بندے اور رسول ہیں',
-    english: 'I bear witness that there is no God but Allah and Muhammad is His servant and messenger.',
+    arabic: 'أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ',
+    transliteration: 'Ash hadu an la ilaha illallahu wahdahu la shareeka lahu, wa ash hadu anna Muhammadan abduhu wa rasuluhu',
+    urdu: 'میں گواہی دیتا ہوں کہ اللہ کے سوا کوئی معبود نہیں، وہ اکیلا ہے، اس کا کوئی شریک نہیں، اور میں گواہی دیتا ہوں کہ محمد ﷺ اس کے بندے اور رسول ہیں',
+    english: 'I bear witness that there is no God but Allah, the One alone, without partner, and I bear witness that Muhammad is His servant and messenger.',
     color: '#1565C0',
-    speak: 'Ash hadu an la ilaha illallahu wa ash hadu anna Muhammadan abduhu wa rasuluhu.',
+    speak: 'Ash hadu an la ilaha illallahu wahdahu la shareeka lahu, wa ash hadu anna Muhammadan abduhu wa rasuluhu.',
   },
   {
     number: 3,
@@ -28,17 +28,17 @@ export const kalmasData = [
     urdu: 'پاک ہے اللہ، سب تعریفیں اللہ کے لیے ہیں، اللہ کے سوا کوئی معبود نہیں اور اللہ سب سے بڑا ہے، اور گناہوں سے بچنے کی طاقت اور نیک کام کرنے کی قوت اللہ ہی کی طرف سے ہے جو عالی شان اور عظمت والا ہے۔',
     english: 'Glory be to Allah, All praise is for Allah, There is no God except Allah, and Allah is the Greatest. And there is no power or strength except from Allah, the Most High, the Most Great.',
     color: '#4CAF50',
-    speak: 'Subhanallahi walhamdulillahi wala ilaha illallahu wallahu akbar.',
+    speak: 'Subhanallahi walhamdulillahi wala ilaha illallahu wallahu akbar, wala hawla wala quwwata illa billahil aliyyil azeem.',
   },
   {
     number: 4,
     title: 'Fourth Kalma: Tauheed (چوتھا کلمہ توحید)',
-    arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',
-    transliteration: 'La ilaha illallahu wahdahu la shareeka lahu, lahul mulku walahul hamdu yuhyi wa yumeetu, biyadihil khayr, wa huwa ala kulli shayin qadeer',
-    urdu: 'اللہ کے سوا کوئی معبود نہیں، وہ اکیلا ہے، اس کا کوئی شریک نہیں، بادشاہی اسی کی ہے اور تمام تعریفیں اسی کے لیے ہیں، وہی زندہ کرتا ہے اور مارتا ہے، ہر قسم کی بھلائی اسی کے ہاتھ میں ہے اور وہ ہر چیز پر قادر ہے۔',
-    english: 'There is no God except Allah, Who is unique and has no partner. Sovereignty belongs to Him and all praise is for Him. He gives life and causes death. In His Hand is all goodness, and He has power over all things.',
+    arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ حَيٌّ لَا يَمُوتُ أَبَدًا أَبَدًا، ذُو الْجَلَالِ وَالْإِكْرَامِ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',
+    transliteration: 'La ilaha illallahu wahdahu la shareeka lahu, lahul mulku walahul hamdu, yuhyi wa yumeetu, wa huwa hayyun la yamootu abadan abada, zul jalali wal ikram, biyadihil khayr, wa huwa ala kulli shayin qadeer',
+    urdu: 'اللہ کے سوا کوئی معبود نہیں، وہ اکیلا ہے، اس کا کوئی شریک نہیں، بادشاہی اسی کی ہے اور تمام تعریفیں اسی کے لیے ہیں، وہی زندہ کرتا ہے اور مارتا ہے، اور وہ زندہ ہے، کبھی نہیں مرے گا، وہ صاحبِ جلال و اکرام ہے، ہر قسم کی بھلائی اسی کے ہاتھ میں ہے اور وہ ہر چیز پر قادر ہے۔',
+    english: 'There is no God except Allah, Who is unique and has no partner. Sovereignty belongs to Him and all praise is for Him. He gives life and causes death, and He is Living, who will not die, ever — He of Majesty and Munificence. In His Hand is all goodness, and He has power over all things.',
     color: '#FF9800',
-    speak: 'La ilaha illallahu wahdahu la shareeka lahu, lahul mulku walahul hamdu.',
+    speak: 'La ilaha illallahu wahdahu la shareeka lahu, lahul mulku walahul hamdu, yuhyi wa yumeetu, wa huwa hayyun la yamootu abadan abada, zul jalali wal ikram, biyadihil khayr, wa huwa ala kulli shayin qadeer.',
   },
   {
     number: 5,
@@ -48,7 +48,7 @@ export const kalmasData = [
     urdu: 'میں اپنے پروردگار سے معافی مانگتا ہوں ہر گناہ کی جو میں نے جان بوجھ کر کیا یا بھول کر، پوشیدہ یا علانیہ، اور میں اس کی بارگاہ میں توبہ کرتا ہوں اس گناہ سے جسے میں جانتا ہوں اور اس گناہ سے بھی جسے میں نہیں جانتا، بے شک تو غیبوں کا جاننے والا، عیبوں کا چھپانے والا اور گناہوں کا بخشنے والا ہے اور گناہوں سے بچنے کی ہمت اور نیک کاموں کی طاقت اللہ بلند و برتر کے سوا کسی کی مدد سے ممکن نہیں۔',
     english: 'I seek forgiveness from Allah, my Lord, for every sin I committed knowingly or unknowingly, secretly or openly, and I turn to Him in repentance for the sin that I know and for the sin that I do not know. Indeed You are the Knower of hidden things, the Coverer of faults, and the Forgiver of sins. And there is no power or strength except from Allah, the Most High, the Most Great.',
     color: '#2196F3',
-    speak: 'Astaghfirullaha rabbi min kulli zanbin aznabtuhu amdan aw khata-an.',
+    speak: 'Astaghfirullaha rabbi min kulli zanbin aznabtuhu amdan aw khata-an sirran aw alaniyatan wa atoobu ilayhi minaz zanbil lazi aalamu wa minaz zanbil lazi la aalamu, innaka anta allamul ghuyoobi wa sattarul uyoobi wa ghaffaruz zunoobi wala hawla wala quwwata illa billahil aliyyil azeem.',
   },
   {
     number: 6,
@@ -58,7 +58,7 @@ export const kalmasData = [
     urdu: 'اے اللہ! میں تیری پناہ مانگتا ہوں اس بات سے کہ میں کسی چیز کو تیرا شریک ٹھہراؤں اور مجھے اس کا علم ہو، اور معافی مانگتا ہوں تجھ سے اس گناہ کی جس کا مجھے علم نہیں۔ میں نے اس گناہ سے توبہ کی اور بیزار ہوا کفر، شرک، جھوٹ، غیبت، بدعت، چغلی، بے حیائی، تہمت اور تمام گناہوں سے، اور میں اسلام لایا اور کہتا ہوں کہ اللہ کے سوا کوئی معبود نہیں، حضرت محمد ﷺ اللہ کے رسول ہیں۔',
     english: 'O Allah! I seek refuge in You from associating anything with You knowingly, and I seek Your forgiveness for that which I do not know. I repent from it and free myself from disbelief, polytheism, lying, backbiting, innovation, slander, lewdness, calumny, and all sins. I submit to Your will and declare: There is no God except Allah, Muhammad is the Messenger of Allah.',
     color: '#9C27B0',
-    speak: 'Allahumma inni auzu bika min an ushrika bika shayan.',
+    speak: 'Allahumma inni auzu bika min an ushrika bika shayan wa ana aalamu bihi, wa astaghfiruka lima la aalamu bihi, tubtu anhu wa tabarratu minal kufri wash shirki wal kizbi wal gheebati wal bid-ati wan nameemati wal fawahishi wal buhtani wal maasi kulliha, wa aslamtu wa aqoolu la ilaha illallahu Muhammadur Rasulullah.',
   }
 ];
 

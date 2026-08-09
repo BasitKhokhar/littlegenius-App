@@ -275,6 +275,7 @@ export const generateIslamicDuaBank = () => {
       speech: speakEn(`What is the Urdu meaning of ${dua.title}?`),
       options: [dua.urdu, ...pickWrong(urdu, dua.urdu)],
       answer: dua.urdu,
+      answerLanguage: 'ur-PK',
     });
     questions.push({
       q: `Which dua starts with "${dua.transliteration.split(' ').slice(0, 2).join(' ')}"...? ${dua.emoji}`,
@@ -327,6 +328,7 @@ export const generateIslamicPillarBank = () => {
       speech: speakEn(`What is ${pillar.title} in Urdu?`),
       options: [pillar.urdu, ...pickWrong(urdu, pillar.urdu)],
       answer: pillar.urdu,
+      answerLanguage: 'ur-PK',
     });
     questions.push({
       q: `What does ${pillar.title} mean? ${pillar.emoji}`,

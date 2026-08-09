@@ -444,7 +444,7 @@ const makeStyles = (colors) => StyleSheet.create({
     marginTop: 6,
   },
   pageCardWrap: {
-    borderRadius: 22,
+    // borderRadius: 22,
     marginBottom: 14,
   },
   pageCard: {
@@ -468,11 +468,11 @@ const makeStyles = (colors) => StyleSheet.create({
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
+    // marginBottom: 10,
     alignSelf: 'flex-start',
   },
   pageNum: { fontSize: 12, fontWeight: '900', color: '#FFF' },
-  pageEmoji: { fontSize: 40, marginBottom: 10 },
+  pageEmoji: { fontSize: 60, marginBottom: 10 },
   pageText: {
     fontSize: 14,
     fontWeight: '600',

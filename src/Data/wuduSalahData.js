@@ -2,15 +2,81 @@
 // Step-by-step Wudu (ablution) and Salah (prayer) for children.
 // Schema per step: { step, title, urduTitle, emoji, detail, urduDetail }
 // ──────────────────────────────────────────────────────────────
+// export const wuduSteps = [
+//   { step: 1, title: 'Make Intention (Niyyah)', urduTitle: 'نیت کرنا', emoji: '🤲', detail: 'Begin with "Bismillah" and intend to make wudu for Allah.', urduDetail: '"بسم اللہ" کہہ کر اللہ کے لیے وضو کی نیت کرو۔' },
+//   { step: 2, title: 'Wash Hands', urduTitle: 'ہاتھ دھونا', emoji: '✋', detail: 'Wash both hands up to the wrists, three times.', urduDetail: 'دونوں ہاتھ کلائیوں تک تین بار دھوؤ۔' },
+//   { step: 3, title: 'Rinse Mouth', urduTitle: 'کلی کرنا', emoji: '👄', detail: 'Rinse your mouth with water three times.', urduDetail: 'منہ میں پانی لے کر تین بار کلی کرو۔' },
+//   { step: 4, title: 'Clean Nose', urduTitle: 'ناک صاف کرنا', emoji: '👃', detail: 'Put a little water in the nose and clean it, three times.', urduDetail: 'ناک میں تھوڑا پانی ڈال کر تین بار صاف کرو۔' },
+//   { step: 5, title: 'Wash Face', urduTitle: 'چہرہ دھونا', emoji: '😊', detail: 'Wash your whole face three times.', urduDetail: 'پورا چہرہ تین بار دھوؤ۔' },
+//   { step: 6, title: 'Wash Arms', urduTitle: 'بازو دھونا', emoji: '💪', detail: 'Wash both arms up to the elbows, three times.', urduDetail: 'دونوں بازو کہنیوں تک تین بار دھوؤ۔' },
+//   { step: 7, title: 'Wipe Head (Masah)', urduTitle: 'سر کا مسح', emoji: '🧑', detail: 'Wipe your wet hands over your head once.', urduDetail: 'گیلے ہاتھوں سے ایک بار سر کا مسح کرو۔' },
+//   { step: 8, title: 'Wash Feet', urduTitle: 'پاؤں دھونا', emoji: '🦶', detail: 'Wash both feet up to the ankles, three times.', urduDetail: 'دونوں پاؤں ٹخنوں تک تین بار دھوؤ۔' },
+// ];
 export const wuduSteps = [
-  { step: 1, title: 'Make Intention (Niyyah)', urduTitle: 'نیت کرنا', emoji: '🤲', detail: 'Begin with "Bismillah" and intend to make wudu for Allah.', urduDetail: '"بسم اللہ" کہہ کر اللہ کے لیے وضو کی نیت کرو۔' },
-  { step: 2, title: 'Wash Hands', urduTitle: 'ہاتھ دھونا', emoji: '✋', detail: 'Wash both hands up to the wrists, three times.', urduDetail: 'دونوں ہاتھ کلائیوں تک تین بار دھوؤ۔' },
-  { step: 3, title: 'Rinse Mouth', urduTitle: 'کلی کرنا', emoji: '👄', detail: 'Rinse your mouth with water three times.', urduDetail: 'منہ میں پانی لے کر تین بار کلی کرو۔' },
-  { step: 4, title: 'Clean Nose', urduTitle: 'ناک صاف کرنا', emoji: '👃', detail: 'Put a little water in the nose and clean it, three times.', urduDetail: 'ناک میں تھوڑا پانی ڈال کر تین بار صاف کرو۔' },
-  { step: 5, title: 'Wash Face', urduTitle: 'چہرہ دھونا', emoji: '😊', detail: 'Wash your whole face three times.', urduDetail: 'پورا چہرہ تین بار دھوؤ۔' },
-  { step: 6, title: 'Wash Arms', urduTitle: 'بازو دھونا', emoji: '💪', detail: 'Wash both arms up to the elbows, three times.', urduDetail: 'دونوں بازو کہنیوں تک تین بار دھوؤ۔' },
-  { step: 7, title: 'Wipe Head (Masah)', urduTitle: 'سر کا مسح', emoji: '🧑', detail: 'Wipe your wet hands over your head once.', urduDetail: 'گیلے ہاتھوں سے ایک بار سر کا مسح کرو۔' },
-  { step: 8, title: 'Wash Feet', urduTitle: 'پاؤں دھونا', emoji: '🦶', detail: 'Wash both feet up to the ankles, three times.', urduDetail: 'دونوں پاؤں ٹخنوں تک تین بار دھوؤ۔' },
+  {
+    step: 1,
+    title: 'Make Intention (Niyyah)',
+    urduTitle: 'نیت کرنا',
+    emoji: '🤲',
+    detail: 'Begin with "Bismillah" and intend to make wudu for Allah.',
+    urduDetail: '"بسم اللہ" کہہ کر اللہ کے لیے وضو کی نیت کرے۔'
+  },
+  {
+    step: 2,
+    title: 'Wash Hands',
+    urduTitle: 'ہاتھ دھونا',
+    emoji: '✋',
+    detail: 'Wash both hands up to the wrists, three times.',
+    urduDetail: 'دونوں ہاتھ کلائیوں تک تین بار دھوئے۔'
+  },
+  {
+    step: 3,
+    title: 'Rinse Mouth',
+    urduTitle: 'کلی کرنا',
+    emoji: '👄',
+    detail: 'Rinse your mouth with water three times.',
+    urduDetail: 'منہ میں پانی لے کر تین بار کلی کرے۔'
+  },
+  {
+    step: 4,
+    title: 'Clean Nose',
+    urduTitle: 'ناک صاف کرنا',
+    emoji: '👃',
+    detail: 'Put a little water in the nose and clean it, three times.',
+    urduDetail: 'ناک میں تھوڑا پانی ڈال کر تین بار صاف کرے۔'
+  },
+  {
+    step: 5,
+    title: 'Wash Face',
+    urduTitle: 'چہرہ دھونا',
+    emoji: '😊',
+    detail: 'Wash your whole face three times.',
+    urduDetail: 'پورا چہرہ تین بار دھوئے۔'
+  },
+  {
+    step: 6,
+    title: 'Wash Arms',
+    urduTitle: 'بازو دھونا',
+    emoji: '💪',
+    detail: 'Wash both arms up to the elbows, three times.',
+    urduDetail: 'دونوں بازو کہنیوں تک تین بار دھوئے۔'
+  },
+  {
+    step: 7,
+    title: 'Wipe Head (Masah)',
+    urduTitle: 'سر کا مسح',
+    emoji: '🧑',
+    detail: 'Wipe your wet hands over your head once.',
+    urduDetail: 'گیلے ہاتھوں سے ایک بار سر کا مسح کرے۔'
+  },
+  {
+    step: 8,
+    title: 'Wash Feet',
+    urduTitle: 'پاؤں دھونا',
+    emoji: '🦶',
+    detail: 'Wash both feet up to the ankles, three times.',
+    urduDetail: 'دونوں پاؤں ٹخنوں تک تین بار دھوئے۔'
+  },
 ];
 
 export const salahSteps = [

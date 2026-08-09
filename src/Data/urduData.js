@@ -27,7 +27,7 @@ const RAW_URDU = [
   {
     letter: 'ب', name: 'Bay', color: COLORS[1],
     vocabulary: [
-      { word: 'بکری', meaning: 'Goat', emoji: '🐐', speak: 'Bakri' },
+      { word: 'برف', meaning: 'Snow', emoji: '❄️', speak: 'Barf' },
       { word: 'بلی', meaning: 'Cat', emoji: '🐱', speak: 'Billi' },
       { word: 'بطخ', meaning: 'Duck', emoji: '🦆', speak: 'Batakh' },
       { word: 'باجا', meaning: 'Trumpet', emoji: '🎺', speak: 'Baja' },
@@ -71,12 +71,12 @@ const RAW_URDU = [
   {
     letter: 'ث', name: 'Say', color: COLORS[5],
     vocabulary: [
-      { word: 'ثعلب', meaning: 'Fox', emoji: '🦊', speak: 'Saalab' },
-      { word: 'ثمر', meaning: 'Fruit', emoji: '🍎', speak: 'Samar' },
-      { word: 'ثواب', meaning: 'Reward', emoji: '🎁', speak: 'Sawaab' },
-      { word: 'ثقیل', meaning: 'Heavy', emoji: '🏋️', speak: 'Saqeel' },
-      { word: 'ثقافت', meaning: 'Culture', emoji: '🏛️', speak: 'Saqafat' },
-      { word: 'ثابت', meaning: 'Proven', emoji: '✔️', speak: 'Saabit' },
+      { word: 'ثنا', meaning: 'Praise', emoji: '🙏', speak: 'Sana' },
+      { word: 'ثبات', meaning: 'Firmness', emoji: '💪', speak: 'Sabat' },
+      { word: 'ثانی', meaning: 'Second', emoji: '🥈', speak: 'Sani' },
+      { word: 'ثمین', meaning: 'Precious', emoji: '💎', speak: 'Samin' },
+      { word: 'ثالث', meaning: 'Third', emoji: '🥉', speak: 'Salis' },
+      { word: 'ثبت', meaning: 'Record', emoji: '📝', speak: 'Sabt' },
     ],
   },
   {
@@ -104,12 +104,12 @@ const RAW_URDU = [
   {
     letter: 'ح', name: 'Hay', color: COLORS[8],
     vocabulary: [
-      { word: 'حلوا', meaning: 'Halwa', emoji: '🍮', speak: 'Halwa' },
-      { word: 'حجام', meaning: 'Barber', emoji: '💈', speak: 'Hajjaam' },
-      { word: 'حل', meaning: 'Solution', emoji: '💡', speak: 'Hal' },
-      { word: 'حوصلہ', meaning: 'Courage', emoji: '💪', speak: 'Hosla' },
-      { word: 'حلقہ', meaning: 'Circle', emoji: '⭕', speak: 'Halqa' },
-      { word: 'حرف', meaning: 'Letter', emoji: '🔤', speak: 'Harf' },
+      { word: 'حباب', meaning: 'Bubble', emoji: '🫧', speak: 'Hubab' },
+      { word: 'حیوان', meaning: 'Animal', emoji: '🐾', speak: 'Haiwan' },
+      { word: 'حیرت', meaning: 'Surprise', emoji: '😲', speak: 'Hairat' },
+      { word: 'حرارت', meaning: 'Heat', emoji: '🌡️', speak: 'Hararat' },
+      { word: 'حصہ', meaning: 'Share', emoji: '🍰', speak: 'Hissa' },
+      { word: 'حلق', meaning: 'Throat', emoji: '👄', speak: 'Halaq' },
     ],
   },
   {
@@ -126,12 +126,12 @@ const RAW_URDU = [
   {
     letter: 'د', name: 'Daal', color: COLORS[0],
     vocabulary: [
-      { word: 'درخت', meaning: 'Tree', emoji: '🌳', speak: 'Darakht' },
+      { word: 'دیوار', meaning: 'Wall', emoji: '🧱', speak: 'Deewar' },
       { word: 'دودھ', meaning: 'Milk', emoji: '🥛', speak: 'Doodh' },
-      { word: 'دل', meaning: 'Heart', emoji: '❤️', speak: 'Dil' },
-      { word: 'دستک', meaning: 'Knock', emoji: '🚪', speak: 'Dastak' },
+      { word: 'دوا', meaning: 'Medicine', emoji: '💊', speak: 'Dawa' },
+      { word: 'دیا', meaning: 'Lamp', emoji: '🪔', speak: 'Diya' },
       { word: 'دانت', meaning: 'Tooth', emoji: '🦷', speak: 'Daant' },
-      { word: 'دروازہ', meaning: 'Door', emoji: '🚪', speak: 'Darwaaza' },
+      { word: 'دھوپ', meaning: 'Sunshine', emoji: '☀️', speak: 'Dhoop' },
     ],
   },
   {
@@ -196,10 +196,10 @@ const RAW_URDU = [
     vocabulary: [
       { word: 'ژالہ باری', meaning: 'Hailstorm', emoji: '⛈️', speak: 'Zhala Bari' },
       { word: 'ژوب', meaning: 'Zhob (a city)', emoji: '🏙️', speak: 'Zhob' },
-      { word: 'ژاندر', meaning: 'Spinning wheel', emoji: '🌀', speak: 'Zhandar' },
-      { word: 'ژولیدہ', meaning: 'Tangled', emoji: '🧶', speak: 'Zhoolida' },
-      { word: 'ژوبین', meaning: 'Javelin', emoji: '🗡️', speak: 'Zhobeen' },
-      { word: 'ژاژ', meaning: 'Idle talk', emoji: '💬', speak: 'Zhaz' },
+      { word: 'ژالہ', meaning: 'Hailstone', emoji: '🧊', speak: 'Zhala' },
+      { word: 'ٹیلی ویژن', meaning: 'Television', emoji: '📺', speak: 'Television' },
+      { word: 'گیراژ', meaning: 'Garage', emoji: '🚗', speak: 'Garage' },
+      { word: 'ژولیدہ بال', meaning: 'Messy Hair', emoji: '🙋', speak: 'Zhoolida Baal' },
     ],
   },
   {
@@ -208,7 +208,7 @@ const RAW_URDU = [
       { word: 'سورج', meaning: 'Sun', emoji: '☀️', speak: 'Suraj' },
       { word: 'ستارہ', meaning: 'Star', emoji: '⭐', speak: 'Sitara' },
       { word: 'سکول', meaning: 'School', emoji: '🏫', speak: 'School' },
-      { word: 'سپر', meaning: 'Super', emoji: '🦸', speak: 'Super' },
+      { word: 'سپرمین', meaning: 'Superman', emoji: '🦸', speak: 'Superman' },
       { word: 'سردی', meaning: 'Cold', emoji: '❄️', speak: 'Sardi' },
       { word: 'سیب', meaning: 'Apple', emoji: '🍎', speak: 'Saib' },
     ],
@@ -373,8 +373,8 @@ const RAW_URDU = [
       { word: 'وقت', meaning: 'Time', emoji: '⏰', speak: 'Waqt' },
       { word: 'وطن', meaning: 'Homeland', emoji: '🏳️', speak: 'Watan' },
       { word: 'وزن', meaning: 'Weight', emoji: '⚖️', speak: 'Wazan' },
-      { word: 'ورق', meaning: 'Page', emoji: '📄', speak: 'Waraq' },
-      { word: 'وعدہ', meaning: 'Promise', emoji: '🤝', speak: 'Waada' },
+      { word: 'ورزش', meaning: 'Exercise', emoji: '🏃', speak: 'Warzish' },
+      { word: 'وین', meaning: 'Van', emoji: '🚐', speak: 'Van' },
       { word: 'وردی', meaning: 'Uniform', emoji: '👔', speak: 'Wardi' },
     ],
   },

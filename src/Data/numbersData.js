@@ -48,7 +48,9 @@ export const generateNumbersData = () => {
         { text: english, language: 'en-US' },
         { text: urduNum, language: 'ur-PK' },
       ],
-      objects: Array.from({ length: Math.min(n, 12) }, () => selectedFruit),
+      // One emoji per unit, all the way up to 100 — NumbersScreen shrinks the
+      // glyph size as this array grows so the count section keeps fitting.
+      objects: Array.from({ length: n }, () => selectedFruit),
     };
   });
 };

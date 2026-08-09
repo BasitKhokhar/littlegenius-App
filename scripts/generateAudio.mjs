@@ -160,6 +160,12 @@ const matchLetterForPhrase = (text, voice) =>
 // matched word gets wrapped, the rest of the sentence is untouched.
 const ENGLISH_WORD_IPA = {
   kangaroo: 'ˈkæŋɡəˌruː',
+  // Reported 2026-08-09: the Sawm pillar's English narration ("...until
+  // sunset (Fajr)...") ran the Arabic loanword through Andrew's normal
+  // English letter-reading rules and mangled it. Same fix as kangaroo above —
+  // state the pronunciation outright. Global (not source-scoped) so every
+  // occurrence renders the same way, including the Salah pillar's prayer list.
+  fajr: 'ˈfʌdʒər',
 };
 const applyEnglishWordIpaFix = (text) => {
   const words = Object.keys(ENGLISH_WORD_IPA);
@@ -208,8 +214,11 @@ const ssml = (text, voice, source) => {
       : xmlEscape(text);
   } else if (voice.locale.startsWith('en')) {
     inner = applyEnglishWordIpaFix(text);
+  } else if (voice.locale.startsWith('ar')) {
+    inner = applyArabicFix(text, source);
   } else {
-    inner = xmlEscape(applyUrduHomographFix(text, voice, source));
+    const urduOverride = urduLetterIpaOverride(text, voice, source);
+    inner = urduOverride ?? applyUrduWordIpaFix(text, voice, source);
   }
   // English letters (bare or embedded via forMatch) render at NORMAL rate —
   // see the big comment above LETTER_RATE's declaration for why the -25%
@@ -252,23 +261,29 @@ const ssml = (text, voice, source) => {
 // sources (duas, prophets, pillars, kalmas, …) use شکر correctly to mean
 // "thanks" in free-form sentences and must NOT be rewritten.
 const URDU_HOMOGRAPH_FIX = {
-  'بکری': 'بَکری',
-  'بلی': 'بِلّی',
+  // بکری/بلی moved to URDU_WORD_IPA below — reported again after the
+  // 2026-08-09 sukun/shadda regen shipped in a real rebuild, so diacritics
+  // are exhausted for these two (see URDU_WORD_IPA's comment).
   'شکر': 'شَکَر',
   // Jeem — vowel homograph (بغیر اعراب "جگ" easily reads as "jag", not "jug")
   'جگ': 'جُگ',
   // Chhoti Hay — vowel homograph (ہوا bare -> "hua" [happened], not "hawa" [air])
   'ہوا': 'ہَوا',
-  // Say (ث) — light vowel diacritics
-  'ثعلب': 'ثَعْلَب', 'ثمر': 'ثَمَر', 'ثواب': 'ثَواب',
-  // These three still mispronounced (reported 2026-08-04: "Saqeel" -> "saqmiyal",
-  // "Saqafat" -> "saqafiyat", "Saabit" -> "saabanat") even after diacritics —
-  // ثابت was additionally missing the fatha every other ث entry here has, and
-  // for the other two the diacritics alone weren't enough. Same fix as
-  // URDU_LETTER_NAME_FIX below: substitute the far more common, more reliably
-  // rendered س for the rare ث grapheme (they are pronounced IDENTICALLY in
-  // standard Urdu), keeping the same vowel marks.
-  'ثقیل': 'سَقِیل', 'ثقافت': 'سَقافَت', 'ثابت': 'سَابِت',
+  // Say (ث) — ALL 6 OLD vocab words (ثعلب/ثمر/ثواب/ثقیل/ثقافت/ثابت) replaced
+  // 2026-08-09 (the bare LETTER was already confirmed correct — this was a
+  // words-only ask, same pattern as Hay). New words deliberately avoid و
+  // entirely (favouring ا/ی vowel carriers instead) — و was the repeat
+  // troublemaker behind the Wao-letter word failures earlier the same day
+  // (Azure kept reading it as a vowel/"oo" instead of the intended consonant
+  // "w" even with fatha, sukun-pin, AND an IPA override, all three failing).
+  // Same ث→س substitution mechanism as before (ث/س are pronounced IDENTICALLY
+  // in standard Urdu) — both ث occurrences converted in ثالث, since the
+  // trailing one is just as much the "rare grapheme" as the leading one.
+  // ثنا/ثبات/ثانی/ثمین/ثالث/ثبت moved to URDU_WORD_IPA below — the ث→س
+  // grapheme substitution above was reported still wrong 2026-08-09 (second
+  // round, on words picked specifically to dodge the earlier failure pattern),
+  // so the next untried lever for THESE words specifically is a phoneme
+  // override rather than another grapheme guess.
   // Chay (چ) — light vowel diacritics. چائے keeps its fatha (confirmed correct
   // 2026-08-04). چڑیا and چہل پہل are deliberately NOT here any more: they had
   // the same speculative fatha/kasra treatment, but it was never validated and
@@ -294,16 +309,31 @@ const URDU_HOMOGRAPH_FIX = {
   // URDU_LETTER_NAME_FIX's 'ح': 'ہے' for the bare letter, extended here to
   // every word that spells with ح). حرف ("letter") is also the generic word
   // used across most Urdu quiz question templates ("کس حرف سے..."), so this
-  // fix lands far beyond just the Hay vocabulary list.
-  'حلوا': 'ہَلوا', 'حجام': 'ہَجّام', 'حل': 'ہَل',
-  'حوصلہ': 'ہَوصَلہ', 'حلقہ': 'ہَلقَہ', 'حرف': 'ہَرف',
-  // Daal (د) — light vowel diacritics
-  'درخت': 'دَرَخت', 'دل': 'دِل', 'دستک': 'دَستَک', 'دروازہ': 'دَروازَہ',
-  // Wao (و) — reported 2026-08-04: ورق ("waraq", page) rendering as something
-  // close to English "work", and وعدہ ("waada", promise) also mispronounced.
-  // Same bare-consonant-skeleton vowel-guessing issue as the other CVC/CVCC
-  // entries above — light fatha diacritics to force the "wa-" reading.
-  'ورق': 'وَرَق', 'وعدہ': 'وَعدہ',
+  // fix lands far beyond just the Hay vocabulary list — keep it even though
+  // Hay's own vocab list no longer uses حرف as one of its 6 example words
+  // (see below).
+  'حرف': 'ہَرف',
+  // Hay's OLD 6 vocab words (حلوا/حجام/حل/حوصلہ/حلقہ) all had this exact
+  // ح→ہ fix applied and shipped, and were STILL reported mispronounced
+  // 2026-08-09 (the letter ح itself was confirmed correct — this is a
+  // words-only problem). Rather than guess at these specific words a second
+  // time, the user replaced them with different ح-vocabulary in
+  // `urduData.js`; the new words get the same proven ح→ہ substitution below,
+  // on the theory that the substitution mechanism itself works (it fixed
+  // other ح words historically) and the OLD words had some other issue.
+  // If these ALSO come back wrong, that theory is disproven — the ح→ہ
+  // substitution itself doesn't reliably work either.
+  // حباب/حیوان/حیرت/حرارت/حصہ/حلق moved to URDU_WORD_IPA below — same story
+  // as Say's words above: the ح→ہ substitution was reported still wrong
+  // 2026-08-09 (second round), so escalating to a phoneme override for these
+  // specific words rather than a third grapheme guess.
+  // Daal (د) word list — درخت/دل/دستک/دروازہ moved to URDU_WORD_IPA below
+  // (reported 2026-08-09, AFTER a confirmed native rebuild, still wrong even
+  // with these diacritics baked and shipped — diacritics are exhausted for
+  // these four, see URDU_WORD_IPA's comment).
+  // Wao (و) — ورق/وعدہ also moved to URDU_WORD_IPA below (same story: fatha,
+  // then a sukun-pin escalation on 2026-08-09, both regenerated and both
+  // reported still wrong after a real rebuild).
 };
 const URDU_HOMOGRAPH_SOURCES = new Set(['urdu', 'urduVocabPhrase', 'quiz']);
 
@@ -317,6 +347,14 @@ const URDU_HOMOGRAPH_SOURCES = new Set(['urdu', 'urduVocabPhrase', 'quiz']);
 // "…" quotes with no surrounding whitespace.
 const NAMAZ_PHRASE_FIX = [['اللہ اکبر', 'اللہُ اکبر']];
 
+// Zakat (زکوٰۃ) reported 2026-08-09 mispronounced in the Pillars Urdu
+// narration, unlike the English "Zakat" (a plain Latin word Andrew reads
+// literally, no issue). The gol-he ending (ۃ) stacked with the dagger-alif
+// (ٰ) is a rarer grapheme cluster than a plain teh — same "swap for the more
+// common spelling" lever as URDU_LETTER_NAME_FIX's ح→ہ/ث→س above. Synthesis
+// only — pillarsData.js keeps the standard زکوٰۃ spelling on screen.
+const PILLARS_URDU_PHRASE_FIX = [['زکوٰۃ', 'زکات']];
+
 // Bare isolated Urdu letter glyphs (e.g. a lone 'ث') have no vowel to voice,
 // so Azure's ur-PK guesses — and often lands on a different letter entirely
 // (ث/چ/ح collapsing to a plain س sound, ژ reading as ی, ء reading as the
@@ -329,9 +367,16 @@ const NAMAZ_PHRASE_FIX = [['اللہ اکبر', 'اللہُ اکبر']];
 // letter's spelling rather than the rarer one; Azure renders common graphemes
 // (سے "from", ہے "is") far more reliably than rare artificial letter-name
 // tokens like ثے/حے. Confirmed empirically 2026-08-01: سے fixed Say; ثے did not.
+// 'ڑ' (Rray) is deliberately NOT here: the spelled-out substitute 'ڑے' was
+// tried 2026-08-01 without empirical confirmation (unlike سے above) and
+// reported 2026-08-09 as still wrong — Azure reads it as "لی" (Lee), not the
+// retroflex flap it names. See URDU_LETTER_IPA below instead.
+// 'ش' (Sheen) is ALSO deliberately not here any more, same story: 'شین' was
+// reported (still, after a confirmed rebuild) rendering as "shen" (short e)
+// instead of "Sheen" (long ee) — moved to URDU_LETTER_IPA below.
 const URDU_LETTER_NAME_FIX = {
-  'ث': 'سے', 'چ': 'چے', 'ح': 'ہے', 'د': 'دال', 'ڑ': 'ڑے',
-  'ژ': 'ژے', 'ش': 'شین', 'گ': 'گاف', 'و': 'واؤ', 'ء': 'ہمزہ',
+  'ث': 'سے', 'چ': 'چے', 'ح': 'ہے', 'د': 'دال',
+  'ژ': 'ژے', 'گ': 'گاف', 'و': 'واؤ', 'ء': 'ہمزہ',
 };
 const URDU_LETTER_NAME_SOURCES = new Set(['urduLetters', 'urduVocabPhrase']);
 
@@ -340,6 +385,9 @@ const applyUrduHomographFix = (text, voice, source) => {
   let out = text;
   if (source === 'namaz') {
     for (const [bare, fixed] of NAMAZ_PHRASE_FIX) out = out.split(bare).join(fixed);
+  }
+  if (source === 'pillars') {
+    for (const [bare, fixed] of PILLARS_URDU_PHRASE_FIX) out = out.split(bare).join(fixed);
   }
   if (URDU_HOMOGRAPH_SOURCES.has(source)) {
     for (const [bare, fixed] of Object.entries(URDU_HOMOGRAPH_FIX)) {
@@ -357,6 +405,227 @@ const applyUrduHomographFix = (text, voice, source) => {
   return out;
 };
 
+// Letters where even the spelled-out grapheme substitute above isn't enough —
+// state the sound directly in IPA so Azure has nothing left to guess. Same
+// escape hatch as English LETTER_IPA, scoped to Urdu isolated-letter clips.
+//   ڑ (Rray) — retroflex flap. 'ڑے' (spelled-out name) rendered as "لی"/Lee;
+//   this IPA override rendered a DIFFERENT wrong answer, "Lay" (reported
+//   2026-08-09 after a real rebuild) — evidence the phoneme tag IS being
+//   processed, but Asad's voice just can't produce an authentic retroflex
+//   flap and substitutes its nearest liquid-consonant neighbour regardless.
+//   A hi-IN cross-lingual embed (Devanagari ड़ے, same sound, different
+//   script/locale) was tried as a 4th technique and is EVEN WORSE — Azure
+//   returns 200 OK with ZERO audio bytes for that combination (confirmed via
+//   a direct test call), i.e. Asad's voice does not support cross-lingual
+//   embedding into hi-IN at all. Reverted to this IPA form as the least-bad
+//   available option: at least it produces real, if imperfect, audio.
+//   **Left as a known, likely-unfixable limitation of this specific Azure
+//   voice** — three techniques tried (grapheme, IPA, cross-lingual), the
+//   cross-lingual one failing outright rather than just mispronouncing.
+const URDU_LETTER_IPA = {
+  'ڑ': 'ɽeː',
+};
+
+// Cross-lingual embed — last resort for a letter where diacritics, the
+// spelled-out name, AND an IPA phoneme override all failed.
+//   ش (Sheen) — "Sheen" happens to also be a real English word, spelled and
+//   pronounced identically to the Urdu letter name, so this asks Asad's own
+//   voice to read it as an English token via SSML <lang xml:lang="en-US">
+//   (cross-lingual synthesis some neural voices support without switching
+//   speaker) instead of guessing at Urdu-script phonetics a 4th time.
+//   Confirmed (via a direct test call) this produces real, non-empty audio —
+//   unlike the hi-IN attempt for ڑ below, which does not. Still UNVERIFIED
+//   whether the audio is actually pronounced correctly — needs a human
+//   rebuild+listen, same as everything else in this file.
+// ڑ (Rray) is NOT here: no English word sounds like a retroflex flap, and a
+// hi-IN cross-lingual attempt (the same idea, different target locale) was
+// tried and produces silent (0-byte) output — see URDU_LETTER_IPA's comment
+// above for why it's back on the IPA form instead.
+const URDU_LETTER_CROSS_LANG = {
+  'ش': { lang: 'en-US', text: 'Sheen' },
+};
+
+// Leading "<letter> سے " token of a urduVocabPhrase entry (UrduScreen's
+// speakText: `${letter.letter} سے ${vocab.word}`) — only the letter gets the
+// phoneme override; the word after it still goes through the normal
+// homograph-fix path.
+const URDU_LETTER_TOKEN_RE = /^(\S+)(\s+سے\s+)/;
+
+// Whole-WORD escape hatch — same idea as URDU_LETTER_IPA above, but for
+// vocabulary words rather than isolated letter names. Tried 2026-08-09 on 8
+// words where URDU_HOMOGRAPH_FIX's diacritic approach (sometimes escalated
+// through a light fatha AND a sukun/shadda pin) had already shipped and been
+// reconfirmed wrong after a real rebuild. Re-ear-checked the SAME day: 7 of
+// the 8 were STILL wrong even with the IPA phoneme override — i.e. Azure's
+// ur-PK voice does not reliably honour `alphabet="ipa"` for whole words (the
+// bare-letter IPA trick, e.g. ڑ, is a narrower case and unconfirmed itself).
+// بلی (Billi, Cat) is the one exception, reported correct — most likely
+// because its EARLIER shadda diacritic fix (بِلّی) was already right and had
+// simply never been ear-checked before, not because the IPA override did
+// anything (its IPA form 'bɪlːiː' encodes the same gemination). Left as-is:
+// don't fix what isn't broken.
+// The other 7 (بکری/ورق/وعدہ/درخت/دستک/دروازہ/دل) were NOT put through a
+// third guessed-pronunciation round — the user opted instead to replace them
+// with different words in `urduData.js` (Bakri→Barf/Snow, Waraq→Warzish/
+// Exercise, Waada→Van, Darakht→Deewar/Wall, Dastak→Diya/Lamp, Darwaza→Dhoop/
+// Sunshine, Dil→Dawa/Medicine) — simple, high-frequency, vowel-regular words
+// chosen to avoid the consonant-cluster ambiguity (rakht/stak/rwaza-style
+// clusters) that seemed to be tripping the voice up. If those ALSO mispronounce,
+// the pattern (word replacement, not more SSML tuning) is proven not to be a
+// silver bullet and needs rethinking from scratch.
+// Scoped to URDU_HOMOGRAPH_SOURCES (same gate as the diacritic dict) so
+// common words are not silently rewritten wherever they appear in unrelated
+// dua/kalma sentences.
+const URDU_WORD_IPA = {
+  'بلی': 'bɪlːiː',
+  // Say (ث) — grapheme substitution (ث→س) fixed the bare letter but was
+  // reported still wrong on TWO separate word lists (2026-08-09). Escalating
+  // straight to phoneme overrides for these words specifically.
+  'ثنا': 'sənaː', 'ثبات': 'səbaːt', 'ثانی': 'saːniː',
+  'ثمین': 'səmiːn', 'ثالث': 'saːlɪs', 'ثبت': 'səbt',
+  // Hay (ح) — same story: ح→ہ fixed the bare letter but was reported still
+  // wrong on TWO separate word lists (2026-08-09). Escalating to phoneme
+  // overrides for these words specifically.
+  'حباب': 'hʊbaːb', 'حیوان': 'haɪʋaːn', 'حیرت': 'haɪrət',
+  'حرارت': 'həraːrət', 'حصہ': 'hɪsːə', 'حلق': 'hələq',
+};
+
+// Wraps every URDU_WORD_IPA match in 'text' as a phoneme tag; everything else
+// still goes through the normal diacritic homograph-fix path untouched. Mirrors
+// applyEnglishWordIpaFix's word-splice approach, but word-bounded by
+// whitespace/start/end (Urdu script has no \b word-character class in JS regex)
+// like URDU_HOMOGRAPH_FIX's own matcher, not a straight \b split.
+const applyUrduWordIpaFix = (text, voice, source) => {
+  if (!URDU_HOMOGRAPH_SOURCES.has(source)) {
+    return xmlEscape(applyUrduHomographFix(text, voice, source));
+  }
+  const words = Object.keys(URDU_WORD_IPA);
+  const re = new RegExp(`(^|\\s)(${words.join('|')})(?=$|\\s)`, 'g');
+  let out = '';
+  let last = 0;
+  let m;
+  while ((m = re.exec(text))) {
+    out += xmlEscape(applyUrduHomographFix(text.slice(last, m.index), voice, source));
+    out += m[1];
+    out += `<phoneme alphabet="ipa" ph="${URDU_WORD_IPA[m[2]]}">${xmlEscape(m[2])}</phoneme>`;
+    last = re.lastIndex;
+  }
+  out += xmlEscape(applyUrduHomographFix(text.slice(last), voice, source));
+  return out;
+};
+
+// Renders a single letter override token via whichever table claims it —
+// IPA phoneme (URDU_LETTER_IPA) or cross-lingual embed (URDU_LETTER_CROSS_LANG,
+// any target locale/script) — or null if neither table has an entry for it.
+const urduLetterOverrideToken = (letter) => {
+  if (URDU_LETTER_IPA[letter]) {
+    return `<phoneme alphabet="ipa" ph="${URDU_LETTER_IPA[letter]}">${xmlEscape(letter)}</phoneme>`;
+  }
+  const cross = URDU_LETTER_CROSS_LANG[letter];
+  if (cross) {
+    return `<lang xml:lang="${cross.lang}">${xmlEscape(cross.text)}</lang>`;
+  }
+  return null;
+};
+
+// The bare-letter or letter-phrase override for 'text', or null if this
+// (text, source) pair doesn't need one — in which case the caller falls back
+// to the grapheme-substitute path above.
+const urduLetterIpaOverride = (text, voice, source) => {
+  if (!voice.locale.startsWith('ur') || !URDU_LETTER_NAME_SOURCES.has(source)) return null;
+  const trimmed = text.trim();
+  const bare = urduLetterOverrideToken(trimmed);
+  if (bare) return bare;
+  const m = trimmed.match(URDU_LETTER_TOKEN_RE);
+  if (m) {
+    const token = urduLetterOverrideToken(m[1]);
+    if (token) {
+      const rest = trimmed.slice(m[0].length);
+      return `${token}${xmlEscape(m[2])}${applyUrduWordIpaFix(rest, voice, source)}`;
+    }
+  }
+  return null;
+};
+
+// ── Arabic recitation fixes (kalmas) ───────────────────────────────────────
+// Reported 2026-08-09: the Six Kalmas' Arabic (ar-SA, Hamed) run certain word
+// pairs together hard enough that a consonant gets lost in the blur (1st/6th
+// Kalma's closing "...مُحَمَّدٌ رَسُولُ اللَّهِ" reported as "muammadurrasool-
+// ullah" — Muhammad's ح swallowed) or read a silent letter aloud (2nd Kalma's
+// "أَنْ لَا" should assimilate — idgham — into "allaa", the noon unvoiced, but
+// was reported read as its own "an" syllable).
+// Two mechanisms, both synthesis-only — kalmasData.js's `arabic` field (the
+// on-screen text) is untouched:
+//   1. A brief <break> at exactly the word boundary reported as over-joined.
+//      Lower risk than a phoneme respelling: it only inserts a pause, it can't
+//      change how either word itself is pronounced. (Whole-word Arabic IPA
+//      overrides were deliberately NOT attempted here — the Urdu section's own
+//      history above found phoneme tags unreliable for whole words even in the
+//      much more heavily-tuned ur-PK voice, so guessing IPA for an entirely
+//      untuned ar-SA voice is a poor bet without a rebuild+listen to check it.)
+//   2. A literal substring swap for the one spot where the fix is a real
+//      Tajweed orthography convention (a shadda marking an idgham
+//      assimilation, and dropping a pausal tanween) rather than a guess.
+// Scoped to source 'kalmas' only — the same words/phrases appear in duas,
+// tasbeeh, and the 99 names, where this report does not apply.
+const ARABIC_BREAK = '<break time="180ms"/>';
+// Every string below was extracted programmatically from kalmasData.js (or
+// built purely from Unicode codepoints for the two novel diacritic forms) and
+// verified with a byte-level .includes() check — never hand-retyped —
+// because Arabic combining marks (fatha/shadda/tanween) have no fixed storage
+// order and this file's own edit tooling was observed silently reordering
+// typed marks, which would make a `bare` key silently fail to match.
+const KALMAS_ARABIC_FIXES = [
+  // 1st & 6th Kalma both end "Muhammadur Rasoolullah" — reported slurring
+  // into one unbroken run ("muammadurrasoolullah"). A pause gives Muhammad's
+  // ح its own onset instead of bleeding into Rasoolullah.
+  [
+    "مُحَمَّدٌ رَسُولُ اللَّهِ",
+    `مُحَمَّدٌ${ARABIC_BREAK} رَسُولُ اللَّهِ`,
+  ],
+  // 2nd Kalma: "an laa" should idgham into "allaa" (noon silent, assimilated
+  // into the following laam) — a shadda on the laam is the standard Tajweed
+  // notation for that assimilation; reported read instead as an audible "an laa".
+  [
+    "أَشْهَدُ أَنْ لَا إِلَٰهَ",
+    "أَشْهَدُ أَنْ لَّا إِلَٰهَ",
+  ],
+  // 4th Kalma: "hayyun laa yamootu" reported over-joined ("hayyullaayamutu").
+  [
+    "حَيٌّ لَا يَمُوتُ",
+    `حَيٌّ لَا${ARABIC_BREAK} يَمُوتُ`,
+  ],
+  // 4th Kalma: the repeated "abadan abadan" is a pausal doubling — only the
+  // FIRST carries the audible tanween ("abadan"); the second stops the sound
+  // ("abada", no audible noon). Both currently carry the tanween diacritic.
+  [
+    "أَبَدًا أَبَدًا،",
+    "أَبَدًا أَبَدَا،",
+  ],
+  // 5th Kalma: "alaniyatan wa atoobu" reported slurring ("...tavatooobu").
+  [
+    "عَلَانِيَةً وَأَتُوبُ",
+    `عَلَانِيَةً${ARABIC_BREAK} وَأَتُوبُ`,
+  ],
+  // 6th Kalma: "shayan wa ana" reported slurring ("shaiiavana").
+  [
+    "شَيْئًا وَأَنَا",
+    `شَيْئًا${ARABIC_BREAK} وَأَنَا`,
+  ],
+];
+const applyArabicFix = (text, source) => {
+  if (source !== 'kalmas') return xmlEscape(text);
+  let out = text;
+  for (const [bare, fixed] of KALMAS_ARABIC_FIXES) out = out.split(bare).join(fixed);
+  // Escape everything except the literal <break .../> tags just inserted —
+  // Arabic scripture text itself never contains XML metacharacters, so this
+  // only ever protects the break tags from being escaped.
+  return out
+    .split(new RegExp(`(${ARABIC_BREAK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`))
+    .map((part) => (part === ARABIC_BREAK ? part : xmlEscape(part)))
+    .join('');
+};
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Load collect.mjs by bundling it (esbuild resolves the ESM data files for Node).
@@ -369,6 +638,10 @@ async function loadPairs() {
     platform: 'node',
     outfile,
     logLevel: 'silent',
+    // collect.mjs transitively pulls in Data files (e.g. storyImages.js) that
+    // require() image assets for React Native's bundler — irrelevant to text
+    // collection here, so stub them out rather than teach esbuild to load them.
+    loader: { '.png': 'empty', '.jpg': 'empty', '.jpeg': 'empty' },
   });
   const mod = await import(pathToFileURL(outfile).href);
   fs.rmSync(outfile, { force: true });
