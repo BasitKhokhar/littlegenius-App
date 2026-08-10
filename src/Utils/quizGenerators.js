@@ -443,23 +443,19 @@ export const getQuizBank = (bankKey) => {
   return generator ? generator() : [];
 };
 
-// Which banks are Islamic. scripts/collect.mjs reads this so the audio pipeline
-// can leave Islamic content alone without hard-coding a second copy of the list
-// that would silently rot as banks are added.
-export const ISLAMIC_BANKS = [
-  'islamicDua', 'islamicKalma', 'islamicPillar', 'islamicNames', 'islamicMixed',
-];
-
 // The "*Mixed" banks are just concatenations of the others, so collecting them
 // would re-walk questions we already have. Enumerating the base banks alone
-// covers every distinct question the app can ask.
+// covers every distinct question the app can ask. Islamic banks (islamicDua,
+// islamicKalma, islamicPillar, islamicNames) are included here — their question
+// text is English/Urdu-transliteration, not Arabic scripture, so they bake the
+// same as every other module's quiz. Excluding them used to leave every
+// Islamic quiz question/wrong-answer word on the device-TTS fallback voice.
 export const BASE_BANKS = Object.keys(bankGenerators).filter(
-  (k) => !k.endsWith('Mixed') && !ISLAMIC_BANKS.includes(k),
+  (k) => !k.endsWith('Mixed'),
 );
 
 export default {
   getQuizBank,
   bankGenerators,
-  ISLAMIC_BANKS,
   BASE_BANKS,
 };

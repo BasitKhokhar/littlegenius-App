@@ -187,7 +187,7 @@ export function collectPairs() {
   // Quiz questions — ModuleQuizScreen speaks question.speech when the question
   // changes. The banks are generated from the curriculum data, so the QUESTION
   // text is deterministic (only the wrong options are shuffled) and can be
-  // enumerated here. Islamic banks are excluded via BASE_BANKS.
+  // enumerated here. BASE_BANKS now includes the Islamic quiz banks too.
   //
   // `speech.text` is taken verbatim — quizGenerators.js has already stripped the
   // emoji. Do not transform it here or the key won't match what the app asks for.

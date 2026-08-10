@@ -166,6 +166,12 @@ const ENGLISH_WORD_IPA = {
   // state the pronunciation outright. Global (not source-scoped) so every
   // occurrence renders the same way, including the Salah pillar's prayer list.
   fajr: 'ˈfʌdʒər',
+  // Reported 2026-08-10: the Shahada pillar's English narration ("Shahada is
+  // the foundation of Islam...") rendered as "Shahida" — Andrew's voice
+  // guessing the wrong vowel in the unfamiliar loanword, same failure mode as
+  // kangaroo/fajr above. Global so the title/description read the same
+  // wherever "Shahada" appears in English narration.
+  shahada: 'ʃəˈhɑːdə',
 };
 const applyEnglishWordIpaFix = (text) => {
   const words = Object.keys(ENGLISH_WORD_IPA);
@@ -216,6 +222,8 @@ const ssml = (text, voice, source) => {
     inner = applyEnglishWordIpaFix(text);
   } else if (voice.locale.startsWith('ar')) {
     inner = applyArabicFix(text, source);
+  } else if (source === 'wuduSalah') {
+    inner = applyWuduSalahFix(text);
   } else {
     const urduOverride = urduLetterIpaOverride(text, voice, source);
     inner = urduOverride ?? applyUrduWordIpaFix(text, voice, source);
@@ -354,6 +362,89 @@ const NAMAZ_PHRASE_FIX = [['اللہ اکبر', 'اللہُ اکبر']];
 // common spelling" lever as URDU_LETTER_NAME_FIX's ح→ہ/ث→س above. Synthesis
 // only — pillarsData.js keeps the standard زکوٰۃ spelling on screen.
 const PILLARS_URDU_PHRASE_FIX = [['زکوٰۃ', 'زکات']];
+
+// Wudu & Salah (wuduSalahData.js) — several quoted Arabic phrases inside the
+// Urdu narration reported mispronounced by ur-PK Asad 2026-08-10. FIRST
+// attempt (feeding fully-diacritized Quranic/MSA Arabic through the Urdu
+// voice, same lever as NAMAZ_PHRASE_FIX/PILLARS_URDU_PHRASE_FIX above) was
+// reported the SAME DAY as making these phrases sound WORSE — ur-PK Asad
+// isn't trained on dense MSA diacritic clusters and garbles them, unlike the
+// single damma NAMAZ_PHRASE_FIX adds. The user's own framing of the report —
+// these Arabic quotes should sound the same inside an Urdu sentence as they
+// do in real Arabic — points at the real fix: don't ask the Urdu voice to
+// read Arabic, ask it to switch pronunciation RULES for that span via SSML
+// cross-lingual embed (<lang xml:lang="ar-SA">), same mechanism already
+// proven non-empty/working for URDU_LETTER_CROSS_LANG's Sheen→English embed
+// above (confirmed via a direct test call 2026-08-10: both the embed and a
+// bare-diacritic control returned real, similar-length audio — unlike the
+// hi-IN embed attempt for ڑ, which returns 0 bytes outright). This keeps the
+// SAME voice actor throughout (consistency is the feature — see VOICES
+// comment) while letting Asad apply Arabic phonology only to the wrapped
+// span. Where the exact phrase already exists diacritized elsewhere in the
+// app (namazGuideData.js's proven-correct `arabic` fields), that substring is
+// reused verbatim rather than hand-retyped, per the diacritic-transposition
+// gotcha in [[kalmas-2-4-truncated-arabic-fixed]]. wuduSalahData.js display
+// text is untouched either way — synthesis-only.
+//   - Wudu step 1: "بسم اللہ" (Bismillah) — reuses the Al-Fatiha's own
+//     opening "بِسْمِ اللَّهِ" from namazGuideData.js.
+//   - Salah step 1: "اللہ اکبر" (Allahu Akbar).
+//   - Salah step 3 & 4 & 5: the three tasbeeh phrases, full Quranic
+//     diacritics, now read as continuous Arabic recitation instead of
+//     word-by-word Urdu-guessed vowels.
+//   - Salah step 7: "التحیات" — reuses the diacritized "اَلتَّحِيَّاتُ"
+//     already proven-correct in namazGuideData.js's own Tashahhud step.
+//   - Salah step 8: "السلام علیکم ورحمۃ اللہ", full-Tajweed diacritics.
+// UNVERIFIED BY EAR — the test call above only confirms Azure accepts the
+// embed and returns non-trivial audio, not that it's pronounced correctly.
+const WUDU_SALAH_ARABIC_EMBED = [
+  ['بسم اللہ', 'بِسْمِ اللَّهِ'],
+  ['اللہ اکبر', 'اللَّهُ أَكْبَرُ'],
+  ['سبحان ربی العظیم', 'سُبْحَانَ رَبِّيَ الْعَظِيمِ'],
+  ['سمع اللہ لمن حمدہ', 'سَمِعَ ٱللَّهُ لِمَنْ حَمِدَه'],
+  ['سبحان ربی الاعلیٰ', 'سُبْحَانَ رَبِّيَ الْأَعْلَىٰ'],
+  ['التحیات', 'اَلتَّحِيَّاتُ'],
+  ['السلام علیکم ورحمۃ اللہ', 'السَّلاَمُ عَلَيْكُمْ وَرَحْمَةُ اللهِ'],
+];
+
+// Plain-Urdu (non-Arabic-quote) word fixes for the same source — ordinary
+// diacritic homograph substitution, no cross-lingual embed needed since these
+// are native Urdu words, not Arabic quotes:
+//   - "جھک" (bow) read with the wrong default vowel ("jhak" instead of "jhuk").
+//   - "منہ" (mouth/face) read with a flat "mun" instead of the correct
+//     nasalized "moonh" — reported FIXED (confirmed by ear) at both
+//     occurrences (Wudu step 3 "rinse mouth", Salah step 8 "turn your face").
+const WUDU_SALAH_URDU_FIX = {
+  'جھک': 'جھُک',
+  'منہ': 'مونہہ',
+};
+
+// Wraps each WUDU_SALAH_URDU_FIX word fix, then each WUDU_SALAH_ARABIC_EMBED
+// phrase in a <lang xml:lang="ar-SA"> span — everything else is xmlEscape'd
+// normally. Mirrors applyUrduWordIpaFix's word-splice approach but emits a
+// literal SSML tag instead of a phoneme override, so this bypasses (is called
+// instead of) applyUrduWordIpaFix/applyUrduHomographFix for this source.
+const applyWuduSalahFix = (text) => {
+  let out = text;
+  for (const [bare, fixed] of Object.entries(WUDU_SALAH_URDU_FIX)) {
+    out = out.replace(new RegExp(`(^|\\s)${bare}(?=$|\\s)`, 'g'), `$1${fixed}`);
+  }
+  const phrases = WUDU_SALAH_ARABIC_EMBED
+    .map(([bare]) => bare)
+    .sort((a, b) => b.length - a.length)
+    .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const re = new RegExp(`(${phrases.join('|')})`, 'g');
+  let result = '';
+  let last = 0;
+  let m;
+  while ((m = re.exec(out))) {
+    result += xmlEscape(out.slice(last, m.index));
+    const fixed = WUDU_SALAH_ARABIC_EMBED.find(([bare]) => bare === m[0])[1];
+    result += `<lang xml:lang="ar-SA">${xmlEscape(fixed)}</lang>`;
+    last = re.lastIndex;
+  }
+  result += xmlEscape(out.slice(last));
+  return result;
+};
 
 // Bare isolated Urdu letter glyphs (e.g. a lone 'ث') have no vowel to voice,
 // so Azure's ur-PK guesses — and often lands on a different letter entirely
@@ -581,6 +672,16 @@ const ARABIC_BREAK = '<break time="180ms"/>';
 // reordering typed marks, which would make a `bare` key silently fail to
 // match.
 const KALMAS_ARABIC_FIXES = [
+  // 1st & 6th Kalma: the ending is phonetically correct in kalmasData.js
+  // (idgham baked into the spelling: مُحَمَّدُ رَّسُولُ اللَّهِ) but reported
+  // 2026-08-10 with unnatural stress/emphasis on the geminated راء —
+  // Azure over-emphasizing a rare shadda-doubled-consonant pattern.
+  // <emphasis level="reduced"> pulls the stress back to match the rest of
+  // the recitation, without touching the (already-correct) spelling.
+  [
+    "مُحَمَّدُ رَّسُولُ اللَّهِ",
+    "مُحَمَّدُ <emphasis level=\"reduced\">رَّسُولُ</emphasis> اللَّهِ",
+  ],
   // 4th Kalma: a neutral pause between "حَيُّ لَّا" (already fixed at the
   // source in kalmasData.js) and "يَمُوتُ" — لَّا carries no tanween/noon-sakin
   // here, so no idgham rule applies to this boundary; this is rhythm only.
@@ -602,12 +703,13 @@ const applyArabicFix = (text, source) => {
   if (source !== 'kalmas') return xmlEscape(text);
   let out = text;
   for (const [bare, fixed] of KALMAS_ARABIC_FIXES) out = out.split(bare).join(fixed);
-  // Escape everything except the literal <break .../> tags just inserted —
-  // Arabic scripture text itself never contains XML metacharacters, so this
-  // only ever protects the break tags from being escaped.
+  // Escape everything except SSML tags deliberately inserted above (breaks,
+  // emphasis spans, ...) — Arabic scripture text itself never contains XML
+  // metacharacters, so this generic tag-shaped split only ever protects
+  // tags we ourselves inserted, never real Arabic content.
   return out
-    .split(new RegExp(`(${ARABIC_BREAK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`))
-    .map((part) => (part === ARABIC_BREAK ? part : xmlEscape(part)))
+    .split(/(<\/?[a-z]+(?:\s+[a-z-]+="[^"]*")*\s*\/?>)/i)
+    .map((part) => (/^<\/?[a-z]/i.test(part) ? part : xmlEscape(part)))
     .join('');
 };
 

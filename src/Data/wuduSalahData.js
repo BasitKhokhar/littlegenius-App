@@ -35,7 +35,7 @@ export const wuduSteps = [
     urduTitle: 'کلی کرنا',
     emoji: '👄',
     detail: 'Rinse your mouth with water three times.',
-    urduDetail: 'منہ میں پانی لے کر تین بار کلی کرے۔'
+    urduDetail: 'منہ میں تھوڑا سا پانی لے کر تین بار کلی کرے۔'
   },
   {
     step: 4,

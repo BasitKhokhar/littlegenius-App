@@ -27,7 +27,8 @@ export const densifySkeleton = (skeleton, size, pad = 0) => {
   const drawSize = size - pad * 2;
   const step = Math.max(3, size * 0.03);
   const pts = [];
-  for (const line of skeleton) {
+  for (let lineIdx = 0; lineIdx < skeleton.length; lineIdx++) {
+    const line = skeleton[lineIdx];
     for (let i = 0; i < line.length - 1; i++) {
       const ax = pad + line[i][0] * drawSize;
       const ay = pad + line[i][1] * drawSize;
@@ -36,7 +37,7 @@ export const densifySkeleton = (skeleton, size, pad = 0) => {
       const segLen = Math.hypot(bx - ax, by - ay);
       const n = Math.max(1, Math.round(segLen / step));
       for (let k = 0; k <= n; k++) {
-        pts.push({ x: ax + ((bx - ax) * k) / n, y: ay + ((by - ay) * k) / n });
+        pts.push({ x: ax + ((bx - ax) * k) / n, y: ay + ((by - ay) * k) / n, line: lineIdx });
       }
     }
   }
@@ -89,12 +90,33 @@ export const scoreTrace = (guidePts, strokes, size) => {
   const onR2 = onR * onR;
   const strayR2 = strayR * strayR;
 
-  // recall — did the child cover the letter?
-  let covered = 0;
-  for (const g of guidePts) {
-    if (minDistSq(g, inkPts) <= nearR2) covered++;
-  }
-  const recall = covered / guidePts.length;
+  // recall — did the child cover the letter? Measured PER STROKE (each
+  // polyline of the skeleton, e.g. the crossbar of an "A"/"H" or one loop
+  // of an "8") and then combined so a long stroke can't hide a short one
+  // that was skipped entirely. Pooling every guide point into one flat
+  // average let a child who traced only 2 of "A"'s 3 strokes (both long
+  // diagonals, skipping the short crossbar) still land recall ~0.9,
+  // because the crossbar is a tiny fraction of the letter's total point
+  // count — that's why an incomplete letter used to still score 8-9/10.
+  const lineIds = [];
+  for (const g of guidePts) if (!lineIds.includes(g.line)) lineIds.push(g.line);
+  const perLineRecall = lineIds.map((id) => {
+    let lineCovered = 0;
+    let lineTotal = 0;
+    for (const g of guidePts) {
+      if (g.line !== id) continue;
+      lineTotal++;
+      if (minDistSq(g, inkPts) <= nearR2) lineCovered++;
+    }
+    return lineTotal ? lineCovered / lineTotal : 0;
+  });
+  const avgRecall = perLineRecall.reduce((a, b) => a + b, 0) / perLineRecall.length;
+  const minRecall = Math.min(...perLineRecall);
+  // A stroke that's skipped or barely attempted (minRecall near 0) drags the
+  // whole letter down hard via this power term, even if the strokes that
+  // WERE drawn were perfect — an "A" missing its crossbar is not a passing
+  // "A" just because both diagonals were traced beautifully.
+  const recall = avgRecall * Math.pow(minRecall, 1.5);
 
   // precision — did the child's ink stay ON the letter (vs. scribbling)?
   let onLetter = 0;
@@ -157,7 +179,7 @@ export const scoreFreeform = (strokes, size) => {
   const inZoneRatio = inZone / pts.length;             // stay inside the guide
   const spanX = (maxX - minX) / size;
   const spanY = (maxY - minY) / size;
-  const extent = Math.min(1, spanX / 0.45) * Math.min(1, spanY / 0.45); // fills area
+  const extent = Math.min(1, spanX / 0.55) * Math.min(1, spanY / 0.55); // fills area
   const lengthScore = Math.min(1, length / (size * 1.2)); // enough ink, not a dot
 
   // Overdraw penalty: a real glyph's ink length is a small multiple of its
@@ -170,10 +192,14 @@ export const scoreFreeform = (strokes, size) => {
 
   const fill = 0.4 * extent + 0.3 * lengthScore + 0.3 * neat;
 
-  // Placement gates the whole score hard (squared), and the ceiling is lower
-  // than a true traced letter would earn — honest for a shape we can't verify.
+  // Placement gates the whole score hard (squared). CEILING caps the best
+  // possible mark below the "amazing" tier (>=8): without a real skeleton we
+  // can't confirm the ink is actually the target glyph and not just a filled
+  // scribble or an unrelated stroke that happens to span the guide box, so
+  // this heuristic must never claim the same confidence as a verified trace.
   // No floor at 1, so a corner scribble or a tiny mark genuinely scores low.
-  const score = Math.max(0, Math.min(1, Math.pow(inZoneRatio, 1.5) * fill));
+  const CEILING = 0.72;
+  const score = Math.max(0, Math.min(1, Math.pow(inZoneRatio, 1.5) * fill * CEILING));
   const marks = Math.max(0, Math.round(score * 10));
   return { marks, coverage: inZoneRatio, stray: 1 - inZoneRatio };
 };

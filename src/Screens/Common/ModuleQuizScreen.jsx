@@ -34,10 +34,11 @@ const ModuleQuizScreen = ({ navigation, route }) => {
     return config?.packs.find((p) => p.id === packId);
   }, [module, packId]);
 
-  // Themed gradient stage, built from the module's own accent colour — the
-  // same "cartoon premium" full-bleed treatment the mini-games use, so a
-  // quiz feels like part of the same app rather than a plain form screen.
-  const accent = moduleColors[module]?.solid || pack?.color || colors.primary;
+  // Themed gradient stage, built from the pack's own accent colour so the
+  // detail screen matches the gradient the pack's card showed in the list
+  // (QuizListScreen colours each card from pack.color) — falling back to the
+  // module-wide accent only when a pack has no colour of its own.
+  const accent = pack?.color || moduleColors[module]?.solid || colors.primary;
   const stage = useMemo(
     () => ({ bg: gradientStageFromAccent(accent, isDark), accent, deco: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.16)' }),
     [accent, isDark]
