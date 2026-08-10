@@ -569,48 +569,33 @@ const urduLetterIpaOverride = (text, voice, source) => {
 // Scoped to source 'kalmas' only — the same words/phrases appear in duas,
 // tasbeeh, and the 99 names, where this report does not apply.
 const ARABIC_BREAK = '<break time="180ms"/>';
-// Every string below was extracted programmatically from kalmasData.js (or
-// built purely from Unicode codepoints for the two novel diacritic forms) and
-// verified with a byte-level .includes() check — never hand-retyped —
-// because Arabic combining marks (fatha/shadda/tanween) have no fixed storage
-// order and this file's own edit tooling was observed silently reordering
-// typed marks, which would make a `bare` key silently fail to match.
+// kalmasData.js's `arabic` field now already contains the confirmed idgham
+// fixes for kalma 1, 2, 5, and 6 (tanween removed, shadda added on the
+// assimilating letter — baked directly into the source text, not overridden
+// here, since what's displayed should match what's spoken). Only kalma 4
+// still needs synthesis-only help, for the two reasons in each entry below.
+// Every string below was extracted programmatically from kalmasData.js —
+// never hand-retyped — and verified with a byte-level .includes() check,
+// because Arabic combining marks (fatha/shadda/tanween) have no fixed
+// storage order and this file's own edit tooling was observed silently
+// reordering typed marks, which would make a `bare` key silently fail to
+// match.
 const KALMAS_ARABIC_FIXES = [
-  // 1st & 6th Kalma both end "Muhammadur Rasoolullah" — reported slurring
-  // into one unbroken run ("muammadurrasoolullah"). A pause gives Muhammad's
-  // ح its own onset instead of bleeding into Rasoolullah.
+  // 4th Kalma: a neutral pause between "حَيُّ لَّا" (already fixed at the
+  // source in kalmasData.js) and "يَمُوتُ" — لَّا carries no tanween/noon-sakin
+  // here, so no idgham rule applies to this boundary; this is rhythm only.
   [
-    "مُحَمَّدٌ رَسُولُ اللَّهِ",
-    `مُحَمَّدٌ${ARABIC_BREAK} رَسُولُ اللَّهِ`,
+    "حَيُّ لَّا يَمُوتُ",
+    `حَيُّ لَّا${ARABIC_BREAK} يَمُوتُ`,
   ],
-  // 2nd Kalma: "an laa" should idgham into "allaa" (noon silent, assimilated
-  // into the following laam) — a shadda on the laam is the standard Tajweed
-  // notation for that assimilation; reported read instead as an audible "an laa".
-  [
-    "أَشْهَدُ أَنْ لَا إِلَٰهَ",
-    "أَشْهَدُ أَنْ لَّا إِلَٰهَ",
-  ],
-  // 4th Kalma: "hayyun laa yamootu" reported over-joined ("hayyullaayamutu").
-  [
-    "حَيٌّ لَا يَمُوتُ",
-    `حَيٌّ لَا${ARABIC_BREAK} يَمُوتُ`,
-  ],
-  // 4th Kalma: the repeated "abadan abadan" is a pausal doubling — only the
-  // FIRST carries the audible tanween ("abadan"); the second stops the sound
-  // ("abada", no audible noon). Both currently carry the tanween diacritic.
+  // 4th Kalma: the repeated "abadan abadan" is a pausal doubling — only
+  // the FIRST carries the audible tanween ("abadan"); the second stops
+  // the sound ("abada", no audible noon). Kept synthesis-only (not baked
+  // into kalmasData.js) since this is a waqf/pausal reading convention
+  // for continuous recitation, not a fixed spelling correction.
   [
     "أَبَدًا أَبَدًا،",
     "أَبَدًا أَبَدَا،",
-  ],
-  // 5th Kalma: "alaniyatan wa atoobu" reported slurring ("...tavatooobu").
-  [
-    "عَلَانِيَةً وَأَتُوبُ",
-    `عَلَانِيَةً${ARABIC_BREAK} وَأَتُوبُ`,
-  ],
-  // 6th Kalma: "shayan wa ana" reported slurring ("shaiiavana").
-  [
-    "شَيْئًا وَأَنَا",
-    `شَيْئًا${ARABIC_BREAK} وَأَنَا`,
   ],
 ];
 const applyArabicFix = (text, source) => {
