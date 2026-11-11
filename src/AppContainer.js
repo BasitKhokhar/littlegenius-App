@@ -19,13 +19,11 @@ const AppContainer = ({ children }) => {
                 under the translucent status bar, so the status-bar content
                 (clock, battery, icons) must stay light/white in BOTH themes. */}
             <StatusBar
-                translucent
-                backgroundColor="transparent"
                 barStyle="light-content"
             />
 
             <SafeAreaView edges={["left", "right", "bottom"]} style={styles.safeArea}>
-                {children}
+                <View style={styles.tabletFrame}>{children}</View>
             </SafeAreaView>
         </View>
     );
@@ -39,5 +37,11 @@ const styles = StyleSheet.create({
     },
     safeArea: {
         flex: 1,
+    },
+    tabletFrame: {
+        flex: 1,
+        width: "100%",
+        maxWidth: 1200,
+        alignSelf: "center",
     },
 });

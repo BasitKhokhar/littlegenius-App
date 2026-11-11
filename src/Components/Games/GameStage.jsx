@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue,
@@ -22,8 +22,6 @@ import Svg, { Path } from 'react-native-svg';
 //
 //   <GameStage theme={gt} wave>{content}</GameStage>
 // ──────────────────────────────────────────────────────────────
-
-const { width } = Dimensions.get('window');
 
 // One ambient floating orb (lifted from the Onboarding `Orb` pattern).
 const Orb = ({ style, color, delay = 0, drift = 22, dur = 3400 }) => {
@@ -56,6 +54,7 @@ const BUBBLES = [
 ];
 
 const GameStage = ({ theme, wave = false, children, style }) => {
+  const { width } = useWindowDimensions();
   const bg = theme?.bg || ['#818CF8', '#6366F1', '#4338CA'];
   const deco = theme?.deco || 'rgba(255,255,255,0.14)';
   // Wave sits at the bottom as a slightly stronger translucent band.

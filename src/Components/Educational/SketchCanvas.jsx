@@ -5,7 +5,7 @@ import {
   Modal,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import Svg, { Path, Text as SvgText, Circle } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
@@ -17,8 +17,6 @@ import traceSkeletons from '../../Data/traceSkeletons';
 import { densifySkeleton, skeletonToPath, scoreTrace, scoreFreeform } from '../../Utils/traceScoring';
 import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
-
-const { width: SCREEN_W } = Dimensions.get('window');
 
 // How many times the child writes the glyph in one practice session.
 const ATTEMPTS = 5;
@@ -51,12 +49,16 @@ const SketchCanvas = ({
   color = '#8A6FF0',
   fontFamily,
 }) => {
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const colors = useThemeColors();
   const styles = makeStyles(colors);
   const { addStars } = useAuth();
 
   // Square drawing surface, capped so it always fits on screen.
-  const CANVAS = useMemo(() => Math.min(SCREEN_W - 48, 320), []);
+  const CANVAS = useMemo(
+    () => Math.min(screenWidth - 48, screenHeight - 220, 420),
+    [screenWidth, screenHeight]
+  );
   const PAD = useMemo(() => Math.round(CANVAS * 0.14), [CANVAS]);
 
   // A real writing skeleton exists for A–Z and 0–9. Urdu haroof fall back

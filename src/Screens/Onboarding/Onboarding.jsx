@@ -3,7 +3,7 @@ import {
   StyleSheet,
   View,
   Text,
-  Dimensions,
+  useWindowDimensions,
   StatusBar,
   Pressable,
 } from 'react-native';
@@ -31,11 +31,9 @@ import SpeechEngine from '../../Utils/speechEngine';
 import { lightColors as C, gradients, onBrandOverlay as O } from '../../Theme/colors';
 import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
 
-const { width, height } = Dimensions.get('window');
 // Hero art fills the top ~65%; the content sheet below overlaps it by
 // SHEET_OVERLAP so its rounded top corners peek in front of the image —
 // matching the bottom-sheet-over-hero layout from the design reference.
-const HERO_HEIGHT = height * 0.68;
 const SHEET_RADIUS = 32;
 const SHEET_OVERLAP = 24;
 
@@ -78,22 +76,22 @@ const THEME_ACCENT = C.primary;
 const THEME_GRADIENT = gradients.cta;
 
 // ── Full-bleed hero image (gentle Ken Burns zoom + crossfade) ───
-const Hero = ({ item, index, scrollX }) => {
-  const input = [(index - 1) * width, index * width, (index + 1) * width];
+const Hero = ({ item, index, scrollX, pageWidth, heroHeight }) => {
+  const input = [(index - 1) * pageWidth, index * pageWidth, (index + 1) * pageWidth];
   const imgStyle = useAnimatedStyle(() => ({
     opacity: interpolate(scrollX.value, input, [0.35, 1, 0.35], Extrapolation.CLAMP),
     transform: [{ scale: interpolate(scrollX.value, input, [1.14, 1, 1.14], Extrapolation.CLAMP) }],
   }));
   return (
-    <View style={styles.heroSlide}>
+    <View style={[styles.heroSlide, { width: pageWidth, height: heroHeight }]}>
       <Animated.Image source={item.image} resizeMode="cover" style={[styles.heroImage, imgStyle]} />
     </View>
   );
 };
 
 // ── Slide copy (rises + fades in as its page centers) ───────────
-const Copy = ({ item, index, scrollX }) => {
-  const input = [(index - 1) * width, index * width, (index + 1) * width];
+const Copy = ({ item, index, scrollX, pageWidth }) => {
+  const input = [(index - 1) * pageWidth, index * pageWidth, (index + 1) * pageWidth];
   const textStyle = useAnimatedStyle(() => ({
     opacity: interpolate(scrollX.value, input, [0, 1, 0], Extrapolation.CLAMP),
     transform: [{ translateY: interpolate(scrollX.value, input, [22, 0, 22], Extrapolation.CLAMP) }],
@@ -109,8 +107,8 @@ const Copy = ({ item, index, scrollX }) => {
 };
 
 // ── Scroll-linked pagination dot ────────────────────────────────
-const Dot = ({ index, scrollX }) => {
-  const input = [(index - 1) * width, index * width, (index + 1) * width];
+const Dot = ({ index, scrollX, pageWidth }) => {
+  const input = [(index - 1) * pageWidth, index * pageWidth, (index + 1) * pageWidth];
   const aStyle = useAnimatedStyle(() => ({
     width: interpolate(scrollX.value, input, [8, 24, 8], Extrapolation.CLAMP),
     opacity: interpolate(scrollX.value, input, [0.4, 1, 0.4], Extrapolation.CLAMP),
@@ -120,6 +118,8 @@ const Dot = ({ index, scrollX }) => {
 };
 
 const Onboarding = ({ navigation }) => {
+  const { width, height } = useWindowDimensions();
+  const heroHeight = Math.max(280, height * (width >= 768 ? 0.58 : 0.68));
   const insets = useSafeAreaInsets();
   const scrollRef = useRef(null);
   const scrollX = useSharedValue(0);
@@ -172,7 +172,7 @@ const Onboarding = ({ navigation }) => {
     if (activeIndex > 0) {
       scrollRef.current?.scrollTo({ x: (activeIndex - 1) * width, animated: true });
     }
-  }, [activeIndex]);
+  }, [activeIndex, width]);
 
   const handleNext = useCallback(() => {
     if (activeIndex < LAST) {
@@ -181,14 +181,14 @@ const Onboarding = ({ navigation }) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       goToProfile();
     }
-  }, [activeIndex, goToProfile]);
+  }, [activeIndex, goToProfile, width]);
 
   const isFirst = activeIndex === 0;
   const isLast = activeIndex === LAST;
 
   return (
     <View style={styles.container}>
-      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+      <StatusBar barStyle="light-content" />
 
       <Animated.View style={[styles.content, enterStyle]}>
         {/* Skip — floats over the hero art */}
@@ -212,10 +212,10 @@ const Onboarding = ({ navigation }) => {
           style={styles.scroller}
         >
           {SLIDES.map((item, i) => (
-            <View key={item.id} style={styles.page}>
-              <Hero item={item} index={i} scrollX={scrollX} />
+            <View key={item.id} style={[styles.page, { width }]}>
+              <Hero item={item} index={i} scrollX={scrollX} pageWidth={width} heroHeight={heroHeight} />
               <View style={styles.copyArea}>
-                <Copy item={item} index={i} scrollX={scrollX} />
+                <Copy item={item} index={i} scrollX={scrollX} pageWidth={width} />
               </View>
             </View>
           ))}
@@ -223,11 +223,11 @@ const Onboarding = ({ navigation }) => {
 
         {/* Pagination dots — fixed just inside the sheet's rounded top edge */}
         <View
-          style={[styles.dotsRow, { top: HERO_HEIGHT - SHEET_OVERLAP + Spacing.lg }]}
+          style={[styles.dotsRow, { top: heroHeight - SHEET_OVERLAP + Spacing.lg }]}
           pointerEvents="none"
         >
           {SLIDES.map((_, i) => (
-            <Dot key={i} index={i} scrollX={scrollX} />
+            <Dot key={i} index={i} scrollX={scrollX} pageWidth={width} />
           ))}
         </View>
 
@@ -286,11 +286,9 @@ const styles = StyleSheet.create({
   skipText: { ...textStyles.bodyStrong, fontSize: 13, color: O.textStrong },
 
   scroller: { flex: 1 },
-  page: { width, height: '100%' },
+  page: { height: '100%' },
 
   heroSlide: {
-    width,
-    height: HERO_HEIGHT,
     overflow: 'hidden',
     backgroundColor: C.brandSurface,
   },

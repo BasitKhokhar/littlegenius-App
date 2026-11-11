@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { Layout } from '../../Theme';
 
@@ -25,16 +25,19 @@ const Screen = ({
   ...rest
 }) => {
   const colors = useThemeColors();
+  const { width } = useWindowDimensions();
   const bg = colors[background] || colors.bg;
 
-  const padStyle = padded ? { paddingHorizontal: Layout.screenPadding } : null;
+  const padStyle = padded
+    ? { paddingHorizontal: width >= 768 ? Layout.screenPadding * 2 : Layout.screenPadding }
+    : null;
 
   if (scroll) {
     return (
       <View style={[styles.flex, { backgroundColor: bg }, style]}>
         <ScrollView
           style={styles.flex}
-          contentContainerStyle={[padStyle, contentContainerStyle]}
+          contentContainerStyle={[styles.scrollContent, padStyle, contentContainerStyle]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           {...rest}
@@ -54,6 +57,11 @@ const Screen = ({
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  scrollContent: {
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
+  },
 });
 
 export default Screen;

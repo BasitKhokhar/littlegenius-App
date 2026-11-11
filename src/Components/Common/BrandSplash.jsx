@@ -25,7 +25,7 @@ const BrandSplash = () => {
 
   return (
     <LinearGradient colors={gradients.splash} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={lightColors.brandSurface} />
+      <StatusBar barStyle="light-content" />
 
       {/* Soft depth blobs */}
       <View style={[styles.blob, styles.blob1]} />

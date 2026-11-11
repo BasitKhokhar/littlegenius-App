@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
+  useWindowDimensions,
   ScrollView,
   StatusBar,
 } from 'react-native';
@@ -16,18 +16,16 @@ import { Input, Button, BottomSheet } from '../../Components/Common';
 import { lightColors as C, gradients } from '../../Theme/colors';
 import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
 
-const { height, width } = Dimensions.get('window');
-
 // 10 avatars laid out as two rows of 5. Chip size is derived so exactly
 // 5 fit per row (minus horizontal padding + the 4 inter-chip gaps).
 const AVATAR_COLS = 5;
-const AVATAR_CHIP = Math.floor((width - Spacing.xl * 2 - Spacing.sm * (AVATAR_COLS - 1)) / AVATAR_COLS);
 
 const AVATARS = ['🐯', '🐱', '🦄', '🦁', '🦉', '🦊', '🐨', '🐼', '🐸', '🐵'];
 const AGE_OPTIONS = ['2 Years', '3 Years', '4 Years', '5 Years', '6 Years', '7 Years', '8 Years', '9 Years', '10 Years'];
 
 // ProfileSetup — one-time, no-login profile for the offline app.
 const ProfileSetup = () => {
+  const { width, height } = useWindowDimensions();
   const { loginSuccess } = useAuth();
   const { showAlert } = useDialog();
   const colors = useThemeColors();
@@ -55,14 +53,19 @@ const ProfileSetup = () => {
     }
   };
 
-  const s = makeStyles(colors);
+  const contentWidth = Math.min(width, 720);
+  const avatarChip = Math.min(
+    82,
+    Math.floor((contentWidth - Spacing.xl * 2 - Spacing.sm * (AVATAR_COLS - 1)) / AVATAR_COLS)
+  );
+  const s = makeStyles(colors, avatarChip);
 
   return (
     <View style={[styles.container, { backgroundColor: gradients.hero[gradients.hero.length - 1] }]}>
-      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+      <StatusBar barStyle="light-content" />
 
       {/* ── Top Hero ── */}
-      <LinearGradient colors={gradients.hero} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.topBar}>
+      <LinearGradient colors={gradients.hero} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.topBar, { minHeight: height * 0.3 }]}>
         <View style={styles.blob1} />
         <View style={styles.blob2} />
         <View style={[styles.avatarRing, coloredShadow(C.primary, 'lg')]}>
@@ -147,12 +150,12 @@ const ProfileSetup = () => {
   );
 };
 
-const makeStyles = (colors) =>
+const makeStyles = (colors, avatarChip) =>
   StyleSheet.create({
     sectionLabel: { ...textStyles.overline, color: colors.primary, marginBottom: Spacing.md, marginTop: Spacing.sm },
     avatarChip: {
-      width: AVATAR_CHIP,
-      height: AVATAR_CHIP,
+      width: avatarChip,
+      height: avatarChip,
       borderRadius: Radius.md,
       backgroundColor: colors.surface,
       borderWidth: 2,
@@ -192,7 +195,6 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xxl,
     paddingTop: 58,
     overflow: 'hidden',
-    minHeight: height * 0.3,
   },
   blob1: { position: 'absolute', top: -40, left: -40, width: 170, height: 170, borderRadius: 85, backgroundColor: 'rgba(255,255,255,0.08)' },
   blob2: { position: 'absolute', bottom: -30, right: -30, width: 130, height: 130, borderRadius: 65, backgroundColor: 'rgba(255,255,255,0.06)' },

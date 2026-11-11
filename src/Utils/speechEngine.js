@@ -74,6 +74,7 @@ let currentSettle = null;
 const activeSpeakers = new Map(); // ownerId -> reset()
 
 const claimSpeaker = (ownerId) => {
+  logEvent('claimSpeaker', { activeSpeakerCount: activeSpeakers.size });
   activeSpeakers.forEach((reset, id) => {
     if (id !== ownerId) reset();
   });
@@ -100,7 +101,42 @@ const diagnostics = {
   ttsFallbacks: 0,
   lastClipError: null,
   lastResolvedUri: null,
+  // Leak-detection counters for the "stuck speaking icon" bug: each speak()
+  // call must eventually settle. If callsStarted/callsSettled drift apart and
+  // stay apart (outstanding > 0) after activity stops, that's a JS-side leak.
+  callsStarted: 0,
+  callsSettled: 0,
+  // How many times a real native AudioPlayer was ever instantiated — should
+  // stay at 1 for the whole app session now that clips reuse one player via
+  // replace() (see getClipPlayer()). If this climbs, something forced a fresh
+  // native allocation, worth investigating.
+  nativePlayerAllocs: 0,
+  // How many times a clip was loaded into the shared player — informational
+  // only (not a leak signal, since the player itself is never destroyed).
+  clipLoads: 0,
 };
+
+// Rolling trace of the exact same bug so it can be reproduced on a Play Store
+// build (no attached console there) and exported via Settings → share sheet
+// instead of requiring ADB. Capped so a long session doesn't grow unbounded.
+const MAX_LOG_EVENTS = 300;
+const eventLog = [];
+const logEvent = (type, data) => {
+  try {
+    eventLog.push({ t: Date.now(), type, ...data });
+    if (eventLog.length > MAX_LOG_EVENTS) eventLog.shift();
+    // console.log('[SG]', type, data || ''); // dev-only trace, re-enable when debugging playback
+  } catch { /* logging must never break playback */ }
+};
+const formatLog = () =>
+  eventLog
+    .map((e) => {
+      const { t, type, ...rest } = e;
+      const time = new Date(t).toTimeString().slice(0, 8) + '.' + String(t % 1000).padStart(3, '0');
+      const extra = Object.keys(rest).length ? ` ${JSON.stringify(rest)}` : '';
+      return `${time}  ${type}${extra}`;
+    })
+    .join('\n');
 
 // How long a bundled clip may take to reach a loaded state before we abandon it
 // and speak with the device voice instead. Clips are local files, so this is
@@ -160,14 +196,33 @@ const ensureAudioMode = () => {
 // The bundled clip for a phrase, or null when it wasn't pre-baked.
 const lookupClip = (language, text) => AUDIO[speechKey(language, text)] ?? null;
 
+// A SINGLE reused native AudioPlayer for all clip playback (pre-baked teacher
+// clips AND explicit opts.audioClip / Qari recitation), instead of creating a
+// brand-new native player and destroying it on every tap. The original design
+// did create+remove per call; under rapid tapping (exactly how kids use the
+// letter/word screens) that churn exhausts Android's native decoder pool after
+// roughly 40-55 plays in a session. Confirmed via the [SG] event log: JS-side
+// call/settle bookkeeping stayed perfectly balanced the whole time, but native
+// playbackStatusUpdate events (including didJustFinish) started arriving only
+// via the JS fallback timers, then eventually stopped arriving at all for one
+// tap — exactly the "stuck speaking icon, no sound, needs app restart" bug.
+// player.replace(source) (expo-audio) swaps the loaded source on one persistent
+// player without tearing down/reallocating the native decoder, avoiding the
+// churn entirely — the same pattern expo-video recommends for VideoPlayer reuse.
+let sharedClipPlayer = null;
+const getClipPlayer = () => {
+  if (!sharedClipPlayer) {
+    sharedClipPlayer = createAudioPlayer(null);
+    diagnostics.nativePlayerAllocs += 1;
+    logEvent('player:alloc', { total: diagnostics.nativePlayerAllocs });
+  }
+  return sharedClipPlayer;
+};
+
 const releasePlayer = (player) => {
-  // Pause BEFORE remove so playback is silenced instantly. remove()/release on
-  // its own can let a clip's tail keep sounding for a beat while native teardown
-  // happens — long enough for a freshly-tapped clip to overlap the previous one.
-  // Pausing first guarantees the old sound is gone before the new one starts, so
-  // rapidly tapping between Islamic recitations never double-voices.
+  // Pause only — the native player is the reused singleton above and is never
+  // destroyed per call anymore.
   try { player?.pause?.(); } catch { /* already gone */ }
-  try { player?.remove?.(); } catch { /* already gone */ }
   if (currentPlayer === player) currentPlayer = null;
 };
 
@@ -272,6 +327,8 @@ export const SpeechEngine = {
     // True while this is still the call the user is waiting on — see speakGeneration.
     const generation = ++speakGeneration;
     const isCurrent = () => generation === speakGeneration;
+    diagnostics.callsStarted += 1;
+    logEvent('speak:start', { gen: generation, text: clean.slice(0, 30), lang: language, hasAudioClip: !!opts.audioClip });
 
     // A single-settle guard so onDone/onError fire exactly once, no matter
     // which of {native callback, start-watchdog, done-watchdog} wins.
@@ -288,6 +345,13 @@ export const SpeechEngine = {
     const settle = (ok, err) => {
       if (settled) return;
       settled = true;
+      diagnostics.callsSettled += 1;
+      logEvent('speak:settle', {
+        gen: generation,
+        ok,
+        err: err?.message,
+        outstandingCalls: diagnostics.callsStarted - diagnostics.callsSettled,
+      });
       clearTimers();
       if (cleanup) { try { cleanup(); } catch { /* noop */ } cleanup = null; }
       if (currentSettle === settle) currentSettle = null;
@@ -334,7 +398,10 @@ export const SpeechEngine = {
     // orphaned native player per superseded call — enough of them exhausts
     // the OS's concurrent-decoder limit, after which even fresh taps show
     // "speaking" with no sound until the app is fully restarted.
-    if (settled) return;
+    if (settled) {
+      logEvent('speak:superseded-bailout', { gen: generation });
+      return;
+    }
     // Cancel any pre-baked clip still playing from a previous call.
     if (currentPlayer) releasePlayer(currentPlayer);
 
@@ -470,8 +537,11 @@ export const SpeechEngine = {
       recordResolvedUri(clip);
       try {
         ensureAudioMode();
-        const player = createAudioPlayer(clip);
+        const player = getClipPlayer();
+        player.replace(clip);
         currentPlayer = player;
+        diagnostics.clipLoads += 1;
+        logEvent('player:load', { gen: generation, clipLoads: diagnostics.clipLoads });
 
         // Snappier, professional delivery: play the pre-baked teacher clip a
         // little faster than baked with pitch correction on, so it stays the
@@ -485,17 +555,22 @@ export const SpeechEngine = {
         // slowed-down clip off partway through (the longer the clip, the
         // bigger the gap between native duration and real playback time).
         let effectiveClipRate = 1;
-        if (isTeacherClip) {
-          try {
+        try {
+          player.shouldCorrectPitch = true;
+          if (isTeacherClip) {
             // Per-call tuning × the user's global speed, clamped so an extreme
             // setting can't distort the voice into a chipmunk/drone.
             const floor = Number.isFinite(opts.minClipRate) ? opts.minClipRate : 0.4;
             const clipRate = clampRate((opts.clipRate ?? CLIP_PLAYBACK_RATE) * globalSpeed, floor, 3.0);
-            player.shouldCorrectPitch = true;
             player.setPlaybackRate(clipRate, 'high');
             effectiveClipRate = clipRate;
-          } catch { /* older expo-audio native — play at 1x */ }
-        }
+          } else {
+            // Explicit clip (e.g. Qari recitation) must always play EXACTLY as
+            // recorded — reset any rate left over on the shared player from a
+            // previous (now reused, not recreated) call.
+            player.setPlaybackRate(1, 'high');
+          }
+        } catch { /* older expo-audio native — play at whatever rate is already set */ }
 
         let armed = false;       // precise duration-based done timer is set
         let loaded = false;      // the clip actually reached a playable state
@@ -504,7 +579,7 @@ export const SpeechEngine = {
 
         // Hand a dead clip over to the device voice instead of going silent.
         // This is the recovery path the synchronous catch below CANNOT provide:
-        // createAudioPlayer() never throws when the media can't be opened, so a
+        // player.replace() never throws when the media can't be opened, so a
         // clip that is present in the bundle but unplayable on the device (the
         // classic release-build-only failure) would otherwise play nothing at
         // all, report success, and leave no trace.
@@ -516,6 +591,7 @@ export const SpeechEngine = {
           diagnostics.ttsFallbacks += 1;
           diagnostics.lastClipError = `${reason?.message ?? reason}`;
           console.warn('[SpeechEngine] Bundled clip did not play, using TTS:', reason);
+          logEvent('clip:abandon', { gen: generation, reason: `${reason?.message ?? reason}` });
           if (cleanup) { try { cleanup(); } catch { /* noop */ } cleanup = null; }
           // Stopped or superseded while the clip was loading — stay silent.
           if (!isCurrent()) { settle(true); return; }
@@ -539,11 +615,18 @@ export const SpeechEngine = {
             // It is tightened below as soon as the true duration is known.
             // Scaled by the applied rate so a slowed-down clip (child-pace
             // narration) still gets the full real-time allowance.
-            doneTimer = setTimeout(() => settle(true), Math.round(90000 / effectiveClipRate));
+            doneTimer = setTimeout(() => {
+              logEvent('timer:done-generous', { gen: generation });
+              settle(true);
+            }, Math.round(90000 / effectiveClipRate));
           }
 
           // didJustFinish fires once when the clip reaches its end.
-          if (status?.didJustFinish) { settle(true); return; }
+          if (status?.didJustFinish) {
+            logEvent('player:didJustFinish', { gen: generation });
+            settle(true);
+            return;
+          }
 
           // ExoPlayer drops back to "idle" when it fails to open the media. If
           // the player was doing something and still never loaded, the clip is
@@ -563,10 +646,14 @@ export const SpeechEngine = {
           if (loaded && !armed && dur > 0 && Number.isFinite(dur)) {
             armed = true;
             if (doneTimer) clearTimeout(doneTimer);
-            doneTimer = setTimeout(() => settle(true), Math.round((dur * 1000) / effectiveClipRate) + 3000);
+            doneTimer = setTimeout(() => {
+              logEvent('timer:done-precise', { gen: generation });
+              settle(true);
+            }, Math.round((dur * 1000) / effectiveClipRate) + 3000);
           }
         });
-        // settle() runs this to release the native player + listener exactly once.
+        // settle() runs this to detach the listener and pause the shared player
+        // exactly once.
         cleanup = () => {
           try { sub?.remove?.(); } catch { /* noop */ }
           releasePlayer(player);
@@ -604,7 +691,13 @@ export const SpeechEngine = {
    * build it should look like "assets_audio_teacher_<hash>" — an empty string
    * means the asset could not be located and nothing can play).
    */
-  getDiagnostics: () => ({ ...diagnostics, manifestSize: Object.keys(AUDIO).length }),
+  getDiagnostics: () => ({
+    ...diagnostics,
+    manifestSize: Object.keys(AUDIO).length,
+    outstandingCalls: diagnostics.callsStarted - diagnostics.callsSettled,
+    activeSpeakerCount: activeSpeakers.size,
+    logText: formatLog(),
+  }),
 
   /**
    * Register a speak-owning UI instance (a SpeakButton / useSpeak caller) so it
@@ -630,6 +723,7 @@ export const SpeechEngine = {
 
   /** Stop currently playing speech (both pre-baked audio and device TTS). */
   stop: async () => {
+    logEvent('stop:called', { gen: speakGeneration });
     // Retire any in-flight speak() so a clip still waiting on its load watchdog
     // can't fall back to the device voice a moment after the child hit stop.
     speakGeneration += 1;

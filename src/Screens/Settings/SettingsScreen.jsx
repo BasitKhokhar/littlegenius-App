@@ -20,6 +20,9 @@ import SpeechEngine from '../../Utils/speechEngine';
 import { SPEECH_PHRASES } from '../../Data/speechCatalog';
 import { Spacing, Radius, textStyles, coloredShadow } from '../../Theme';
 import { useTabBarClearance } from '../../Hooks';
+import Constants from 'expo-constants';
+
+const APP_VERSION = Constants.expoConfig?.version || '1.4.3';
 
 // Grown-up-friendly preset reminder times (no extra native date-picker dep).
 const TIME_PRESETS = [
@@ -280,6 +283,7 @@ const SettingsScreen = ({ navigation }) => {
               </Text>
             </View>
           )}
+
         </Card>
 
         {/* Reminders */}
@@ -363,7 +367,7 @@ const SettingsScreen = ({ navigation }) => {
         <Button title="Switch Profile" icon="🔄" variant="primary" size="lg" onPress={confirmSwitch} style={styles.actionBtn} />
         <Button title="Reset Profile & Data" icon="🗑️" variant="danger" size="md" onPress={() => requestGate('Reset Profile', confirmDelete)} style={styles.actionBtn} />
 
-        <Text style={s.versionText}>Little Genius v1.0.0 · Play Store Edition</Text>
+        <Text style={s.versionText}>Little Genius v{APP_VERSION} · Play Store Edition</Text>
       </ScrollView>
 
       <ParentalGate

@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { Header } from '../../Components/UI';
 import { useThemeColors } from '../../Context/ThemeContext';
@@ -18,13 +18,13 @@ import { DrawCanvas, ColorPalette, ERASER } from '../../Components/Games';
 // pencils, three brush sizes, eraser, undo and clear.
 // ──────────────────────────────────────────────────────────────
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const BOARD_BG = '#0F0D28';
 
 const NEON = ['#22D3EE', '#F472B6', '#A78BFA', '#4ADE80', '#FBBF24', '#F87171', '#FFFFFF'];
 const WIDTHS = [6, 10, 16];
 
 const DrawingBoardScreen = ({ navigation }) => {
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const colors = useThemeColors();
   const bottomPad = useTabBarClearance();
   const { showConfirm } = useDialog();
@@ -34,8 +34,8 @@ const DrawingBoardScreen = ({ navigation }) => {
   const [width, setWidth] = useState(WIDTHS[1]);
   const canvasRef = useRef(null);
 
-  const canvasW = SCREEN_W - 24;
-  const canvasH = Math.max(450, SCREEN_H - bottomPad - 330);
+  const canvasW = Math.min(screenWidth - 24, 1000);
+  const canvasH = Math.max(320, screenHeight - bottomPad - 330);
 
   const isEraser = color === ERASER;
 

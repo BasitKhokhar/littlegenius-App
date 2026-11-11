@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, useWindowDimensions } from 'react-native';
 import { useThemeColors } from '../../Context/ThemeContext';
 import { Radius, Spacing, coloredShadow } from '../../Theme';
 
@@ -20,11 +20,10 @@ import { Radius, Spacing, coloredShadow } from '../../Theme';
 //     onExit={() => navigation.goBack()} />
 // ──────────────────────────────────────────────────────────────
 
-const { width, height } = Dimensions.get('window');
 const CONFETTI = ['🎉', '⭐', '🎊', '✨', '🌟', '🎈'];
 
 // A single confetti piece falling + spinning from above the card.
-const Piece = ({ emoji, left, delay, duration, size }) => {
+const Piece = ({ emoji, left, delay, duration, size, travelDistance }) => {
   const fall = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const loop = Animated.loop(
@@ -34,7 +33,7 @@ const Piece = ({ emoji, left, delay, duration, size }) => {
     return () => loop.stop();
   }, [fall, delay, duration]);
 
-  const translateY = fall.interpolate({ inputRange: [0, 1], outputRange: [-40, height * 0.5] });
+  const translateY = fall.interpolate({ inputRange: [0, 1], outputRange: [-40, travelDistance] });
   const rotate = fall.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '320deg'] });
   const opacity = fall.interpolate({ inputRange: [0, 0.1, 0.85, 1], outputRange: [0, 1, 1, 0] });
 
@@ -58,6 +57,7 @@ const CelebrationOverlay = ({
   replayLabel = 'Play Again 🔁',
   exitLabel = 'Back to Games ➔',
 }) => {
+  const { width, height } = useWindowDimensions();
   const colors = useThemeColors();
   const styles = makeStyles(colors);
 
@@ -85,13 +85,13 @@ const CelebrationOverlay = ({
         duration: 2200 + (i % 5) * 350,
         size: 18 + (i % 4) * 6,
       })),
-    []
+    [width]
   );
 
   return (
     <View style={styles.overlay}>
       {pieces.map((p, i) => (
-        <Piece key={i} {...p} />
+        <Piece key={i} {...p} travelDistance={height * 0.5} />
       ))}
 
       <Animated.View style={[styles.card, coloredShadow(accent, 'xl'), { transform: [{ scale }] }]}>

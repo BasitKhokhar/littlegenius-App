@@ -16,13 +16,16 @@ export default () => ({
     // build's OTA channel to this version. (1.3.0 added expo-audio.)
     // 1.4.2: audio-recovery + OTA-channel fix. Bumped so this build's OTA
     // runtime version is distinct from the silent 1.4.1 release on Play.
+    // 1.4.3: fixes the "stuck speaking icon" bug (native AudioPlayer churn
+    // exhausting Android's decoder pool after ~40-55 rapid sound-button taps —
+    // see speechEngine.js getClipPlayer()/replace()), plus corrected legal
+    // pages. versionCode 10 (Play Console's last published build is 9/1.4.2).
     // KEEP IN SYNC BY HAND — this project does not run `expo prebuild`, so
     // android/app/build.gradle (versionName) and
     // android/app/src/main/res/values/strings.xml (expo_runtime_version)
     // must be edited to match, or the binary reports the wrong runtime version
     // and no OTA update can ever target it.
-    version: '1.4.2',
-    orientation: 'portrait',
+    version: '1.4.3',
     icon: './assets/logo.png',
     owner: 'talhabasit7016',
     userInterfaceStyle: 'light',
@@ -66,6 +69,7 @@ export default () => ({
         backgroundColor: '#1E1B4B'
       },
       package: 'com.basitkhokhar.littlegenius.app',
+      edgeToEdgeEnabled: true,
       // Off — Android's Auto Backup was restoring AsyncStorage (onboarding_complete,
       // registeredUsers) from Google Drive on reinstall, making a fresh install look
       // like a returning user and skipping straight to ProfileSetup instead of
@@ -107,6 +111,14 @@ export default () => ({
       favicon: './assets/favicon.png'
     },
     plugins: [
+      './plugins/withAndroidLargeScreenSupport',
+      [
+        '@sentry/react-native/expo',
+        {
+          organization: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+        },
+      ],
       'expo-font',
       'expo-asset',
       'expo-audio',
@@ -125,11 +137,16 @@ export default () => ({
           android: {
             compileSdkVersion: 36,
             targetSdkVersion: 36,
+            enableMinifyInReleaseBuilds: true,
+            enableShrinkResourcesInReleaseBuilds: true,
           },
         },
       ],
     ],
     extra: {
+      // The DSN is a public client identifier and is safe to include in the
+      // application bundle. Keep the old spelling working during migration.
+      SENTRY_DSN: process.env.SENTRY_DSN || process.env.SNETRY_DSN,
       eas: {
         projectId: process.env.EXPO_ID
       }

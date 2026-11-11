@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import Svg, { Path, Circle, Text as SvgText } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
@@ -29,10 +29,7 @@ import { Fonts } from '../../Theme/fonts';
 // with an animated marks badge, then a row total like 32/40.
 // ──────────────────────────────────────────────────────────────
 
-const { width: SCREEN_W } = Dimensions.get('window');
 const ATTEMPTS = 4;
-const CELL = Math.floor((SCREEN_W - 16 * 2 - 12) / 2); // 2-column grid
-const CELL_PAD = Math.round(CELL * 0.12);
 const GUIDE_OPACITY = [0.9, 0.55, 0.35, 0.18]; // progressive fading
 
 // Glyph keypad under the tabs: every glyph of the active set laid out in
@@ -41,9 +38,6 @@ const GUIDE_OPACITY = [0.9, 0.55, 0.35, 0.18]; // progressive fading
 const GLYPH_COLS = 7;
 const GLYPH_GAP = 6;
 const PANEL_PAD = 8;
-const GLYPH_SIZE = Math.floor(
-  (SCREEN_W - 16 * 2 - PANEL_PAD * 2 - GLYPH_GAP * (GLYPH_COLS - 1)) / GLYPH_COLS
-);
 
 const TRACE_URDU = urduData.map((h) => h.letter);
 
@@ -71,11 +65,18 @@ const glyphEmoji = (setKey, glyph) => {
 const emptyCells = () => Array.from({ length: ATTEMPTS }, () => null); // null | { marks, paths }
 
 const TracingWorksheetScreen = ({ navigation }) => {
+  const { width: screenWidth } = useWindowDimensions();
+  const layoutWidth = Math.min(screenWidth, 900);
+  const CELL = Math.floor((layoutWidth - 16 * 2 - 12) / 2);
+  const CELL_PAD = Math.round(CELL * 0.12);
+  const glyphSize = Math.floor(
+    (layoutWidth - 16 * 2 - PANEL_PAD * 2 - GLYPH_GAP * (GLYPH_COLS - 1)) / GLYPH_COLS
+  );
   const { colors, isDark } = useTheme();
   const gt = getGameTheme(7, isDark); // violet stage
   const { addStars } = useAuth();
   const { recordGameComplete } = useProgress();
-  const styles = makeStyles(colors);
+  const styles = makeStyles(colors, glyphSize);
 
   const [setKey, setSetKey] = useState('abc');
   const [glyphIdx, setGlyphIdx] = useState(0);
@@ -418,10 +419,10 @@ const TracingWorksheetScreen = ({ navigation }) => {
   );
 };
 
-const makeStyles = (colors) => StyleSheet.create({
+const makeStyles = (colors, glyphSize) => StyleSheet.create({
   // Footer buttons sit 10px off the bottom — no tab-bar clearance is needed
   // here because the bar is hidden on this pushed game screen.
-  content: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10 },
+  content: { width: '100%', maxWidth: 900, alignSelf: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10 },
   mascotWrap: { marginVertical: 6 },
   mascot: { alignSelf: 'center', marginBottom: 6 },
 
@@ -454,8 +455,8 @@ const makeStyles = (colors) => StyleSheet.create({
     marginBottom: 12,
   },
   glyphChip: {
-    width: GLYPH_SIZE,
-    height: GLYPH_SIZE,
+    width: glyphSize,
+    height: glyphSize,
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: colors.border,
